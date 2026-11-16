@@ -101,5 +101,20 @@ recentes; anteriores têm paginação na API. Auditoria completa de segurança e
 operação produtiva permanecem pendentes gerais. Há um aviso upstream de
 depreciação TestClient/httpx, sem teste ignorado ou falha.
 
-Publicação e resultado do GitHub Actions serão registrados após o envio.
+## Publicação e validação remota
+
+Implementação enviada à `main` oficial, sem force push:
+[fd415f740a59862d00758e5b0f852f1796d84145](https://github.com/matheusenalt/SolDesk/commit/fd415f740a59862d00758e5b0f852f1796d84145).
+Push concluído; SHA remoto conferido por `git ls-remote`, histórico sincronizado
+e árvore local limpa depois do envio.
+
+[GitHub Actions 43872972449](https://github.com/matheusenalt/SolDesk/actions/runs/43872972449)
+concluído com sucesso nos jobs `checks` e `postgres`. Logs do job PostgreSQL
+confirmam **24 pytest aprovados em 11,65 s** e **12 Playwright aprovados em
+24,2 s** com Chromium desktop/emulação móvel. Setup Bash, migração desde banco
+isolado, instalação Cloud, builds, Ruff, ESLint, formatação, tokens e testes
+unitários também aprovados no Ubuntu do runner.
+
+Critérios obrigatórios da fase 03 aprovados local e remotamente. As limitações
+de produção e funções de fases futuras acima não foram apresentadas como prontas.
 Parar nesta fase, sem iniciar o Prompt 04 automaticamente.

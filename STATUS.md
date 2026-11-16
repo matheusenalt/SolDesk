@@ -25,6 +25,9 @@ Não pronto para produção.
   de contraste/tokens aprovados. Migrações repetidas e reinício novamente
   aprovados com UUID preservado e volume existente, sem apagar dados.
 - Sem novas dependências na fase 03; locks, inventários e texto AGPL preservados.
+- Fase 03 publicada na main: `fd415f7`. [GitHub Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43872972449),
+  com 24 pytest PostgreSQL e 12 E2E autenticados Chromium no Ubuntu, além dos
+  linters, tokens, testes unitários, build e setup Bash.
 
 - Fase 02: organizações, identidades e vínculos, sessões opacas, Argon2id, CSRF,
   revogação/logout global, bloqueio progressivo e rate limit persistente por IP/conta.
