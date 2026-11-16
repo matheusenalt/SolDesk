@@ -37,7 +37,7 @@ Contratos e fronteiras: [API_FASE_04](API_FASE_04.md).
 
 | Validação | Resultado local observado |
 | --- | --- |
-| `docker compose --profile test run --build --rm tests` | 43 pytest aprovados, última execução completa 78,92 s, sem skip no perfil PostgreSQL |
+| `docker compose --profile test run --build --rm tests` | 43 pytest aprovados; repetição final com imagem já construída: 49,95 s, sem skip no perfil PostgreSQL |
 | `npx playwright test --config playwright.identity.config.ts` com `E2E_CONTROL_WORKER=1` | 24 aprovados em 2,2 min; sem skip; 12 cenários × desktop/emulação móvel |
 | `npm test` | 6 Vitest aprovados |
 | `npm run test:e2e` contra Nginx/API | 4 regressões de instalação aprovadas em 9,8 s |
@@ -56,7 +56,7 @@ literal, glossário sem números, mock/tempos/revisão, anexos/dedup/hash/acesso
 extensão trocada/arquivo vazio/tamanho/provedor desativado, seis contêineres reais
 gerados por ffmpeg, duração excessiva, timeout/backoff/retry/descarte, Redis/RQ
 executando job urgente após resolução, versões/snapshot/retenção, S3 SDK privado,
-A/B/expiração/outra sessão e lease invalidado, worker interrompido, ditado/retensão
+A/B/expiração/outra sessão e lease invalidado, worker interrompido, ditado/retenção
 por dias e hook ClamAV TCP limpo/FOUND.
 
 Navegador cobre fluxo real de revisão/confirmação, marcação de incerteza/credencial,
@@ -110,5 +110,16 @@ LICENSE oficial com SHA-256
 Não foram acessados/copiados dados/fontes de outros projetos ou empregadores.
 A busca textual não substitui auditoria independente.
 
-Push/identificador e resultado do Actions serão registrados depois da execução;
-nenhum aceite remoto é declarado antecipadamente. Parar antes do Prompt 05.
+Implementação: [`23b276adc84e81818f2f21453e03a33e79ce4e0f`](https://github.com/matheusenalt/SolDesk/commit/23b276adc84e81818f2f21453e03a33e79ce4e0f),
+`feat: implementa fase 04 do SolDesk`. Push para main oficial concluído, avanço
+normal de `0ae4189` para `23b276a`, sem force, main/origin main sincronizadas.
+O [Actions da implementação](https://github.com/matheusenalt/SolDesk/actions/runs/43889397697)
+terminou `completed/success`. Concluiu os passos de lint/formatação, testes rápidos, tokens, build, PostgreSQL,
+setup Bash e navegador com sucesso. Logs do job PostgreSQL registram **43 pytest
+aprovados em 29,20 s** e **24 Playwright aprovados em 1,8 min**, sem skip nessas
+suítes; Chromium em Ubuntu, incluindo parada/retomada real do worker.
+O job rápido pode pular testes exclusivos de PostgreSQL; eles foram executados
+integralmente no job PostgreSQL, não contados como aprovados por terem sido pulados.
+Nenhum aceite obrigatório do modo padrão permanece falhando/pendente. Inferência
+real/benchmark e demais opcionais acima continuam sem aprovação presumida.
+Parar antes do Prompt 05.

@@ -34,6 +34,10 @@ Não pronto para produção.
   Imagem opcional faster-whisper construída, SDK/CPU e erro de modelo ausente
   verificados sem rede/download. Inventários: 52 pacotes Python base, 16 opcionais
   e 272 npm; texto AGPL oficial preservado. Não houve nova dependência npm.
+- Fase 04 publicada na main: `23b276a`. [Actions da implementação](https://github.com/matheusenalt/SolDesk/actions/runs/43889397697):
+  lint/formatação/testes/build, PostgreSQL (43 aprovados), setup Bash e E2E
+  Chromium Ubuntu (24 aprovados, incluindo worker parado/retomado) concluídos
+  com sucesso. Limitações opcionais permanecem explícitas abaixo.
 
 - Fase 03: registro textual com três destinos, original preservado, edição humana
   versionada, fato/recebimento/revisão separados, retroativo auditado e futuro rejeitado.
