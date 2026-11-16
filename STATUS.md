@@ -1,7 +1,8 @@
 # Status do SolDesk
 
-Atualizado em 15/11/2026. **Fase 01 implementada, com aceite de infraestrutura
-pendente. As fases 02–06 não foram implementadas.** Não pronto para produção.
+Atualizado em 15/11/2026. **Fase 01 implementada; aceite Compose/PostgreSQL e
+navegador aprovado no Windows com WSL 2. As fases 02–06 não foram implementadas.**
+Não pronto para produção.
 
 ## Funciona agora
 
@@ -16,18 +17,26 @@ pendente. As fases 02–06 não foram implementadas.** Não pronto para produç�
 - 5 testes pytest, 3 testes Vitest e 4 testes Playwright aprovados. O Playwright
   executou Edge headless, desktop e emulação de largura/dispositivo móvel, com API real.
 - `npm audit`: zero vulnerabilidades após corrigir Vitest e minimatch transitivo.
+- Setup PowerShell executado com Docker Desktop 4.99.0, Engine 29.9.3 e Compose
+  5.7.0: imagens construídas e serviços iniciados; PostgreSQL 17 saudável.
+- Migrações repetidas e UUID preservado após reinício; volume persistente
+  conferido. API/web sem root e PostgreSQL sem porta publicada no host.
+- 4 testes Playwright adicionais aprovados contra Nginx/API/PostgreSQL reais:
+  desktop e emulação móvel, temas, UUID, erro e nova tentativa.
+- Perfil dev construído/iniciado e outros 4 testes Playwright aprovados contra
+  Vite/API em contêineres e PostgreSQL. UUID preservado após recriar contêineres;
+  banco parado produz 503 e recupera após restabelecer a conexão.
+- Swagger aberto no navegador; frontend, health, server-info e OpenAPI acessíveis.
+- Primeiro push `e6f5cb9` concluído na `main`; GitHub Actions aprovado.
+- AGPL v3 somente aplicada com texto oficial inalterado; dependências revisadas
+  em [LICENCAS.md](docs/LICENCAS.md).
 
 ## Parcial / não validado
 
-- Dockerfiles, Compose padrão/dev, PostgreSQL e setup criados, mas **não executados**
-  em contêineres: Docker não encontrado e WSL não instalado nesta máquina.
-- YAML e invariantes de exposição de portas conferidos por Python; isso **não é**
-  `docker compose config`, build de imagens ou teste do daemon.
-- PowerShell: sintaxe válida e interrupção clara sem Docker comprovadas. Bash:
-  sintaxe conferida com `bash -n`; setup completo Linux não executado.
-- Reinício de contêineres e persistência do volume PostgreSQL ainda pendentes.
-- CI criada, não executada no GitHub. pip-audit/gitleaks e auditoria completa de
-  segurança são pendentes, previstos para o fechamento; `npm audit` não os substitui.
+- Setup completo em um host Linux não executado; Bash teve somente a sintaxe
+  conferida com `bash -n`. O aceite atual é Windows/WSL 2 com contêineres Linux.
+- pip-audit/gitleaks e auditoria completa de segurança são pendentes, previstos
+  para o fechamento do produto; `npm audit` e busca textual não os substituem.
 - pytest emite aviso upstream de depreciação do transporte httpx no TestClient.
 
 ## Planejado
@@ -40,16 +49,8 @@ pendente. As fases 02–06 não foram implementadas.** Não pronto para produç�
 
 ## Próximo passo necessário
 
-Verificação para publicação: 5 testes pytest, 3 Vitest e 4 Playwright novamente
-aprovados, assim como lint, formatação, build web e tokens. Licença AGPL v3 somente
-aprovada pelo titular e aplicada; revisão de dependências em [LICENCAS.md](docs/LICENCAS.md).
-Publicação autorizada com as pendências documentadas. WSL 2 e Docker Desktop
-localizados e daemon consultado com sucesso; o aceite Compose ainda será executado.
-Isso não encerra o aceite de infraestrutura nem aprova as pendências abaixo.
-
-Configurar WSL 2 e Docker Desktop (pode exigir administrador/reinicialização),
-iniciar Docker e seguir [TESTE_LOCAL.md](TESTE_LOCAL.md). Executar o aceite da
-fase 01 com PostgreSQL antes de avançar. Por determinação mais recente do titular,
-o prompt 02 só começa quando os critérios obrigatórios da fase 01 estiverem aprovados.
+Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite. O prompt 02
+não foi iniciado nesta entrega. Não usar dados reais: autenticação, isolamento de
+organizações e RLS continuam planejados para a próxima fase.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).

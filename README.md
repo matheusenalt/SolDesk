@@ -1,7 +1,7 @@
 # SolDesk
 
 Plataforma independente de suporte com histórico, chamados e conhecimento.
-**Fase atual: 01, estrutura inicial implementada; aceite Docker pendente.**
+**Fase atual: 01, estrutura inicial e aceite Docker/PostgreSQL aprovados no Windows/WSL 2.**
 Não há login, clientes ou dados de negócio nesta fase.
 
 ## Instalação do zero

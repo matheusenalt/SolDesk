@@ -131,6 +131,34 @@ O teste inicia API/Vite nas portas 18000/15173 e encerra ao terminar; usa SQLite
 Para testar contra PostgreSQL use o roteiro de Compose acima; a suíte rápida
 usa SQLite temporário e não substitui essa verificação.
 
+### Aceite automatizado dos contêineres
+
+Com os serviços iniciados pelo setup, na raiz (PowerShell):
+
+```powershell
+./scripts/test-compose.ps1
+```
+
+O script verifica saúde, UUID, migrações repetidas, reinício, proxy, páginas,
+usuários não root e volume PostgreSQL sem porta no host. Ele reinicia `db` e `api`;
+execute somente no ambiente local de teste. Não apaga volumes. Para portas
+personalizadas, informe `-ApiUrl` e `-WebUrl`. No Bash use o roteiro manual acima.
+
+Para executar os mesmos testes de navegador contra Nginx/API/PostgreSQL, em `web`:
+
+```powershell
+$env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:8080'
+$env:PLAYWRIGHT_CHANNEL = 'msedge'
+npm run test:e2e
+Remove-Item Env:PLAYWRIGHT_BASE_URL
+Remove-Item Env:PLAYWRIGHT_CHANNEL
+```
+
+Bash: `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npm run test:e2e`.
+Com `PLAYWRIGHT_BASE_URL` definido, o Playwright usa o ambiente existente e não
+inicia API/Vite locais. Para o perfil dev, use `http://127.0.0.1:5173` após subir
+os serviços de desenvolvimento. Sem a variável, permanece o fluxo SQLite isolado.
+
 ## Falhas comuns
 
 - Docker ausente: instale Docker Desktop/Engine e Compose. WSL ausente não é erro

@@ -36,6 +36,12 @@ Banco sem porta no host; API/web vinculadas a 127.0.0.1. Imagens de API e Nginx
 usam usuário não root. O perfil dev monta fontes para hot reload.
 Scripts não apagam banco ou volumes; preservam o UUID em migrações repetidas.
 
+Na fase 01, setup PowerShell, builds de imagens, Compose/PostgreSQL, migrações
+repetidas e reinício com preservação de UUID foram executados em Windows/WSL 2.
+O navegador foi testado contra Nginx/API/PostgreSQL, além da suíte SQLite local.
+O aceite reproduzível está em `scripts/test-compose.ps1`; o Playwright aceita
+`PLAYWRIGHT_BASE_URL` para usar serviços externos sem iniciar API/Vite locais.
+
 SQLite é exclusivamente alternativa de desenvolvimento/testes rápidos. Testes
 SQLite não comprovam PostgreSQL, RLS ou persistência entre contêineres.
 Na fase 02, a API deverá abandonar o papel inicial superusuário de bootstrap,

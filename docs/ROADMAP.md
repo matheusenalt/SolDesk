@@ -15,4 +15,5 @@ Cada fase exige validação e documentação próprias antes da próxima.
 Licenciamento do código próprio: GNU AGPL v3 somente, aprovado pelo titular;
 instalações próprias, contribuições e eventual hospedagem comercial seguem a
 licença. A publicação inicial não encerra o aceite de infraestrutura da fase 01.
-O início do prompt 02 depende da aprovação dos critérios obrigatórios da fase 01.
+O aceite Compose/PostgreSQL da fase 01 foi executado em Windows/WSL 2, incluindo
+testes de navegador contra os contêineres. O prompt 02 não foi iniciado nesta entrega.
