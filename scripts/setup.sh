@@ -23,8 +23,22 @@ if grep -Eq '^RUNTIME_PASSWORD=[[:space:]]*$' .env; then
   sed -i "s/^RUNTIME_PASSWORD=[[:space:]]*$/RUNTIME_PASSWORD=$runtime_password/" .env
   chmod 600 .env
 fi
+if ! grep -q '^DOWNLOAD_SIGNING_KEY=' .env; then printf '\nDOWNLOAD_SIGNING_KEY=\n' >> .env; fi
+if grep -Eq '^DOWNLOAD_SIGNING_KEY=[[:space:]]*$' .env; then
+  signing_key=$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')
+  sed -i "s/^DOWNLOAD_SIGNING_KEY=[[:space:]]*$/DOWNLOAD_SIGNING_KEY=$signing_key/" .env
+  chmod 600 .env
+fi
 docker compose config --quiet
-docker compose up -d --build --wait db api web
+provider=${TRANSCRIPTION_PROVIDER:-$(sed -n 's/^TRANSCRIPTION_PROVIDER=//p' .env | tr -d '\r')}
+services=(db api web redis dispatcher)
+case "${provider:-mock}" in
+  mock) services+=(worker) ;;
+  faster_whisper) services+=(worker-whisper) ;;
+  disabled) ;;
+  *) echo 'TRANSCRIPTION_PROVIDER deve ser mock, faster_whisper ou disabled.' >&2; exit 1 ;;
+esac
+docker compose up -d --build --wait "${services[@]}"
 docker compose run --rm migrate
 docker compose ps
 echo 'Padrão: http://localhost:8080 e http://localhost:8000/docs. Consulte .env se alterou portas.'

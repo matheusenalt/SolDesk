@@ -1,6 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
-
-let cookies: Awaited<ReturnType<BrowserContext['cookies']>> = [];
+import { test, expect, type Page } from './authenticated';
 
 async function mutation(page: Page, path: string, data: unknown) {
   const token = await (await page.request.get('/api/v1/auth/csrf')).json();
@@ -11,24 +9,6 @@ async function mutation(page: Page, path: string, data: unknown) {
   return response.json();
 }
 
-test.beforeAll(async ({ browser }) => {
-  if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
-    throw new Error('Informe as credenciais fictícias de teste pelo ambiente.');
-  }
-  const context = await browser.newContext();
-  try {
-    const page = await context.newPage();
-    await page.goto('/');
-    const area = page.getByRole('region', { name: 'Área da organização' });
-    await area.getByLabel('E-mail', { exact: true }).fill(process.env.E2E_ADMIN_EMAIL);
-    await area.getByLabel('Senha', { exact: true }).fill(process.env.E2E_ADMIN_PASSWORD);
-    await area.locator('form').getByRole('button', { name: 'Entrar', exact: true }).click();
-    await expect(area.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
-    cookies = await context.cookies();
-  } finally { await context.close(); }
-});
-
-test.beforeEach(async ({ context }) => { await context.addCookies(cookies); });
 
 async function start(page: Page) {
   const suffix = `${Date.now()}-${test.info().project.name}`;

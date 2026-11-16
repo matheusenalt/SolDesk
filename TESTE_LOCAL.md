@@ -39,12 +39,13 @@ Alternativa manual em ambos os sistemas:
 
 1. PowerShell: `Copy-Item .env.example .env`; bash: `cp .env.example .env`.
    Não sobrescreva `.env` já existente.
-2. Edite `.env`: preencha `POSTGRES_PASSWORD` com um segredo aleatório próprio,
+2. Edite `.env`: preencha `POSTGRES_PASSWORD`, `RUNTIME_PASSWORD` e
+   `DOWNLOAD_SIGNING_KEY` com segredos aleatórios próprios distintos (32 bytes),
    preferencialmente hexadecimal (sem caracteres reservados de URL), e confira portas.
 3. `docker compose config --quiet` (não imprima a configuração com segredos).
 4. `docker compose up -d --build db`
 5. `docker compose run --rm migrate`
-6. `docker compose up -d --build --wait api web`
+6. `docker compose up -d --build --wait api web redis worker dispatcher`
 7. `docker compose ps`
 
 API e web devem ficar saudáveis/em execução; migrate deve terminar com código 0.
@@ -262,3 +263,104 @@ vezes e reinicia banco/API sem apagar dados. Transições:
 [docs/ESTADOS.md](docs/ESTADOS.md); contratos e limites:
 [docs/API_FASE_03.md](docs/API_FASE_03.md). Resultado executado:
 [docs/VALIDACAO_PROMPT_03.md](docs/VALIDACAO_PROMPT_03.md).
+
+## Aceite da fase 04: modo rápido, sem modelo
+
+Repita o setup: gera também chave aleatória de downloads, migra até 0004 sem
+apagar dados e inicia Redis/dispatcher/worker. Mantenha `TRANSCRIPTION_PROVIDER=mock`
+e `STORAGE_BACKEND=local`. Basta Docker/Git/navegador para o uso web básico.
+Redis e arquivos ficam em volumes privados; nenhuma porta de Redis/S3 é publicada.
+
+1. Entre em **Atendimentos**, selecione cliente e destino. Informe texto fictício,
+   opcionalmente com `Problema: ... Resultado: ...`; grave ou escolha áudio.
+2. No computador use `http://localhost:8080` ou `127.0.0.1`. Autorize o microfone
+   explicitamente, confira contador, pare, ouça a prévia, descarte/regrave e envie.
+   Microfone recusado/indisponível mantém digitação/upload. Em celular físico,
+   `http://IP-da-LAN` não é contexto seguro: use HTTPS de desenvolvimento com
+   certificado confiável/configuração de proxy/origem ou aguarde app nativo da fase 06.
+   O setup não expõe a instalação à LAN nem instala certificado automaticamente.
+3. Upload retorna sem esperar o worker. **Mock não reconhece fala**: reutiliza
+   somente o relato digitado e sinaliza simulação/incerteza. Áudio sem relato real
+   exige digitação antes de confirmar. Nenhum texto de sucesso/transcrição é inventado.
+4. Confira texto bruto/organizado, alertas de possível credencial e trechos incertos;
+   edite e confirme explicitamente. Fato/recebimento permanecem; processamento e
+   revisão têm tempos separados. Conhecimento continua rascunho.
+5. Como admin em **Configurar processamento**, edite rótulos/marcadores de templates
+   e glossário (palavras sem números). Nova versão não altera registros anteriores.
+   O texto livre sem marcadores é preservado; nada de diagnóstico inferido.
+6. Anexe PDF/PNG/JPEG/TXT fictício no chamado ou histórico por cliente. Prepare
+   acesso: URL exige a mesma sessão e expira em 120 s; outra empresa não tem acesso.
+7. Em ambiente fictício, `docker compose stop worker`; crie chamado urgente com
+   áudio, atribua/resolva manualmente. `docker compose up -d --wait worker` retoma
+   o job; transcrição posterior é comentário e não reabre o chamado. Sempre retome
+   o worker no fim do teste. Reprocessar/descarte ficam disponíveis conforme estado.
+8. Retenção padrão mantém arquivos. Somente selecione remoção após confirmação
+   ou N dias quando desejar essa política. Limpeza preserva metadados/auditoria.
+
+Saúde autenticada em `/api/v1/media/health` e no painel de configuração. No host:
+`docker compose exec worker python -m app.media_worker health`. Para operação
+somente textual, pare worker/worker-whisper, ajuste `TRANSCRIPTION_PROVIDER=disabled`
+e repita setup; upload de áudio informa indisponibilidade, texto/chamados funcionam.
+Ao alternar provedor, pare explicitamente o worker antigo antes do novo setup;
+os dois workers não devem consumir as mesmas filas com provedores diferentes.
+
+Testes automatizados: `docker compose --profile test run --build --rm tests`
+executa 43 pytest com PostgreSQL/Redis isolados e ffmpeg, sem modelo.
+O E2E autenticado passa a 24 casos; exporte também `E2E_CONTROL_WORKER=1` somente
+contra esta stack local para incluir parada/retomada real (sem a variável, esse
+aceite será pulado e não comprovará a fase). Credenciais fictícias só no ambiente.
+`npm run test:e2e` mantém 4 casos de instalação e `npm test` mantém 6 Vitest.
+
+## faster-whisper opcional
+
+Não está no modo rápido e não instala pesos por padrão. Obtenha explicitamente um
+modelo CTranslate2 com licença/procedência verificadas; coloque seus arquivos em
+`models/whisper` (ignorado pelo Git). Ausência do modelo causa erro amigável/retry,
+sem download. Semear áudio fictício e revisar manualmente também neste modo.
+
+1. `docker compose stop worker`
+2. Ajuste `TRANSCRIPTION_PROVIDER=faster_whisper` em `.env`.
+3. Repita setup ou use `docker compose --profile whisper up -d --build --wait api dispatcher worker-whisper`.
+4. `docker compose exec worker-whisper python -m app.media_worker health`.
+5. `docker stats --no-stream` para CPU/RAM; registre modelo/hardware, duração do
+   áudio, tempo de carga/processamento, memória de pico e precisão em português.
+
+Imagem limitada a 2 CPUs/3 GiB e tmpfs 128 MiB; inferência CPU/int8, duas threads,
+`HF_HUB_OFFLINE=1`, modelo montado somente leitura e `local_files_only=True`.
+Imagem construída/importada e recusa de modelo ausente testadas sem rede;
+**inferência e benchmark com modelo real permanecem pendentes**, sem promessa de
+velocidade. Para voltar, pare worker-whisper, ajuste mock e repita setup.
+
+## S3 compatível e antivírus opcionais
+
+Configure no ambiente do servidor ou `.env` ignorado `STORAGE_BACKEND=s3`, endpoint,
+bucket privado sem versionamento, região e chaves próprias. Perfil de exemplo
+RustFS usa `http://object-store:9000` e as chaves `S3_ACCESS_KEY`/`S3_SECRET_KEY`,
+vazias no exemplo; não há senha fixa, console nem porta no host.
+
+```text
+docker compose --profile s3 up -d --wait object-store
+docker compose run --rm migrate python -m app.media_worker storage-init
+docker compose run --rm migrate python -m app.media_worker storage-check
+```
+
+`storage-init` cria bucket privado se ausente, sem política pública. `storage-check`
+escreve/lê/remove exclusivamente um objeto fictício novo. Repita setup para aplicar
+o backend à API/dispatcher/worker. Para AWS ou MinIO existente, configure endpoint
+HTTPS apropriado, bucket e IAM restrito; o perfil local não é exposição de produção.
+Trocar backend/bucket não migra objetos existentes. Backups/versões de S3 exigem
+lifecycle próprio. O adapter foi testado com RustFS real; MinIO não foi iniciado
+(imagem tentada retornou 401). Dados locais existentes não foram apagados.
+
+ClamAV: `docker compose --profile antivirus up -d clamav`, espere inicializar
+assinaturas, ajuste `CLAMAV_ENABLED=true` e repita setup. Desligado por padrão.
+O hook INSTREAM foi testado com servidor TCP controlado (limpo/FOUND); daemon e
+atualização real de assinaturas não foram validados nesta fase.
+
+Ditado Web Speech: admin precisa habilitar, navegador precisa suportar contexto
+seguro e usuário aceitar o aviso **antes** de ativar. Alguns fabricantes recebem
+áudio em seus serviços; não ative para dados privados. Não opera simultaneamente
+com MediaRecorder. Texto ao vivo fica separado do resultado do servidor. Serviço
+real do fabricante/Safari/iOS/aparelho físico não foram testados; fallback permanece.
+
+Evidências e pendências: [VALIDACAO_PROMPT_04](docs/VALIDACAO_PROMPT_04.md).

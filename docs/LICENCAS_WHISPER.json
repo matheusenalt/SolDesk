@@ -1,0 +1,181 @@
+[
+  {
+    "name": "av",
+    "version": "19.0.2",
+    "license": "BSD-3-Clause",
+    "classifiers": [],
+    "license_files": [
+      "av-19.0.2.dist-info/licenses/AUTHORS.py",
+      "av-19.0.2.dist-info/licenses/AUTHORS.rst",
+      "av-19.0.2.dist-info/licenses/LICENSE.txt",
+      "av-19.0.2.dist-info/licenses/__pycache__/AUTHORS.cpython-313.pyc"
+    ]
+  },
+  {
+    "name": "ctranslate2",
+    "version": "4.9.0",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": []
+  },
+  {
+    "name": "faster-whisper",
+    "version": "1.2.1",
+    "license": "MIT",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "faster_whisper-1.2.1.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "filelock",
+    "version": "4.2.10",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "filelock-4.2.10.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "flatbuffers",
+    "version": "25.12.19",
+    "license": "Apache 2.0",
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": []
+  },
+  {
+    "name": "fsspec",
+    "version": "2026.9.0",
+    "license": "BSD-3-Clause",
+    "classifiers": [],
+    "license_files": [
+      "fsspec-2026.9.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "hf-xet",
+    "version": "1.8.0",
+    "license": "Apache-2.0",
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": [
+      "hf_xet-1.8.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "httpcore2",
+    "version": "2.16.2",
+    "license": "BSD-3-Clause",
+    "classifiers": [
+      "License :: OSI Approved :: BSD License"
+    ],
+    "license_files": [
+      "httpcore2-2.16.2.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpx2",
+    "version": "2.16.2",
+    "license": "BSD-3-Clause",
+    "classifiers": [
+      "License :: OSI Approved :: BSD License"
+    ],
+    "license_files": [
+      "httpx2-2.16.2.dist-info/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "huggingface_hub",
+    "version": "2.4.0",
+    "license": "Apache-2.0",
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": [
+      "huggingface_hub-2.4.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "numpy",
+    "version": "2.5.5",
+    "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+    "classifiers": [],
+    "license_files": [
+      "numpy-2.5.5.dist-info/licenses/LICENSE.txt",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "numpy-2.5.5.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "numpy-2.5.5.dist-info/licenses/numpy/ma/LICENSE",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "numpy-2.5.5.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+      "numpy/_core/include/numpy/random/LICENSE.txt",
+      "numpy/ma/LICENSE",
+      "numpy/random/LICENSE.md"
+    ]
+  },
+  {
+    "name": "onnxruntime",
+    "version": "1.32.0",
+    "license": "MIT License",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "onnxruntime/LICENSE",
+      "onnxruntime/ThirdPartyNotices.txt"
+    ]
+  },
+  {
+    "name": "protobuf",
+    "version": "7.36.2",
+    "license": "3-Clause BSD License",
+    "classifiers": [],
+    "license_files": [
+      "protobuf-7.36.2.dist-info/LICENSE"
+    ]
+  },
+  {
+    "name": "tokenizers",
+    "version": "0.23.3",
+    "license": null,
+    "reviewed_license": "Apache-2.0",
+    "review_source": "https://github.com/huggingface/tokenizers/blob/v0.23.3/LICENSE",
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": []
+  },
+  {
+    "name": "tqdm",
+    "version": "4.70.1",
+    "license": "MPL-2.0 AND MIT",
+    "classifiers": [],
+    "license_files": [
+      "tqdm-4.70.1.dist-info/licenses/LICENCE"
+    ]
+  },
+  {
+    "name": "truststore",
+    "version": "0.10.5",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "truststore-0.10.5.dist-info/licenses/LICENSE"
+    ]
+  }
+]

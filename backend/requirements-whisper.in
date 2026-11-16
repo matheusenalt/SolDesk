@@ -1,0 +1,2 @@
+# Somente imagem opcional; modelos não são baixados pelo build.
+faster-whisper==1.2.1

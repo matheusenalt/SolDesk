@@ -47,7 +47,8 @@ export const workStrings = {
   deriveType: "Destino do novo rascunho",
   articleDraft: "◷ Rascunho de conhecimento; publicação ainda indisponível.",
   noAutomation:
-    "Somente texto informado por pessoas. Nenhuma revisão ou confirmação automática.",
+    "Relatos por texto ou áudio. Todo conteúdo processado exige conferência humana; não há confirmação automática.",
+  refreshConversation: "Atualizar conversa",
   invalidTime:
     "Horário inválido ou ambíguo neste fuso. Informe uma data com offset explícito na opção abaixo.",
   explicitTime: "Data com fuso explícito (opcional)",
@@ -56,6 +57,13 @@ export const workStrings = {
   status: "Estado",
   mine: "Somente meus chamados",
   conversation: "Conversa cronológica",
+  commentKinds: {
+    comentario: "Comentário",
+    esclarecimento: "Pedido de esclarecimento",
+    resposta: "Resposta",
+    transcricao: "Transcrição do servidor — confira o original",
+    transcricao_mock: "⚠ Mock — texto digitado, sem reconhecimento de fala",
+  },
   comment: "Adicionar comentário",
   reply: "Responder esclarecimento",
   clarify: "Solicitar esclarecimento",

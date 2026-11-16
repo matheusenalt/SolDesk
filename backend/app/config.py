@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,6 +14,27 @@ class Settings(BaseSettings):
     session_hours: int = 12
     soldesk_mode: Literal["community", "cloud"] = "community"
     environment: Literal["development", "production", "test"] = "development"
+    redis_url: str = "redis://redis:6379/0"
+    storage_backend: Literal["local", "s3"] = "local"
+    storage_local_dir: str = "/home/soldesk/media"
+    s3_endpoint_url: str | None = None
+    s3_bucket: str = "soldesk-private"
+    s3_region: str = "us-east-1"
+    s3_access_key: str | None = None
+    s3_secret_key: str | None = None
+    download_signing_key: str = ""
+    download_seconds: int = Field(default=120, ge=1, le=300)
+    upload_max_bytes: int = Field(default=25 * 1024 * 1024, ge=1024, le=64 * 1024 * 1024)
+    audio_max_seconds: int = Field(default=600, ge=1, le=3600)
+    attachment_types: str = "pdf,png,jpeg,txt"
+    transcription_provider: Literal["mock", "faster_whisper", "disabled"] = "mock"
+    whisper_model_path: str = "/models/whisper"
+    whisper_cpu_threads: int = Field(default=2, ge=1, le=8)
+    audio_job_timeout: int = Field(default=300, ge=2, le=1800)
+    audio_max_attempts: int = Field(default=3, ge=1, le=5)
+    clamav_enabled: bool = False
+    clamav_host: str = "clamav"
+    clamav_port: int = 3310
     cors_origins: str = (
         "http://localhost:8080,http://localhost:5173,http://127.0.0.1:8080,http://127.0.0.1:5173"
     )

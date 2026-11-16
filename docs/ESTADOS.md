@@ -69,7 +69,7 @@ organização. O Record enviado não acompanha as mudanças de estado do Ticket.
 | `ocorrido_em` | Fato, sugerido agora; aceita retroativo, rejeita futuro; ajuste auditado com antes/depois |
 | `enviado_em` | Recebimento inicial no servidor, inclusive rascunho; imutável |
 | `capturado_em` | Horário informado pelo dispositivo, não confiável; não substitui recebimento/fato |
-| `processado_em` | Reservado, não preenchido nesta fase |
+| `processado_em` | Fim do processamento do áudio na fase 04; não substitui fato/recebimento |
 | `revisado_em` / `revisado_por` | Confirmação humana da finalização, preservados após cancelamento |
 | `publicado_em` | Reservado para publicação de conhecimento na fase 05 |
 
@@ -81,3 +81,21 @@ com offset explícito em vez de adivinhar.
 O histórico padrão contém somente finalizações `confirmado`. Provisórios são
 opcionais e sinalizados; cancelados não entram na contagem confirmada. O horário
 de revisão nunca substitui o horário do fato ou o recebimento.
+
+## Áudio e jobs (fase 04)
+
+AudioJob: `aguardando` → `processando` → `concluido` ou `erro`; falha transitória
+retorna a `aguardando` com backoff limitado, descarte explícito → `descartado`.
+Reprocessar cria outro job, não reinicia nem apaga a evidência anterior.
+Resultado tardio após descarte/confirmado é ignorado pelo lease/estado.
+
+Finalização/conhecimento: upload → `enviado`, worker → `processando`, conclusão
+→ `aguardando_revisao`; erro definitivo → `erro`. Descarte permite digitar e
+revisar. Finalização somente entra no histórico após autor confirmar o texto e a
+conferência explícita do áudio, individual ou por item do lote. Conhecimento
+permanece rascunho e não publica nesta fase.
+
+Chamado: Record continua enviado; o ciclo de Ticket é independente do job. Pode
+abrir, atribuir e resolver com a fila parada. Conclusão acrescenta comentário
+`transcricao`/`transcricao_mock`, preserva estado resolvido e horários anteriores.
+Notificação interna informa preparo do texto, sem equivaler a aprovação humana.

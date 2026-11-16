@@ -13,9 +13,9 @@ As obrigações de disponibilizar fonte correspondente e preservar avisos se apl
 conforme a distribuição e, para versões modificadas acessíveis pela rede, seção 13.
 O código-fonte oficial está em https://github.com/matheusenalt/SolDesk.
 
-## Revisão das dependências da fase 01
+## Revisão das dependências até a fase 04
 
-Inventário obtido dos metadados das 42 distribuições Python instaladas nas versões
+Inventário obtido dos metadados das 52 distribuições Python instaladas nas versões
 exatas do lock e dos 272 pacotes npm do lock (inclui ferramentas e opcionais de
 outras plataformas). Evidências: [Python](LICENCAS_PYTHON.json) e
 [npm](LICENCAS_NPM.json). Reproduzir com `python scripts/audit_licenses.py` no
@@ -35,6 +35,37 @@ O `colorama` não declara expressão SPDX nos metadados; seu arquivo LICENSE.txt
 instalado foi lido e contém BSD de três cláusulas. Todos os pacotes npm possuem
 licença declarada no lock. Isso é revisão de dependências declaradas e de suas
 condições, não certificação jurídica ou análise exaustiva de cada arquivo binário.
+
+### Adições da fase 04 e provedor opcional
+
+Redis-py, RQ, croniter e dependências boto3/botocore/s3transfer/jmespath/urllib3/six
+usam MIT/BSD/Apache-2.0. python-dateutil oferece Apache-2.0/BSD-3-Clause; o
+LICENSE instalado foi conferido. As 42 versões Python anteriores foram preservadas;
+nenhuma nova dependência npm. Não foi identificada incompatibilidade no uso atual.
+
+O perfil opcional faster-whisper tem 16 distribuições adicionais, com versões
+fixadas e metadados da imagem Linux em [LICENCAS_WHISPER](LICENCAS_WHISPER.json).
+Licenças MIT/BSD/Apache predominam; numpy declara também 0BSD/Zlib/CC0 e tqdm
+declara MPL-2.0 AND MIT. Aplicam-se as condições da tabela acima, preservando
+avisos e fonte dos arquivos cobertos quando redistribuídos. `tokenizers` 0.23.3
+não informou licença nem incluiu arquivo LICENSE no wheel observado; a licença
+Apache-2.0 foi verificada no [LICENSE da tag exata](https://github.com/huggingface/tokenizers/blob/v0.23.3/LICENSE).
+PyAV é BSD-3-Clause ([tag 19.0.2](https://github.com/PyAV-Org/PyAV/blob/v19.0.2/LICENSE.txt));
+seus binários incluem FFmpeg/bibliotecas com avisos e condições próprios.
+
+Redis 8 oferece AGPLv3 como opção; para esta composição é adotada essa opção
+([licenças oficiais](https://redis.io/legal/licenses/)). RustFS é componente
+separado Apache-2.0 ([LICENSE](https://github.com/rustfs/rustfs/blob/main/LICENSE)).
+FFmpeg da imagem Debian é executável separado no worker, com componentes LGPL/GPL;
+preservar avisos/licenças e fonte correspondente conforme o build ao redistribuir
+imagens. O perfil opcional ClamAV também mantém suas licenças GPL e componentes
+próprios. Nenhum desses fontes foi incorporado como código próprio do SolDesk.
+Pesos de modelo não foram baixados, distribuídos nem relicenciados; quem instalar
+um modelo deve revisar a licença e procedência daquele modelo específico.
+
+Esta publicação envia fontes/locks, não publica imagens, wheels ou pesos. A
+construção de imagem para uso local não equivale a inventário completo de SO/codecs;
+redistribuição binária exige revisão dos componentes e entrega de seus avisos/fontes.
 
 ## Distribuição e imagens
 

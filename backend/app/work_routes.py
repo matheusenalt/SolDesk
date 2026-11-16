@@ -107,7 +107,14 @@ def batch_review(body: BatchReview, request: Request, ctx=Depends(context, scope
     result = []
     for item in sorted(body.items, key=lambda entry: entry.id):
         record = find_record(ctx, item.id, item.revision)
-        act_record(ctx, request, record, RecordAction(revision=item.revision, action="confirmar"))
+        act_record(
+            ctx,
+            request,
+            record,
+            RecordAction(
+                revision=item.revision, action="confirmar", audio_reviewed=item.audio_reviewed
+            ),
+        )
         result.append(record_data(ctx, record))
     return {"items": result}
 

@@ -17,8 +17,17 @@ Datas adicionais: `criado_em`, `expira_em`, `usado_em`, `revogado_em`,
 Fase 03 acrescenta RecordVersion, TicketSequence, TicketParticipant,
 TicketComment, TicketEvent, TicketInterval e RequestReceipt. Prioridades:
 `baixa`, `normal`, `alta`, `urgente`; estados em [ESTADOS](ESTADOS.md).
-`capturado_em` é do dispositivo, não confiável; `processado_em`/`publicado_em`
-reservados; `revisado_por` identifica o autor que confirmou. `entrada_em`/
+`capturado_em` é do dispositivo, não confiável; `processado_em` é preenchido pelo
+worker na fase 04, `publicado_em` segue reservado; `revisado_por` identifica o autor que confirmou. `entrada_em`/
 `saida_em` delimitam esperas, `resolvido_em`/`encerrado_em` são eventos distintos.
 Interface e documentos em pt-BR; strings web centralizadas em
-`web/src/strings.ts` e `web/src/work-strings.ts`.
+`web/src/strings.ts`, `web/src/work-strings.ts` e `web/src/media-strings.ts`.
+
+Fase 04: Attachment (arquivo com um dono), AudioJob (tentativa histórica de
+processamento), TemplateVersion (configuração imutável versionada), GlossaryTerm
+(termo/variações por empresa). `criado_em`, `enfileirado_em`, `iniciado_em`,
+`finalizado_em`, `proxima_tentativa_em` são tempos do job; `purgado_em` indica
+remoção do objeto, preservando metadados. Job usa `aguardando`, `processando`,
+`concluido`, `erro`, `descartado`; retenção `manter`, `apos_confirmacao`, `apos_dias`.
+`ditado_texto` é original opcional do navegador, separado da transcrição do
+servidor; `raw_text`, `normalized_text`, `organized_text` identificam estágios.

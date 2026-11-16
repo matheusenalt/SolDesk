@@ -1,4 +1,4 @@
-# Permissões das fases 02–03
+# Permissões das fases 02–04
 
 Todas as operações exigem sessão válida e vínculo ativo na organização corrente.
 O tenant é recuperado da sessão persistida, nunca aceito como credencial do cliente.
@@ -56,3 +56,20 @@ a senha de uma identidade vinculada exclusivamente à sua organização. Contas
 compartilhadas entre empresas exigem que o titular use a alteração autenticada
 da própria senha. Isso impede que uma empresa assuma o acesso a outras empresas.
 Não existe recuperação pública que revele a existência de um e-mail, nem SMTP.
+
+## Áudio e arquivos
+
+| Ação | Regra |
+| --- | --- |
+| Enviar/reprocessar/descartar áudio de registro | Somente autor; revisão atual e estado compatível |
+| Consultar processamento/baixar áudio validado | Mesma visibilidade do registro; vínculo ativo |
+| Anexar/listar/baixar arquivo de cliente | Membro ativo com acesso ao cliente na própria empresa |
+| Anexar/listar/baixar arquivo de chamado | Membro com acesso ao Ticket conforme regras acima |
+| Solicitar link e acessar conteúdo | Autorização do dono em ambas as chamadas; URL vinculada à mesma sessão |
+| Consultar templates/glossário/limites/saúde da fila | Membro ativo, sem segredos de infraestrutura |
+| Alterar template/glossário/retenção/habilitação de ditado | Administrador |
+| Confirmar finalização com áudio | Autor; texto revisado e conferência explícita, inclusive em lote |
+
+Templates antigos, trilha de acesso e histórico de processamento não têm exclusão
+ou edição pública. Revogar vínculo/sessão impede usar um link anteriormente
+emitido. Somente o worker recebe tarefa de transcrição; fila contém IDs, não áudio.

@@ -22,13 +22,13 @@ export const strings = {
   cards: [
     {
       icon: "01",
-      title: "Áudio",
-      text: "Entrada por voz e processamento com revisão humana.",
+      title: "Aplicativo mobile",
+      text: "Gravação e acesso no aplicativo nativo.",
     },
     {
       icon: "02",
-      title: "Arquivos",
-      text: "Anexos vinculados ao contexto de cada atendimento.",
+      title: "Integrações",
+      text: "Conectores e canais externos com configuração explícita.",
     },
     {
       icon: "03",
@@ -43,7 +43,7 @@ export const strings = {
   cloud: "Cloud · ambiente de desenvolvimento",
   footer: "Construído para tornar o registro parte natural do suporte.",
   noBusiness:
-    "Históricos e chamados por texto estão disponíveis na área da organização. Áudio, arquivos e publicação de conhecimento são planejados.",
+    "Históricos, chamados e arquivos estão disponíveis na organização. O processamento de áudio usa mock offline por padrão; transcrição real é opcional. Publicação de conhecimento e mobile são planejados.",
 } as const;
 export const workspaceStrings = {
   title: "Área da organização",
@@ -97,7 +97,7 @@ export const workspaceStrings = {
   organizationName: "Nome da organização",
   slug: "Identificador da organização",
   timezone: "Fuso horário IANA",
-  history: "Arquivos serão disponibilizados nas próximas fases.",
+  history: "Arquivos estão disponíveis no histórico do cliente.",
   external: "Referência externa (opcional)",
   provider: "Provedor",
   identifier: "Identificador externo",

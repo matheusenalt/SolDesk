@@ -10,9 +10,12 @@ flowchart LR
   W --> A[API FastAPI]
   A --> P[(PostgreSQL)]
   M[Mobile futuro] -.-> A
-  A -.-> R[(Redis futuro)]
-  R -.-> T[Worker de transcrição futuro]
-  A -.-> S[StorageBackend futuro: volume local / S3 / MinIO]
+  A --> S[StorageBackend privado: local / S3 compatível]
+  D[Dispatcher] --> P
+  D --> R[(Redis / RQ)]
+  R --> T[Worker: ffmpeg + mock / faster-whisper opcional]
+  T --> P
+  T --> S
 ```
 
 ## Implementado
@@ -50,9 +53,10 @@ das tabelas. Migração/bootstrap usam conexão separada, nunca entregue à API.
 o contexto por transação. Políticas RLS com FORCE reforçam a separação. Testes
 com SQL sem filtro e conexão reutilizada demonstram a barreira no PostgreSQL.
 
-Redis e o worker só serão adicionados na fase de áudio. Armazenamento de arquivos
-será uma abstração `StorageBackend`, com implementação local e S3/MinIO compatível,
-URLs temporárias e auditoria. Não há uploads ou conectores nesta fase.
+Na Fase 04, Redis/RQ, dispatcher, worker e `StorageBackend` local/S3 compatível
+estão implementados. A API grava recibo durável no PostgreSQL e responde 202 sem
+esperar Redis ou transcrição; o dispatcher entrega o trabalho ao RQ. Não há
+conectores externos de negócio.
 
 VPS/produção, TLS, backup/restauração e revisão de segurança ainda não validados.
 Use apenas dados fictícios até a revisão de produção e segurança do produto.
@@ -97,8 +101,36 @@ Lotes de revisão são atômicos. Somente o autor confirma finalizações.
 UI em `WorkArea`, textos em `work-strings`; API real, polling de 15 s, páginas
 de registros/revisões/histórico/chamados e três destinos. Conversão de horário
 IANA preserva o fato e exige offset em ambiguidades de horário de verão.
-Processamento/publicação não têm caminhos ativos. Contratos:
+Na fase 03, processamento/publicação não tinham caminhos ativos. Contratos:
 [API fase 03](docs/API_FASE_03.md), [estados](docs/ESTADOS.md).
+
+## Fase 04: arquivos e processamento assíncrono
+
+Migração 0004: Attachment, AudioJob, TemplateVersion e GlossaryTerm, tenant e FKs
+compostas/RLS FORCE. Armazenamento privado local por padrão; adaptador boto3 para
+S3 compatível. Perfil S3 usa RustFS fixado por digest (a tentativa da imagem MinIO
+retornou 401); endpoint MinIO existente também pode usar o adaptador S3.
+URLs HMAC curtas continuam exigindo autorização e a mesma sessão; acesso auditado.
+
+Upload verifica tamanho/assinatura/MIME e salva arquivo + job durável. Dispatcher
+reconcilia PostgreSQL com RQ/Redis; worker separado normaliza ffmpeg mono 16 kHz,
+verifica duração e chama o provedor. API não contém ffmpeg nem carrega Whisper.
+Prioridade urgente, retries com backoff, deadline e lease idempotente; perda da
+fila ou worker não bloqueia trabalho textual nem a operação de tickets.
+
+Mock determinístico utiliza só texto humano informado, com identificação de
+simulação; não reconhece fala. faster-whisper opcional CPU/int8, modelo local
+explícito e downloads desativados na imagem. Contrato futuro de organizador LLM
+valida evidência literal; somente regras de marcadores estão ativas.
+Templates são versões imutáveis e glossário só normaliza palavras conhecidas.
+
+UI MediaRecorder com consentimento, contador/prévia/cancelamento; upload e
+digitação são alternativas. Web Speech é opt-in, desabilitável por empresa,
+com aviso de possível envio ao fabricante e sem captura simultânea prometida.
+Strings centralizadas em `media-strings.ts`. Conclusão exige conferência humana;
+Ticket recebe comentário posterior sem mudar estado. Horários originais imutáveis.
+Retenção padrão manter; políticas explícitas removem áudio elegível com auditoria.
+Detalhes, limites e contratos: [API fase 04](docs/API_FASE_04.md).
 
 ## Licenciamento do código
 

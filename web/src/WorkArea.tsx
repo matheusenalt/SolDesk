@@ -2,8 +2,12 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiError, request } from "./workspace-api";
 import { workStrings as s } from "./work-strings";
 import { localInput, localToUtc } from "./work-time";
+import { AudioCapture } from "./AudioCapture";
+import { AudioReview, FilePanel, MediaConfiguration } from "./MediaPanels";
+import { uploadFile } from "./media-api";
+import { mediaStrings as ms } from "./media-strings";
 
-type Entry = {
+export type Entry = {
   id: string;
   client_id: string;
   client_name: string;
@@ -23,6 +27,9 @@ type Entry = {
   ticket_id: string | null;
   cancellation_reason: string | null;
   origem_record_id: string | null;
+  template_version_id: string | null;
+  template_version: number | null;
+  ditado_texto: string | null;
 };
 type Ticket = {
   id: string;
@@ -131,6 +138,13 @@ export function WorkArea({
   const [clientId, setClientId] = useState(initialClient || "");
   const [clientSearch, setClientSearch] = useState("");
   const [kind, setKind] = useState("finalizacao");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [liveText, setLiveText] = useState("");
+  const [originalText, setOriginalText] = useState("");
+  const [captureBusy, setCaptureBusy] = useState(false);
+  const [reviewedAudio, setReviewedAudio] = useState<Record<string, boolean>>(
+    {},
+  );
   const [occurred, setOccurred] = useState(
     localInput(new Date().toISOString(), timezone),
   );
@@ -291,7 +305,8 @@ export function WorkArea({
           body: {
             client_id: clientId,
             type: kind,
-            texto_original: get(data, "texto_original"),
+            texto_original: get(data, "texto_original") || ms.audioOnly,
+            ...(liveText ? { ditado_texto: liveText } : {}),
             ocorrido_em: occurrence(data),
             capturado_em: new Date().toISOString(),
             submit: shouldSend,
@@ -305,13 +320,24 @@ export function WorkArea({
           },
         };
       }
-      const item = await request<Entry>(
+      let item = await request<Entry>(
         "/records",
         "POST",
         creation.current.body,
         { "Idempotency-Key": creation.current.key },
       );
+      if (audioFile) {
+        const current = await request<Entry>(`/records/${item.id}`);
+        const result = await uploadFile<{ record: Entry }>(
+          `/records/${item.id}/audio?revision=${current.revision}`,
+          audioFile,
+        );
+        item = result.record;
+      }
       creation.current = null;
+      setAudioFile(null);
+      setLiveText("");
+      setOriginalText("");
       formRef.current?.reset();
       setSelected(item);
       setVersions([]);
@@ -329,6 +355,7 @@ export function WorkArea({
       revision: item.revision,
       action,
       reason,
+      audio_reviewed: !!reviewedAudio[item.id + ":" + item.revision],
       ...fields,
     });
     setSelected(value);
@@ -457,6 +484,7 @@ export function WorkArea({
           ["mine", s.myTickets],
           ["queue", s.queue],
           ["notifications", `${s.notifications} (${unread} ${s.unread})`],
+          ["media", ms.config],
         ].map(([key, title]) => (
           <button
             key={key}
@@ -528,9 +556,11 @@ export function WorkArea({
             {s.original}
             <textarea
               aria-label={s.original}
-              required
+              required={!audioFile}
               name="texto_original"
               maxLength={20000}
+              value={originalText}
+              onChange={(event) => setOriginalText(event.target.value)}
             />
           </label>
           <label>
@@ -582,10 +612,30 @@ export function WorkArea({
               </label>
             </>
           )}
-          <button disabled={busy || !clientId} value="send">
+          <AudioCapture
+            file={audioFile}
+            onFile={(file) => {
+              setAudioFile(file);
+              creation.current = null;
+            }}
+            live={liveText}
+            onLive={(value) => {
+              setLiveText(value);
+              creation.current = null;
+            }}
+            onUseLive={() => {
+              setOriginalText(liveText);
+              creation.current = null;
+            }}
+            onBusy={setCaptureBusy}
+          />
+          <button disabled={busy || !clientId || captureBusy} value="send">
             {s.submit}
           </button>
-          <button disabled={busy || !clientId} value="draft">
+          <button
+            disabled={busy || !clientId || captureBusy || !!audioFile}
+            value="draft"
+          >
             {s.draft}
           </button>
         </form>
@@ -603,6 +653,7 @@ export function WorkArea({
           <p>
             {s.confirmedTotal}: {confirmedTotal}
           </p>
+          {clientId && <FilePanel ownerType="client" ownerId={clientId} />}
         </>
       )}
       {["records", "reviews", "history"].includes(tab) && (
@@ -624,6 +675,8 @@ export function WorkArea({
                       .map((item) => ({
                         id: item.id,
                         revision: item.revision,
+                        audio_reviewed:
+                          !!reviewedAudio[item.id + ":" + item.revision],
                       })),
                   });
                   setSelected(null);
@@ -674,6 +727,28 @@ export function WorkArea({
             </p>
           )}
           {selected.article_id && <p>{s.articleDraft}</p>}
+          {selected.template_version && (
+            <p>
+              {ms.templateVersion}: {selected.template_version}
+            </p>
+          )}
+          <AudioReview
+            key={selected.id + ":" + selected.revision}
+            record={selected}
+            isAuthor={selected.author_id === userId}
+            onRecord={(value) => {
+              setSelected(value);
+              setRecords((current) =>
+                current.map((item) => (item.id === value.id ? value : item)),
+              );
+            }}
+            onAcknowledged={(value) =>
+              setReviewedAudio((current) => ({
+                ...current,
+                [selected.id + ":" + selected.revision]: value,
+              }))
+            }
+          />
           {selected.cancellation_reason && (
             <p>
               {s.reason}: {selected.cancellation_reason}
@@ -948,6 +1023,13 @@ export function WorkArea({
           key={ticket.id + ":" + ticket.revision}
         >
           <h4>{ticket.code}</h4>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void perform(() => openTicket(ticket.id))}
+          >
+            {s.refreshConversation}
+          </button>
           <p>{ticket.description}</p>
           <p>
             {label(s.ticketStates, ticket.status)} ·{" "}
@@ -961,7 +1043,7 @@ export function WorkArea({
             {s.resolvedBy}: {ticket.resolved_by_name || "—"} · {s.closedBy}:{" "}
             {ticket.closed_by_name || "—"} · {s.reopens}: {ticket.reopen_count}
           </p>
-          <p>{s.attachments}</p>
+          <FilePanel ownerType="ticket" ownerId={ticket.id} />
           <form
             className="workspace-form"
             onSubmit={(event) => {
@@ -1055,6 +1137,7 @@ export function WorkArea({
           {ticket.comments?.map((comment) => (
             <p key={comment.id}>
               {date(comment.criado_em)} · {comment.author_name} · {comment.text}
+              <span> · {label(s.commentKinds, comment.kind)}</span>
               {comment.mentioned_user_ids.map((id) => (
                 <span key={id}>
                   {" "}
@@ -1138,6 +1221,9 @@ export function WorkArea({
             </p>
           ))}
         </article>
+      )}
+      {tab === "media" && (
+        <MediaConfiguration administrator={role === "administrador"} />
       )}
       {tab === "notifications" && (
         <>

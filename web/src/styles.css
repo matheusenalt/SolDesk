@@ -101,6 +101,27 @@
 .work-area select[multiple] {
   min-height: 110px;
 }
+.audio-capture,
+.audio-review,
+.file-panel {
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.work-area audio {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  margin: 12px 0;
+}
+.audio-review mark {
+  color: var(--text);
+  background: var(--surface);
+  border-left: 3px solid var(--warning);
+  padding: 4px;
+}
 
 * {
   box-sizing: border-box;

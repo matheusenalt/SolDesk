@@ -30,7 +30,7 @@ from app.security import digest, password_hash
 
 @pytest.fixture(scope="session")
 def pg_settings():
-    settings = Settings()
+    settings = Settings(download_signing_key=secrets.token_urlsafe(32))
     if not settings.migration_database_url or not settings.migration_database_url.endswith(
         "/soldesk_test"
     ):

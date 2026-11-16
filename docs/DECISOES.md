@@ -79,7 +79,47 @@ a funcionalidade for implementada. Prazos rígidos de revisão continuam em aber
 - Notificações internas por destinatário, polling de 15 s; sem serviço externo.
 - Sem novas tecnologias/dependências; AGPL e inventários anteriores preservados.
 
-## Referências técnicas
+## Adotadas na fase 04
+
+- Redis 8/RQ, worker e dispatcher separados. Recibo durável no PostgreSQL antes
+  de 202; HTTP não aguarda transcrição. Lease/locks evitam aplicação duplicada,
+  fila urgente primeiro, 3 tentativas e timeout recuperável, sempre com digitação.
+- ffmpeg apenas no worker; formatos reais normalizados para WAV mono 16 kHz.
+  API valida bytes/tipo; duração e decodificação terminam assincronamente.
+- Mock offline não inventa transcrição: reaproveita texto humano informado e
+  marca simulação/incerteza. Áudio sem texto exige digitação manual no mock.
+  faster-whisper opcional CPU/int8, modelo local, sem download de pesos no setup.
+- **Benchmark de faster-whisper pendente**: medir memória de pico, CPU, tempo de
+  carga, tempo total/fator em relação à duração e precisão em português por modelo
+  e equipamento. Não houve inferência com pesos nem garantia de velocidade.
+  Imagem/SDK e recusa offline de modelo ausente foram verificados.
+- Storage local privado padrão; boto3 para S3 compatível. Imagem MinIO tentada
+  retornou 401; perfil usa RustFS Apache-2.0 fixado por digest, testado com objeto
+  fictício real (put/get/delete). Nenhuma fonte de terceiros foi copiada.
+- Downloads assinados por arquivo/empresa/usuário/sessão, padrão 120 s; cookie
+  continua obrigatório. Logs não registram query/URL nem conteúdo de áudio/texto.
+- Retenção padrão manter. Só política explícita ou descarte pelo autor remove
+  objeto; auditoria/metadados/texto ficam. Bucket S3 sem versionamento neste fluxo;
+  backups, versões e replicação exigem política própria de remoção.
+- Versão de template fixada inclusive para relato textual. Reprocessamento usa
+  nova versão/snapshot e mantém histórico anterior. `rules` só aceita marcadores;
+  contrato para `llm` futuro exige trechos literais, nenhum cliente LLM implementado.
+- Ditado Web Speech desligado por empresa e opt-in por pessoa, com aviso prévio
+  sobre fabricante; não funciona em paralelo com gravador. Texto ao vivo separado
+  da transcrição e revisão; teste real de serviço do fabricante não foi realizado.
+- Chamado urgente pode ser resolvido antes do áudio; transcrição posterior é
+  comentário identificado, sem resolver/reabrir nem alterar fato/recebimento.
+- Licenças novas e opcionais em [LICENCAS](LICENCAS.md). AGPL original preservada.
+
+## Referências técnicas da fase 04
+
+- [RQ: workers](https://python-rq.org/docs/workers/) e [exceções](https://python-rq.org/docs/exceptions/).
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper).
+- [Microfone e contexto seguro](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia).
+- [SpeechRecognition e compatibilidade/privacidade](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
+- [RustFS em contêiner](https://docs.rustfs.com/en/installation/container).
+
+## Referências das fases anteriores
 
 - https://fastapi.tiangolo.com/tutorial/testing/
 - https://alembic.sqlalchemy.org/en/latest/tutorial.html

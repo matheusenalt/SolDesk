@@ -5,5 +5,5 @@ export default defineConfig(base, {
   testDir: './e2e-identity',
   workers: 1,
   timeout: 45000,
-  use: { ...base.use, trace: 'off' },
+  use: { ...base.use, trace: 'off', launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] } },
 });

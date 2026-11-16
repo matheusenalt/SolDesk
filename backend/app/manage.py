@@ -94,6 +94,14 @@ def migrate(settings):
         connection.execute("GRANT SELECT, INSERT ON notification TO soldesk_runtime")
         connection.execute("GRANT UPDATE (lida_em) ON notification TO soldesk_runtime")
         connection.execute(
+            "GRANT SELECT, INSERT, UPDATE ON attachment, audio_job, glossary_term "
+            "TO soldesk_runtime"
+        )
+        connection.execute("GRANT SELECT, INSERT ON template_version TO soldesk_runtime")
+        connection.execute(
+            "GRANT EXECUTE ON FUNCTION public.media_organizations() TO soldesk_runtime"
+        )
+        connection.execute(
             "GRANT EXECUTE ON FUNCTION public.invitation_organization(text), "
             "public.membership_count(text) TO soldesk_runtime"
         )

@@ -36,6 +36,7 @@ class RecordCreate(Occurrence):
     texto_original: str = Field(min_length=1, max_length=20000)
     capturado_em: AwareDatetime | None = None
     submit: bool = True
+    ditado_texto: str | None = Field(default=None, max_length=20000)
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority = "normal"
     category: str = Field(default="", max_length=80)
@@ -54,6 +55,7 @@ class RecordAction(Input):
     revision: int = Field(ge=1)
     action: Literal["enviar", "confirmar", "devolver", "cancelar", "publicar", "processar"]
     reason: str = Field(default="", max_length=2000)
+    audio_reviewed: bool = False
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority = "normal"
     category: str = Field(default="", max_length=80)
@@ -62,6 +64,7 @@ class RecordAction(Input):
 class BatchItem(Input):
     id: str = Field(min_length=36, max_length=36)
     revision: int = Field(ge=1)
+    audio_reviewed: bool = False
 
 
 class BatchReview(Input):

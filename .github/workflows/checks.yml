@@ -54,5 +54,6 @@ jobs:
           export E2E_ADMIN_EMAIL=$(printf '%s' "$credentials" | jq -r '.[0].email')
           export E2E_ADMIN_PASSWORD=$(printf '%s' "$credentials" | jq -r '.[0].password')
           export PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080
+          export E2E_CONTROL_WORKER=1
           cd web
           npx playwright test --config playwright.identity.config.ts

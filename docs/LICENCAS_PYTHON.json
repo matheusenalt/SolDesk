@@ -38,6 +38,15 @@
     ]
   },
   {
+    "name": "argon2-cffi-bindings",
+    "version": "26.2.0",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "argon2_cffi_bindings-26.2.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
     "name": "argon2-cffi",
     "version": "25.1.0",
     "license": "MIT",
@@ -47,12 +56,34 @@
     ]
   },
   {
-    "name": "argon2-cffi-bindings",
-    "version": "26.2.0",
-    "license": "MIT",
+    "name": "boto3",
+    "version": "1.44.3",
+    "license": "Apache-2.0",
     "classifiers": [],
     "license_files": [
-      "argon2_cffi_bindings-26.2.0.dist-info/licenses/LICENSE"
+      "boto3-1.44.3.dist-info/LICENSE",
+      "boto3-1.44.3.dist-info/NOTICE"
+    ]
+  },
+  {
+    "name": "botocore",
+    "version": "1.44.3",
+    "license": "Apache-2.0",
+    "classifiers": [],
+    "license_files": [
+      "botocore-1.44.3.dist-info/LICENSE.txt",
+      "botocore-1.44.3.dist-info/NOTICE",
+      "botocore/data/license-manager-linux-subscriptions/2018-05-10/endpoint-rule-set-1.json.gz",
+      "botocore/data/license-manager-linux-subscriptions/2018-05-10/paginators-1.json",
+      "botocore/data/license-manager-linux-subscriptions/2018-05-10/service-2.json.gz",
+      "botocore/data/license-manager-user-subscriptions/2018-05-10/endpoint-rule-set-1.json.gz",
+      "botocore/data/license-manager-user-subscriptions/2018-05-10/paginators-1.json",
+      "botocore/data/license-manager-user-subscriptions/2018-05-10/service-2.json.gz",
+      "botocore/data/license-manager-user-subscriptions/2018-05-10/waiters-2.json",
+      "botocore/data/license-manager/2018-08-01/endpoint-rule-set-1.json.gz",
+      "botocore/data/license-manager/2018-08-01/examples-1.json",
+      "botocore/data/license-manager/2018-08-01/paginators-1.json",
+      "botocore/data/license-manager/2018-08-01/service-2.json.gz"
     ]
   },
   {
@@ -93,6 +124,17 @@
     ],
     "license_files": [
       "colorama-0.4.6.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "croniter",
+    "version": "7.0.0",
+    "license": "MIT",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "croniter-7.0.0.dist-info/licenses/LICENSE"
     ]
   },
   {
@@ -177,6 +219,17 @@
     ]
   },
   {
+    "name": "jmespath",
+    "version": "1.1.0",
+    "license": "MIT",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "jmespath-1.1.0.dist-info/LICENSE"
+    ]
+  },
+  {
     "name": "Mako",
     "version": "1.4.3",
     "license": "MIT",
@@ -230,21 +283,21 @@
     ]
   },
   {
-    "name": "psycopg",
-    "version": "3.3.9",
-    "license": "LGPL-3.0-only",
-    "classifiers": [],
-    "license_files": [
-      "psycopg-3.3.9.dist-info/licenses/LICENSE.txt"
-    ]
-  },
-  {
     "name": "psycopg-binary",
     "version": "3.3.9",
     "license": "LGPL-3.0-only",
     "classifiers": [],
     "license_files": [
       "psycopg_binary-3.3.9.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "psycopg",
+    "version": "3.3.9",
+    "license": "LGPL-3.0-only",
+    "classifiers": [],
+    "license_files": [
+      "psycopg-3.3.9.dist-info/licenses/LICENSE.txt"
     ]
   },
   {
@@ -257,15 +310,6 @@
     ]
   },
   {
-    "name": "pydantic",
-    "version": "2.14.3",
-    "license": "MIT",
-    "classifiers": [],
-    "license_files": [
-      "pydantic-2.14.3.dist-info/licenses/LICENSE"
-    ]
-  },
-  {
     "name": "pydantic-settings",
     "version": "2.16.3",
     "license": "MIT",
@@ -274,6 +318,15 @@
     ],
     "license_files": [
       "pydantic_settings-2.16.3.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic",
+    "version": "2.14.3",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "pydantic-2.14.3.dist-info/licenses/LICENSE"
     ]
   },
   {
@@ -305,6 +358,18 @@
     ]
   },
   {
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "license": "Dual License",
+    "classifiers": [
+      "License :: OSI Approved :: BSD License",
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": [
+      "python_dateutil-2.9.0.post0.dist-info/LICENSE"
+    ]
+  },
+  {
     "name": "python-dotenv",
     "version": "1.2.4",
     "license": "BSD-3-Clause",
@@ -325,12 +390,57 @@
     ]
   },
   {
+    "name": "redis",
+    "version": "8.1.0",
+    "license": "MIT",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "redis-8.1.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "rq",
+    "version": "2.12.0",
+    "license": "BSD-2-Clause",
+    "classifiers": [
+      "License :: OSI Approved :: BSD License"
+    ],
+    "license_files": [
+      "rq-2.12.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
     "name": "ruff",
     "version": "0.17.5",
     "license": "MIT",
     "classifiers": [],
     "license_files": [
       "ruff-0.17.5.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "s3transfer",
+    "version": "0.19.3",
+    "license": "Apache License 2.0",
+    "classifiers": [
+      "License :: OSI Approved :: Apache Software License"
+    ],
+    "license_files": [
+      "s3transfer-0.19.3.dist-info/LICENSE.txt",
+      "s3transfer-0.19.3.dist-info/NOTICE.txt"
+    ]
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license": "MIT",
+    "classifiers": [
+      "License :: OSI Approved :: MIT License"
+    ],
+    "license_files": [
+      "six-1.17.0.dist-info/LICENSE"
     ]
   },
   {
@@ -378,6 +488,15 @@
     "license_files": [
       "tzdata-2026.6.dist-info/licenses/LICENSE",
       "tzdata-2026.6.dist-info/licenses/licenses/LICENSE_APACHE"
+    ]
+  },
+  {
+    "name": "urllib3",
+    "version": "2.8.0",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "urllib3-2.8.0.dist-info/licenses/LICENSE.txt"
     ]
   },
   {

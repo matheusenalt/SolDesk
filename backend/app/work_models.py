@@ -1,4 +1,4 @@
-"""Registros, chamados e notificações, sem processamento automático nesta fase."""
+"""Registros, chamados e notificações com revisão humana preservada."""
 
 from datetime import datetime
 
@@ -32,6 +32,8 @@ class Record(Base):
     revisado_por: Mapped[str | None] = mapped_column(ForeignKey("app_user.id"))
     publicado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancellation_reason: Mapped[str | None] = mapped_column(Text)
+    template_version_id: Mapped[str | None] = mapped_column(String(36))
+    ditado_texto: Mapped[str | None] = mapped_column(Text)
 
 
 class RecordVersion(Base):

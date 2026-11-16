@@ -1,6 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
-
-let administratorCookies: Awaited<ReturnType<BrowserContext['cookies']>> = [];
+import { test, expect, type Page } from './authenticated';
 
 async function enter(page: Page, email: string, password: string) {
   await page.goto('/');
@@ -16,18 +14,6 @@ async function enter(page: Page, email: string, password: string) {
   return workspace;
 }
 
-test.beforeAll(async ({ browser }) => {
-  if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
-    throw new Error('Informe credenciais fictícias via E2E_ADMIN_EMAIL/PASSWORD.');
-  }
-  const session = await browser.newContext();
-  try {
-    await enter(await session.newPage(), process.env.E2E_ADMIN_EMAIL!, process.env.E2E_ADMIN_PASSWORD!);
-    administratorCookies = await session.cookies();
-  } finally { await session.close(); }
-});
-
-test.beforeEach(async ({ context }) => { await context.addCookies(administratorCookies); });
 
 test('login, cadastro, busca sem acento, edição e consulta reais', async ({ page }) => {
   const workspace = await enter(page, process.env.E2E_ADMIN_EMAIL!, process.env.E2E_ADMIN_PASSWORD!);
@@ -49,7 +35,7 @@ test('login, cadastro, busca sem acento, edição e consulta reais', async ({ pa
   await expect(edit).toHaveCount(0);
   await card.getByRole('button', { name: 'Consultar', exact: true }).click();
   await expect(workspace.getByText('Relato fictício de teste de interface.', { exact: true })).toBeVisible();
-  await expect(workspace.getByText('Arquivos serão disponibilizados nas próximas fases.')).toBeVisible();
+  await expect(workspace.getByText('Arquivos estão disponíveis no histórico do cliente.')).toBeVisible();
   await workspace.getByRole('button', { name: 'Histórico por cliente', exact: true }).click();
   const work = workspace.getByRole('region', { name: 'Atendimentos', exact: true });
   await expect(work.getByRole('combobox', { name: 'Cliente', exact: true }).locator('option:checked')).toHaveText(`Merceária fictícia ${suffix}`);

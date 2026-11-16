@@ -9,7 +9,7 @@
 7. Conectores mock, ponta a ponta e revisão de segurança/privacidade.
 
 Evoluções: restrição de acesso por cliente, SMTP opcional, busca semântica,
-push remoto, políticas de retenção e operação Cloud. Prioridades do MVP em aberto.
+push remoto e operação Cloud de produção. Prioridades do MVP em aberto.
 Cada fase exige validação e documentação próprias antes da próxima.
 
 Licenciamento do código próprio: GNU AGPL v3 somente, aprovado pelo titular;
@@ -26,5 +26,12 @@ Fase 03: registros textuais, revisão própria/lote, histórico confirmado,
 chamados com conversa/menção/intervalos de espera, notificações internas,
 concorrência, idempotência e derivação implementados. Evidências e limites em
 [VALIDACAO_PROMPT_03](VALIDACAO_PROMPT_03.md). Sem novas dependências.
-Áudio, arquivos e processamento permanecem na fase 04; publicação de conhecimento,
-busca e relatórios na fase 05. Parar após a fase 03, aguardando nova instrução.
+
+Fase 04: áudio assíncrono, Redis/RQ, worker/dispatcher, armazenamento local/S3
+privado, anexos de cliente/chamado, links temporários, revisão humana, glossário,
+templates versionados, retenção auditada e ditado progressivo implementados.
+Mock é o padrão offline e não reconhece fala. faster-whisper é integração opcional;
+benchmark com modelo real permanece pendente, explicitamente previsto no prompt.
+Evidências: [VALIDACAO_PROMPT_04](VALIDACAO_PROMPT_04.md).
+Publicação de conhecimento, busca e relatórios continuam na fase 05.
+Parar após a fase 04, aguardando nova instrução.

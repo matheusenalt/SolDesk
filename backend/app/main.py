@@ -38,12 +38,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="SolDesk API", version="1.0.0", lifespan=lifespan)
     app.state.sessions = sessions
     app.state.settings = settings
+    from app.media_routes import signing_key
+
+    app.state.download_signing_key = signing_key(settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-        allow_headers=["Content-Type", "X-CSRF-Token", "Idempotency-Key"],
+        allow_headers=["Content-Type", "X-CSRF-Token", "Idempotency-Key", "X-Filename"],
     )
 
     @app.middleware("http")
@@ -123,17 +126,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "capabilities": ["health", "server_info"]
             + (
                 ["auth", "organizations", "clients", "audit"]
-                if revision in {"0002", "0003"}
+                if revision in {"0002", "0003", "0004"}
                 else []
             )
-            + (["records", "tickets", "notifications"] if revision == "0003" else []),
+            + (["records", "tickets", "notifications"] if revision in {"0003", "0004"} else [])
+            + (["attachments", "audio", "templates"] if revision == "0004" else []),
         }
 
+    from app.media_routes import router as media_router
     from app.routes import router
     from app.work_routes import router as work_router
 
     app.include_router(router)
     app.include_router(work_router)
+    app.include_router(media_router)
     return app
 
 

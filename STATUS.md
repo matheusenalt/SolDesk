@@ -1,10 +1,39 @@
 # Status do SolDesk
 
-Atualizado em 16/11/2026. **Fases 01–03 implementadas e validadas localmente com
-Docker/PostgreSQL e navegador. As fases 04–06 não foram implementadas.**
+Atualizado em 16/11/2026. **Fases 01–04 implementadas e validadas localmente com
+Docker/PostgreSQL e navegador. As fases 05–06 não foram implementadas.**
 Não pronto para produção.
 
 ## Funciona agora
+
+- Fase 04: anexos privados de cliente/chamado, storage local/S3 compatível,
+  validação de bytes/assinatura/tamanho/MIME, áudio real decodificado e duração
+  medida no worker; download temporário autenticado por sessão e acesso auditado.
+- MediaRecorder com permissão explícita, contador, prévia/regravação/cancelamento,
+  upload de arquivo e digitação. Falha de microfone mantém texto. Strings pt-BR
+  centralizadas e estados identificados, em desktop/emulação móvel.
+- Redis/RQ e worker/dispatcher separados; upload 202 sem aguardar transcrição,
+  recibo PostgreSQL durável, prioridade urgente, idempotência/lease, retry/backoff,
+  timeout recuperável, reprocessamento e descarte. ffmpeg só na imagem do worker.
+- Mock offline explícito reutiliza o relato digitado e **não reconhece fala**.
+  Texto bruto/organizado/humano e tempos separados, incerteza/possível credencial
+  destacados, notificação interna, revisão humana obrigatória. Urgente abre e
+  resolve com worker parado; resultado posterior não altera o estado do Ticket.
+- Templates por empresa/tipo, edição visual e versões/snapshots preservados,
+  regras por marcadores, descrição livre integral, glossário sem alterar números.
+  Retenção padrão manter e limpeza de políticas explícitas auditada/testada.
+- Migração 0004 aditiva com RLS FORCE, FKs compostas, isolamento áudio/anexos A/B,
+  URLs expiradas/outra sessão recusadas e conteúdo original preservado.
+- **43 pytest com PostgreSQL/Redis/ffmpeg**, **6 Vitest** e **24 Playwright
+  autenticados** aprovados (sem skips, Edge desktop/emulação móvel, worker realmente
+  parado/retomado). ESLint/Ruff, formatação, TypeScript/Vite e 32 pares de tokens
+  aprovados. Setup PowerShell e persistência/migrações/reinício aprovados sem
+  apagar dados; 4 regressões Playwright de instalação aprovadas. Perfil dev
+  reconstruído/iniciado. Evidências: [VALIDACAO_PROMPT_04](docs/VALIDACAO_PROMPT_04.md).
+- S3 compatível RustFS: escrita/leitura/remoção de objeto fictício real aprovadas.
+  Imagem opcional faster-whisper construída, SDK/CPU e erro de modelo ausente
+  verificados sem rede/download. Inventários: 52 pacotes Python base, 16 opcionais
+  e 272 npm; texto AGPL oficial preservado. Não houve nova dependência npm.
 
 - Fase 03: registro textual com três destinos, original preservado, edição humana
   versionada, fato/recebimento/revisão separados, retroativo auditado e futuro rejeitado.
@@ -78,6 +107,19 @@ Não pronto para produção.
 
 ## Parcial / não validado
 
+- faster-whisper: sem modelo instalado/baixado e sem inferência real. Precisão,
+  velocidade e consumo com pesos dependem de benchmark ainda pendente, conforme
+  o Prompt 04 e [DECISOES](docs/DECISOES.md). Mock não substitui reconhecimento.
+- Web Speech é protótipo opt-in/desabilitável com aviso prévio de privacidade;
+  serviço real do fabricante não foi ativado/testado. Não promete simultaneidade.
+- Safari/iOS/Firefox e microfone em aparelho físico não foram testados. Formatos
+  desses clientes foram exercitados por arquivos reais gerados por ffmpeg; isso
+  não comprova compatibilidade do navegador/dispositivo. HTTP por IP da LAN não
+  habilita microfone; HTTPS de desenvolvimento não foi provisionado pelo setup.
+- Hook ClamAV testado em TCP controlado; daemon/assinaturas reais não validados.
+  MinIO não subiu (imagem 401); perfil local usa RustFS. S3 público/AWS em produção,
+  versionamento/replicação/backups e remoção nesses sistemas externos não validados.
+
 - Setup PowerShell validado localmente em Windows/WSL 2; setup Bash validado em
   runner Ubuntu do GitHub Actions. Distribuições/instalações diferentes desse
   ambiente e implantação de produção ainda não foram validadas.
@@ -87,7 +129,6 @@ Não pronto para produção.
 
 ## Planejado
 
-04: áudio, Redis/worker, storage e processamento.
 05: conhecimento, busca e métricas.
 06A: Expo/mobile e QR; 06B: conectores mock, ponta a ponta e privacidade.
 
@@ -95,8 +136,8 @@ Não pronto para produção.
 
 Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite e
 [API_FASE_02.md](docs/API_FASE_02.md) / [PERMISSOES.md](docs/PERMISSOES.md) para as
-regras. Fase 03: [API](docs/API_FASE_03.md), [estados](docs/ESTADOS.md) e
-[relatório](docs/VALIDACAO_PROMPT_03.md). Aguardar instrução antes do prompt 04.
+regras. Fase 04: [API](docs/API_FASE_04.md), [estados](docs/ESTADOS.md) e
+[relatório](docs/VALIDACAO_PROMPT_04.md). Aguardar instrução antes do prompt 05.
 Usar somente dados fictícios.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).

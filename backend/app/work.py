@@ -127,6 +127,8 @@ def record_data(ctx, item):
         "revisado_por",
         "publicado_em",
         "cancellation_reason",
+        "template_version_id",
+        "ditado_texto",
     )
     result = {field: getattr(item, field) for field in fields}
     result["author_name"] = ctx.db.get(User, item.author_id).name
@@ -134,6 +136,12 @@ def record_data(ctx, item):
     result["provisional"] = item.status not in {"confirmado", "publicado"}
     result["age_seconds"] = max(0, int((now() - item.enviado_em).total_seconds()))
     result["article_status"] = "rascunho" if item.article_id else None
+    from app.media_models import TemplateVersion
+
+    template = (
+        ctx.get(TemplateVersion, item.template_version_id) if item.template_version_id else None
+    )
+    result["template_version"] = template.version if template else None
     return result
 
 
@@ -271,6 +279,8 @@ def send_record(ctx, request, item, assignee_id=None, priority="normal", categor
 
 def create_record(ctx, request, body, key=None, scope="records", source=None):
     payload = body.model_dump(mode="json")
+    if payload.get("ditado_texto") is None:
+        payload.pop("ditado_texto", None)
     fingerprint = digest(json.dumps(payload, sort_keys=True, ensure_ascii=False))
     key_hash = None
     if key is not None:
@@ -293,6 +303,28 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
                 raise HTTPException(409, "Idempotency-Key já usada com outro conteúdo")
             return find_record(ctx, receipt.record_id)
     ctx.get(Client, body.client_id)
+    from app.media import ensure_defaults
+    from app.media_models import GlossaryTerm, TemplateVersion
+    from app.transcription import RulesOrganizer, normalize_terms
+
+    ensure_defaults(ctx)
+    template = ctx.db.scalar(
+        ctx.query(TemplateVersion)
+        .where(TemplateVersion.type == body.type)
+        .order_by(TemplateVersion.version.desc())
+        .limit(1)
+    )
+    glossary = [
+        {"term": term.term, "aliases": term.aliases}
+        for term in ctx.db.scalars(ctx.query(GlossaryTerm))
+    ]
+    normalized = normalize_terms(body.texto_original, glossary)
+    draft = RulesOrganizer().organize(normalized, template.fields)
+    if body.ditado_texto:
+        from app.media import media_preferences
+
+        if not media_preferences(ctx)["live_dictation_enabled"]:
+            raise HTTPException(403, "Ditado ao vivo desabilitado pela organização")
     if body.type != "chamado" and (body.assignee_id or body.priority != "normal" or body.category):
         raise HTTPException(422, "Responsável, prioridade e categoria são campos de chamado")
     received = now()
@@ -307,6 +339,9 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
         enviado_em=received,
         capturado_em=body.capturado_em,
         origem_record_id=source.id if source else None,
+        ditado_texto=body.ditado_texto,
+        template_version_id=template.id,
+        texto_organizado=draft["text"] if draft["text"] != body.texto_original else None,
     )
     ctx.db.add(item)
     ctx.db.flush()
@@ -378,6 +413,9 @@ def act_record(ctx, request, item, body):
     else:
         author_only(ctx, item)
         if body.action == "confirmar":
+            from app.media import check_audio_review
+
+            check_audio_review(ctx, item, body.audio_reviewed)
             if item.type != "finalizacao" or item.status != "aguardando_revisao":
                 raise HTTPException(
                     409, "Somente finalização aguardando revisão pode ser confirmada"
@@ -450,6 +488,15 @@ def change_ticket(ctx, request, item, body):
         notify(ctx, item.assignee_id, "chamado_atribuido", "ticket", item.id)
     if body.priority is not None:
         item.priority = body.priority
+        from app.media_models import AudioJob
+
+        for pending in ctx.db.scalars(
+            ctx.query(AudioJob).where(
+                AudioJob.record_id == item.record_id, AudioJob.status == "aguardando"
+            )
+        ):
+            pending.priority = body.priority
+            pending.enfileirado_em = None
     if body.category is not None:
         item.category = body.category
     if body.status:
