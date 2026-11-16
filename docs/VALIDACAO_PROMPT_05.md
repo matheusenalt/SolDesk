@@ -47,6 +47,7 @@ outros projetos, sem serviço de IA externo e sem nova dependência.
 | E2E instalação Edge | 4 aprovados em 32,7 s contra Nginx/API/PostgreSQL |
 | Bash setup | Sintaxe bash -n aprovada; execução Ubuntu será conferida no Actions |
 | Exemplos | JSON e CSV obtidos da API real, contagens conferidas, somente dados fictícios em [exemplos](exemplos/README.md) |
+| GitHub Actions implementação | completed/success: jobs checks e postgres; 65 pytest PostgreSQL em 45,14 s e 32 E2E Chromium Ubuntu em 2,2 min, sem skips nessas suítes |
 
 22 casos parametrizados novos cobrem estados editoriais/versões/triggers,
 autopublicação padrão/configurada, comentário obrigatório, código/acento/cliente,
@@ -109,6 +110,24 @@ locks e texto AGPL preservados, inventários repetidos sem diferenças. Nenhuma
 fonte/dado de outro projeto/empregador foi acessado ou copiado.
 Busca textual não substitui auditoria independente. Origin oficial conferido,
 main sincronizada com origin/main (0/0) antes do commit; identidade Git configurada.
-Commit/push/Actions serão registrados após a publicação, sem force push.
+Implementação publicada: [`160297a4b61c1b21389833b553a09c2122da423f`](https://github.com/matheusenalt/SolDesk/commit/160297a4b61c1b21389833b553a09c2122da423f),
+`feat: implementa fase 05 do SolDesk`. Push normal para main oficial concluído,
+avanço de `75a9018` para `160297a`, sem force; main/origin main sincronizadas (0/0).
+[Actions da implementação](https://github.com/matheusenalt/SolDesk/actions/runs/43928535399)
+concluído com **completed/success**, jobs checks e postgres aprovados. Logs
+conferidos: **65 pytest PostgreSQL aprovados em 45,14 s** e **32 Playwright
+Chromium Ubuntu aprovados em 2,2 min**, incluindo parada/retomada real do worker,
+CSV e revisão editorial; sem skip nessas suítes. Lint/formatação, tokens, testes
+web, build e setup Bash aprovados. O job rápido pode pular testes que dependem de
+PostgreSQL; eles foram executados integralmente no job próprio, não contados por skip.
 Nenhum aceite obrigatório local pendente; limites opcionais acima continuam
 explícitos. Não avançar para o Prompt 06.
+
+Arquivos principais: [conhecimento](../backend/app/knowledge.py),
+[relatórios](../backend/app/reports.py), [migração](../backend/migrations/versions/0005_knowledge_reports.py),
+[testes PostgreSQL](../backend/tests/test_knowledge_reports.py),
+[UI de conhecimento](../web/src/KnowledgeArea.tsx),
+[UI de relatórios](../web/src/ReportArea.tsx),
+[E2E](../web/e2e-identity/insights.spec.ts), [métricas](METRICAS.md) e
+[exemplos](exemplos/README.md), além de README/STATUS/arquitetura/permissões/estados.
+**Fase 05 completamente aprovada no escopo obrigatório padrão**, localmente e no CI.

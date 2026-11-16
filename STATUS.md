@@ -24,6 +24,11 @@ Não pronto para produção.
   do worker ocioso corrigida com heartbeat compatível. Exemplos JSON/CSV gerados
   pela API com dados fictícios em [exemplos](docs/exemplos/README.md).
   Evidências: [VALIDACAO_PROMPT_05](docs/VALIDACAO_PROMPT_05.md).
+- Fase 05 publicada na main: [`160297a`](https://github.com/matheusenalt/SolDesk/commit/160297a4b61c1b21389833b553a09c2122da423f).
+  [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43928535399):
+  lint/formatação/tokens/testes/build, setup Bash, **65 pytest PostgreSQL** e
+  **32 Playwright Chromium Ubuntu** em execução completa, sem skip nessas suítes.
+  Aceite obrigatório da Fase 05 completamente aprovado; opcionais/produção seguem abaixo.
 
 - Fase 04: anexos privados de cliente/chamado, storage local/S3 compatível,
   validação de bytes/assinatura/tamanho/MIME, áudio real decodificado e duração
@@ -160,7 +165,7 @@ Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite e
 [API_FASE_02.md](docs/API_FASE_02.md) / [PERMISSOES.md](docs/PERMISSOES.md) para as
 regras. Fase 05: [API](docs/API_FASE_05.md), [métricas](docs/METRICAS.md),
 [estados](docs/ESTADOS.md) e [relatório](docs/VALIDACAO_PROMPT_05.md).
-Publicar o aceite da Fase 05 e aguardar instrução antes do Prompt 06.
+Aguardar instrução antes do Prompt 06; Fase 05 aprovada e publicada.
 Usar somente dados fictícios.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).

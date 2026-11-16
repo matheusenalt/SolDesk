@@ -39,4 +39,6 @@ Relatórios descritivos, eventos por ator, calendário/fuso, mediana/P90/pausas,
 equipes e CSV auditado com escopo próprio de técnico. Aceite local aprovado:
 65 pytest, 32 cenários autenticados e 4 regressões de instalação, lint/build/Docker;
 [métricas](METRICAS.md) e [validação](VALIDACAO_PROMPT_05.md).
+Publicada em main (`160297a`); [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43928535399),
+65 pytest PostgreSQL e 32 E2E Chromium Ubuntu em execução completa.
 Parar após validar/documentar/publicar a Fase 05; não iniciar Prompt 06.
