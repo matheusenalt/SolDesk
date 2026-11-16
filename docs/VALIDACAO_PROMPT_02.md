@@ -72,14 +72,22 @@ Data de fechamento: 16/11/2026. Somente dados fictícios; fase 03 não iniciada.
   caches e resultados locais não são incluídos no commit. Busca textual de
   credenciais é uma verificação limitada, não uma auditoria de segurança completa.
 
-O commit da fase 02 será enviado à `main` oficial, sem force push, depois da
-conferência de sincronização. A CI ampliada será verificada após o envio; não é
-declarada aprovada antes de executar. O relatório final informa commit/push/CI.
+## Publicação e validação remota
+
+Implementação enviada à `main` oficial, sem force push, após conferir sincronização:
+[f9aa2e7d310333afae82f5f2710475b30027e989](https://github.com/matheusenalt/SolDesk/commit/f9aa2e7d310333afae82f5f2710475b30027e989).
+
+[GitHub Actions 43865117672](https://github.com/matheusenalt/SolDesk/actions/runs/43865117672)
+concluído com **success**. Jobs de checks e PostgreSQL concluídos sem falhas,
+incluindo a suíte real PostgreSQL/RLS, `scripts/setup.sh` em host Ubuntu do runner,
+build das imagens e 6 E2E autenticados com Chromium desktop/emulação móvel.
+Isso acrescenta a validação Bash/Linux ao aceite local PowerShell/Windows/WSL 2.
+Não há aprovação automática de outros ambientes ou implantação produtiva.
 
 ## Limites remanescentes
 
 Sem recuperação SMTP, tokens mobile, áudio, histórico, chamados, arquivos ou
-conectores nesta fase. Setup completo em host Linux independente e auditoria
+conectores nesta fase. Revisão de implantação e auditoria
 de produção permanecem pendentes. O IP atrás do Nginx é conservador e pode ser
 compartilhado; configuração de proxies externos exige revisão de produção.
 Aviso upstream TestClient/httpx permanece. Nenhum desses limites é apresentado

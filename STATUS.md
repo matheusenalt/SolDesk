@@ -25,7 +25,8 @@ Não pronto para produção.
 - Aceite de migrações repetidas/reinício e UUID novamente aprovado com o runtime
   restrito. Quatro regressões Playwright de instalação aprovadas na fase 02.
 - CI ampliada para testar PostgreSQL/RLS, setup Bash e interface autenticada;
-  resultado remoto deve ser consultado no GitHub para o commit publicado.
+  [execução da fase 02 aprovada](https://github.com/matheusenalt/SolDesk/actions/runs/43865117672),
+  incluindo setup em Ubuntu e E2E autenticado Chromium desktop/móvel.
 
 - API FastAPI com saúde real do banco, identidade persistente, modo Community/Cloud,
   OpenAPI, CORS estrito, erros padronizados e logs JSON sem corpo/query.
@@ -54,8 +55,9 @@ Não pronto para produção.
 
 ## Parcial / não validado
 
-- Setup completo em um host Linux não executado; Bash teve somente a sintaxe
-  conferida com `bash -n`. O aceite atual é Windows/WSL 2 com contêineres Linux.
+- Setup PowerShell validado localmente em Windows/WSL 2; setup Bash validado em
+  runner Ubuntu do GitHub Actions. Distribuições/instalações diferentes desse
+  ambiente e implantação de produção ainda não foram validadas.
 - pip-audit/gitleaks e auditoria completa de segurança são pendentes, previstos
   para o fechamento do produto; `npm audit` e busca textual não os substituem.
 - pytest emite aviso upstream de depreciação do transporte httpx no TestClient.
