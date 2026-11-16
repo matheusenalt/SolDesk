@@ -13,11 +13,10 @@ As obrigações de disponibilizar fonte correspondente e preservar avisos se apl
 conforme a distribuição e, para versões modificadas acessíveis pela rede, seção 13.
 O código-fonte oficial está em https://github.com/matheusenalt/SolDesk.
 
-## Revisão das dependências até a fase 05
+## Revisão das dependências
 
-Fase 05 não adicionou/alterou dependências, locks nem texto jurídico. Comparação
-Git desses arquivos e SHA-256 de LICENSE conferidos novamente; inventários abaixo
-continuam aplicáveis. Extensões PostgreSQL unaccent/pg_trgm já eram usadas na Fase 02.
+Inventários dos locks atuais e condições de terceiros abaixo. Texto AGPL e
+SHA-256 preservados; unaccent/pg_trgm são extensões PostgreSQL já utilizadas.
 
 ### Descontinuação do cliente nativo — 16/11/2026
 
@@ -48,7 +47,7 @@ ambiente de desenvolvimento. O script exige as versões Python iguais ao lock.
 | LGPL-3.0-only: psycopg e psycopg-binary | Bibliotecas separadas, sem modificação local. Preservar LGPL, acesso ao fonte correspondente e possibilidade de substituição/religação conforme a forma de distribuição. Não relicenciar essas bibliotecas como código próprio. |
 | MPL-2.0: certifi e lightningcss/opcionais | Copyleft por arquivo; manter avisos, licença e fonte dos arquivos cobertos ao redistribuir. Não houve modificação nem incorporação de seus fontes no SolDesk. lightningcss integra as ferramentas de build. |
 | CC-BY-4.0: caniuse-lite | Dados usados pelas ferramentas de build; preservar atribuição/licença e indicar mudanças se esses dados forem redistribuídos. Não é licença do código próprio do SolDesk. |
-| MIT/MIT-0/BSD: Argon2-cffi, bindings, cffi e pycparser | Adicionados na fase 02 para hash Argon2id; licenças permissivas compatíveis com a licença do código próprio. Preservar os avisos dos pacotes e da implementação nativa. |
+| MIT/MIT-0/BSD: Argon2-cffi, bindings, cffi e pycparser | Usados para hash Argon2id; licenças permissivas compatíveis com a licença do código próprio. Preservar os avisos dos pacotes e da implementação nativa. |
 
 Não foi identificada licença incompatível no conjunto inventariado e no uso atual.
 O `colorama` não declara expressão SPDX nos metadados; seu arquivo LICENSE.txt
@@ -56,12 +55,12 @@ instalado foi lido e contém BSD de três cláusulas. Todos os pacotes npm possu
 licença declarada no lock. Isso é revisão de dependências declaradas e de suas
 condições, não certificação jurídica ou análise exaustiva de cada arquivo binário.
 
-### Adições da fase 04 e provedor opcional
+### Fila, armazenamento e provedor opcional
 
 Redis-py, RQ, croniter e dependências boto3/botocore/s3transfer/jmespath/urllib3/six
 usam MIT/BSD/Apache-2.0. python-dateutil oferece Apache-2.0/BSD-3-Clause; o
-LICENSE instalado foi conferido. As 42 versões Python anteriores foram preservadas;
-nenhuma nova dependência npm. Não foi identificada incompatibilidade no uso atual.
+LICENSE instalado foi conferido. As versões exatas constam no inventário Python;
+as dependências npm constam no lock web. Não foi identificada incompatibilidade no uso atual.
 
 O perfil opcional faster-whisper tem 16 distribuições adicionais, com versões
 fixadas e metadados da imagem Linux em [LICENCAS_WHISPER](LICENCAS_WHISPER.json).

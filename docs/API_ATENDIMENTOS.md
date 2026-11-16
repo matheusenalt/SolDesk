@@ -1,7 +1,7 @@
-# API da fase 03
+# API de registros e chamados
 
 Prefixo `/api/v1`. Sessão, organização e papel vêm do servidor. Escritas exigem
-CSRF, seguindo [API fase 02](API_FASE_02.md). Erros usam RFC 7807
+CSRF, seguindo [API](API_IDENTIDADE.md). Erros usam RFC 7807
 `application/problem+json`: 404 para recurso inacessível, 403 para ação sem
 permissão, 409 para revisão/transição/reenvio incompatível e 422 para entrada
 inválida. `organization_id`, autoria e carimbos do servidor não são aceitos no
@@ -43,8 +43,8 @@ rascunhos de chamado são criados por `/records`.
 opcionalmente, `ocorrido_em`. O original e o recebimento são preservados também
 por trigger no PostgreSQL. Cada escrita gera versão/auditoria, inclusive envio,
 confirmação, devolução, derivação e cancelamento. Ações `processar` e `publicar`
-retornam 409 nesta fase. O conhecimento cria somente artigo rascunho vinculado;
-não há endpoint de consulta/publicação da base de conhecimento.
+não são atalhos para processamento ou publicação. O conhecimento cria artigo
+rascunho vinculado; consulta/publicação usam o [contrato editorial](API_CONHECIMENTO_RELATORIOS.md).
 
 ## Repetição e concorrência
 

@@ -1,4 +1,4 @@
-# Contratos da Fase 05
+# API de conhecimento, relatórios e equipes
 
 Prefixo `/api/v1`, sessão opaca/vínculo ativo, tenant exclusivo do servidor.
 Mutações exigem `X-CSRF-Token` obtido em `/auth/csrf` com os mesmos cookies.
@@ -70,4 +70,5 @@ inferência de complexidade, prazo/SLA presumido ou avaliação profissional.
 Record agora aceita category/system também nos destinos finalização/conhecimento;
 Ticket aceita system. Classificação revisada fica protegida no banco. Alterar
 nome/fuso preserva políticas existentes da organização; mídia/conhecimento usam
-suas rotas próprias. Capacidades knowledge/search/reports anunciadas só em 0005.
+suas rotas próprias. Capacidades knowledge/search/reports anunciadas a partir de 0005,
+incluindo a revisão atual 0006a.

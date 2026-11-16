@@ -1,4 +1,4 @@
-# API e segurança da fase 02
+# API de identidade, organizações e clientes
 
 Contrato executável em `/docs` e `/openapi.json`. Erros usam
 `application/problem+json`; os detalhes de SQL, parâmetros e exceções não são
@@ -31,8 +31,8 @@ conservador/compartilhado e o limite por conta permanece independente. Confiar e
 cadeias de proxy externas exige configuração própria antes de produção.
 
 `GET /auth/config` informa apenas se o cadastro público está disponível.
-Mobile terá fluxo próprio de acesso curto e refresh com rotação na fase 06;
-esta fase não cria tokens mobile longos nem login mobile fictício.
+Sessões bearer legadas usam [acesso curto e refresh rotativo](API_SESSAO_TOKEN.md),
+separados do cookie/CSRF web. O cliente nativo foi descontinuado.
 
 ## Organizações e integrantes
 

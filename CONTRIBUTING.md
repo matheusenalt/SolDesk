@@ -10,4 +10,4 @@ O código próprio é licenciado sob GNU AGPL v3 somente (`AGPL-3.0-only`), conf
 [LICENSE](LICENSE). Envie apenas contribuições que você tenha direito de licenciar
 nesses termos. Preserve os avisos de terceiros e documente novas dependências em
 [docs/LICENCAS.md](docs/LICENCAS.md). Não há cessão de direitos autorais nem CLA
-adicional instituído nesta fase.
+adicional instituído no projeto.

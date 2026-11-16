@@ -242,7 +242,6 @@ export function Workspace() {
         if (tab === "team") await loadTeam();
       });
     }
-    // Recarregar somente quando o contexto autenticado ou a aba mudar.
   }, [profile?.organization_id, profile?.must_change_password, tab]);
 
   function authSubmit(event: FormEvent<HTMLFormElement>) {

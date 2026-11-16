@@ -1,4 +1,4 @@
-# Definições de métricas — Fase 05
+# Definições de métricas
 
 Contrato escrito antes da implementação dos relatórios. Os números descrevem
 somente atendimentos registrados; não medem conhecimento, complexidade,
@@ -23,7 +23,7 @@ competência, produtividade, necessidade de treinamento ou contratação.
   `TicketEvent.ocorrido_em`; abertura usa `aberto_em`. Não trocar pelo processamento
   ou revisão posterior. Fila atual é fotografia no instante da consulta, identificada
   separadamente dos totais do período. Histórico de classificações/equipes anterior
-  à Fase 05 não é reconstruído por suposição.
+  à criação das respectivas versões não é reconstruído por suposição.
 
 ## Indicadores e fontes
 

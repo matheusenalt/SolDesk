@@ -1,4 +1,4 @@
-# Demonstração fictícia da fase 02
+# Demonstração fictícia no produto
 
 Em uma instalação **Cloud não produtiva**, após o setup:
 

@@ -11,9 +11,9 @@ RLS por usuário/empresa e hashes de tokens não foram removidos nem alterados.
 O contrato legado bearer mantém acesso curto, refresh rotativo/antirreplay e
 testes de segurança, independente de SDK nativo. Cookie/CSRF continuam sendo
 a autenticação da web. Nenhum modelo de negócio ou horário foi alterado.
-Contrato: [sessão por token](docs/API_FASE_06A.md).
+Contrato: [sessão por token](docs/API_SESSAO_TOKEN.md).
 
-## Fase 05: conhecimento e relatórios
+## Conhecimento e relatórios
 
 Migração aditiva 0005 amplia KnowledgeArticle e acrescenta ArticleVersion,
 ArticleConsultation e Team, com RLS FORCE. FKs compostas protegem cliente/template
@@ -44,11 +44,11 @@ Períodos até 3661 dias. Tela pagina histórico em 100; CSV exporta histórico 
 dentro dos limites. Carga de produção exige medição futura. Não há dependência
 nova, busca vetorial ou serviço externo. Nome/fuso da organização preservam as
 políticas aninhadas de mídia/conhecimento; alterações usam rotas e locks próprios.
-Contrato: [API Fase 05](docs/API_FASE_05.md).
+Contrato: [API](docs/API_CONHECIMENTO_RELATORIOS.md).
 
 Monorepo: API Python/FastAPI + Pydantic, SQLAlchemy 2 e Alembic; web React,
 TypeScript, Vite e Tailwind CSS v4; PostgreSQL 17 no Compose. Sem microserviços
-de negócio nesta fase. Contrato OpenAPI disponível em `/docs` e `/openapi.json`.
+de negócio separados. Contrato OpenAPI disponível em `/docs` e `/openapi.json`.
 
 ```mermaid
 flowchart LR
@@ -88,21 +88,16 @@ Banco sem porta no host; API/web vinculadas a 127.0.0.1. Imagens de API e Nginx
 usam usuário não root. O perfil dev monta fontes para hot reload.
 Scripts não apagam banco ou volumes; preservam o UUID em migrações repetidas.
 
-Na fase 01, setup PowerShell, builds de imagens, Compose/PostgreSQL, migrações
-repetidas e reinício com preservação de UUID foram executados em Windows/WSL 2.
-O navegador foi testado contra Nginx/API/PostgreSQL, além da suíte SQLite local.
-O aceite reproduzível está em `scripts/test-compose.ps1`; o Playwright aceita
-`PLAYWRIGHT_BASE_URL` para usar serviços externos sem iniciar API/Vite locais.
 
 SQLite é exclusivamente alternativa de desenvolvimento/testes rápidos. Testes
 SQLite não comprovam PostgreSQL, RLS ou persistência entre contêineres.
-Na fase 02, a API usa `soldesk_runtime`, sem superusuário/BYPASSRLS e sem ser dona
+A API usa `soldesk_runtime`, sem superusuário/BYPASSRLS e sem ser dona
 das tabelas. Migração/bootstrap usam conexão separada, nunca entregue à API.
 `Context.query/get` aplica o tenant da sessão e `set_config(..., true)` define
 o contexto por transação. Políticas RLS com FORCE reforçam a separação. Testes
 com SQL sem filtro e conexão reutilizada demonstram a barreira no PostgreSQL.
 
-Na Fase 04, Redis/RQ, dispatcher, worker e `StorageBackend` local/S3 compatível
+Redis/RQ, dispatcher, worker e `StorageBackend` local/S3 compatível
 estão implementados. A API grava recibo durável no PostgreSQL e responde 202 sem
 esperar Redis ou transcrição; o dispatcher entrega o trabalho ao RQ. Não há
 conectores externos de negócio.
@@ -110,11 +105,11 @@ conectores externos de negócio.
 VPS/produção, TLS, backup/restauração e revisão de segurança ainda não validados.
 Use apenas dados fictícios até a revisão de produção e segurança do produto.
 
-## Fase 02: identidade e organização
+## Identidade e organização
 
 `Organization`, `User`, `OrganizationMembership`, `Client`, `ClientExternalRef`,
 `Invitation` e `AuditEvent` adicionados em migração aditiva 0002. O esquema SQL
-é um snapshot congelado, independente dos modelos de futuras fases. Datas
+é um snapshot congelado, independente de alterações posteriores dos modelos. Datas
 TIMESTAMPTZ em UTC; fuso IANA por organização, aplicado na interface.
 
 Sessões opacas (12 h), hashes Argon2id, CSRF sincronizado no servidor, revogação,
@@ -129,17 +124,16 @@ por empresa/cliente. Auditoria administrativa não armazena segredos e o runtime
 não recebe permissão para alterar/apagar auditoria.
 
 Papéis e regras: [PERMISSOES](docs/PERMISSOES.md). Contratos e fronteiras:
-[API fase 02](docs/API_FASE_02.md). Mobile, Redis, áudio, SMTP e arquivos continuam
-fora desta fase.
+[API](docs/API_IDENTIDADE.md). Áudio, fila e arquivos estão descritos abaixo; SMTP não implementado.
 
-## Fase 03: relato, revisão e operação
+## Relato, revisão e operação
 
 Migração 0003 aditiva: Record/RecordVersion, Ticket/TicketSequence,
 TicketParticipant/TicketComment/TicketEvent/TicketInterval, KnowledgeArticle
 (somente rascunho), Notification e RequestReceipt. SQL congelado, FKs por tenant,
 RLS FORCE em todas as tabelas novas, leitura de notificações por destinatário.
 `work_schemas`, `work`, `work_routes` separam entrada, regras transacionais e HTTP.
-Não houve novas dependências nem serviços; worker/Redis permanecem na fase 04.
+O domínio de operação é independente dos jobs de áudio; worker/Redis são descritos abaixo.
 
 Bloqueio da linha e revisão otimista evitam sobrescrita; recibo com hash e
 advisory lock transacional evitam criações duplicadas. Comentários, versões e
@@ -150,15 +144,14 @@ Lotes de revisão são atômicos. Somente o autor confirma finalizações.
 UI em `WorkArea`, textos em `work-strings`; API real, polling de 15 s, páginas
 de registros/revisões/histórico/chamados e três destinos. Conversão de horário
 IANA preserva o fato e exige offset em ambiguidades de horário de verão.
-Na fase 03, processamento/publicação não tinham caminhos ativos. Contratos:
-[API fase 03](docs/API_FASE_03.md), [estados](docs/ESTADOS.md).
+Processamento e publicação usam seus fluxos próprios. Contratos:
+[API](docs/API_ATENDIMENTOS.md), [estados](docs/ESTADOS.md).
 
-## Fase 04: arquivos e processamento assíncrono
+## Arquivos e processamento assíncrono
 
 Migração 0004: Attachment, AudioJob, TemplateVersion e GlossaryTerm, tenant e FKs
 compostas/RLS FORCE. Armazenamento privado local por padrão; adaptador boto3 para
-S3 compatível. Perfil S3 usa RustFS fixado por digest (a tentativa da imagem MinIO
-retornou 401); endpoint MinIO existente também pode usar o adaptador S3.
+S3 compatível. Perfil S3 usa RustFS fixado por digest para reprodutibilidade; endpoint MinIO existente também pode usar o adaptador S3.
 URLs HMAC curtas continuam exigindo autorização e a mesma sessão; acesso auditado.
 
 Upload verifica tamanho/assinatura/MIME e salva arquivo + job durável. Dispatcher
@@ -179,7 +172,7 @@ com aviso de possível envio ao fabricante e sem captura simultânea prometida.
 Strings centralizadas em `media-strings.ts`. Conclusão exige conferência humana;
 Ticket recebe comentário posterior sem mudar estado. Horários originais imutáveis.
 Retenção padrão manter; políticas explícitas removem áudio elegível com auditoria.
-Detalhes, limites e contratos: [API fase 04](docs/API_FASE_04.md).
+Detalhes, limites e contratos: [API](docs/API_MIDIA.md).
 
 ## Licenciamento do código
 

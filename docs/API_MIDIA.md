@@ -1,4 +1,4 @@
-# API e fronteiras da Fase 04
+# API de mídia e processamento
 
 Todas as rotas abaixo usam `/api/v1`, sessão opaca e organização autenticada no
 servidor; mutações exigem `X-CSRF-Token`. Respostas de erro seguem RFC 7807.

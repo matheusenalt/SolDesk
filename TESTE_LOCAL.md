@@ -1,413 +1,88 @@
-# Teste local
+# Desenvolvimento e testes
 
-## Pré-requisitos
+Somente dados fictícios e ambientes isolados. Nunca executar controle de worker,
+bootstrap de demonstração ou teste de reinício em produção. Instalação e
+pré-requisitos: [guia](docs/INSTALACAO.md). Configuração/portas: [Compose](compose.yaml).
 
-Windows 10/11: Git, navegador e Docker Desktop em versão compatível com o Windows,
-backend WSL 2 e virtualização habilitada no firmware. Verifique `wsl --status`
-e `wsl -l -v`; se ausente, a instalação do WSL exige privilégios e pode exigir
-reinicialização. Siga a documentação oficial do Docker Desktop e do WSL.
+## Backend
 
-Linux: Git, Docker Engine, plugin Compose e navegador. Configure a permissão de
-acesso ao daemon segundo a política da máquina. VS Code é opcional.
+Python 3.12+ declarado, ambiente local testado em 3.13. Node 22.12+ para web.
+Crie `.venv`, instale `backend/requirements.lock` e então `pip install --no-deps -e backend`.
+Use o Python do ambiente criado, sem instalar dependências globais.
+Para operação autenticada, PostgreSQL é obrigatório: DATABASE_URL runtime,
+MIGRATION_DATABASE_URL migrador e RUNTIME_PASSWORD por ambiente privado.
+Execute `python -m app.manage migrate` com a conexão de migração; a API nunca
+deve receber essa conexão. Não imprima URLs com credenciais.
 
-Verifique espaço livre e RAM para imagens e banco. Como orçamento inicial,
-reserve 8 GB de RAM e 10 GB de disco livre; isso é orientação, não medição nem
-garantia de desempenho. Testes básicos não precisam de GPU ou modelo de IA.
+SQLite só comprova rotas de instalação na revisão 0001; não simula autenticação/RLS.
+Para instalação rápida isolada, defina DATABASE_URL=sqlite:///./soldesk.db,
+rode `python -m alembic -c backend/alembic.ini upgrade 0001` e inicie
+`python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log`.
 
-```text
-git --version
-docker --version
-docker compose version
-docker info
-```
-
-## Setup e alternativa manual
-
-PowerShell, na raiz:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
-```
-
-Bash, na raiz:
-
-```bash
-bash scripts/setup.sh
-```
-
-Alternativa manual em ambos os sistemas:
-
-1. PowerShell: `Copy-Item .env.example .env`; bash: `cp .env.example .env`.
-   Não sobrescreva `.env` já existente.
-2. Edite `.env`: preencha `POSTGRES_PASSWORD`, `RUNTIME_PASSWORD` e
-   `DOWNLOAD_SIGNING_KEY` com segredos aleatórios próprios distintos (32 bytes),
-   preferencialmente hexadecimal (sem caracteres reservados de URL), e confira portas.
-3. `docker compose config --quiet` (não imprima a configuração com segredos).
-4. `docker compose up -d --build db`
-5. `docker compose run --rm migrate`
-6. `docker compose up -d --build --wait api web redis worker dispatcher`
-7. `docker compose ps`
-
-API e web devem ficar saudáveis/em execução; migrate deve terminar com código 0.
-O script faz a migração antes de liberar a API e a repete para conferir idempotência.
-
-## Verificação mínima
-
-PowerShell:
-
-```powershell
-Invoke-RestMethod http://localhost:8000/api/v1/health
-$before = (Invoke-RestMethod http://localhost:8000/api/v1/server-info).instance_id
-docker compose run --rm migrate
-docker compose restart db api
-docker compose up -d --wait api web
-$after = (Invoke-RestMethod http://localhost:8000/api/v1/server-info).instance_id
-if ($before -ne $after) { throw 'Identidade da instalação mudou' }
-```
-
-Bash:
-
-```bash
-curl --fail http://localhost:8000/api/v1/health
-before=$(curl --fail --silent http://localhost:8000/api/v1/server-info)
-docker compose run --rm migrate
-docker compose restart db api
-docker compose up -d --wait api web
-after=$(curl --fail --silent http://localhost:8000/api/v1/server-info)
-test "$before" = "$after"
-```
-
-Health esperado: `{"status":"ok","database":"connected"}`. Server-info inclui
-`product=SolDesk`, `api_version=1.0.0`, UUID, modo `community` e capabilities reais.
-Abra http://localhost:8080, confira “Backend conectado”, UUID, tema claro/escuro
-e largura de celular; http://localhost:8000/docs deve abrir o OpenAPI.
-Pare API com `docker compose stop api`; recarregue a web e verifique erro amigável,
-sem falso sucesso. Retome com `docker compose start api` e “Verificar novamente”.
-
-## Desenvolvimento fora do Docker
-
-Python 3.12+ e Node LTS 22.12+ são necessários apenas neste modo.
-
-PowerShell:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e './backend[dev]'
-$env:DATABASE_URL = 'sqlite:///./soldesk.db'
-.\.venv\Scripts\alembic.exe -c backend/alembic.ini upgrade 0001
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
-```
-
-Bash:
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -e './backend[dev]'
-export DATABASE_URL=sqlite:///./soldesk.db
-.venv/bin/alembic -c backend/alembic.ini upgrade 0001
-.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
-```
-
-Em outro terminal: `cd web`, `npm ci`, `npm run dev`. Abra http://localhost:5173.
-SQLite executa somente as rotas de instalação da fase 01 e a migração 0001.
-Operações da fase 02 exigem PostgreSQL; não existe autenticação simulada SQLite.
-Para PostgreSQL local, configure `DATABASE_URL` para o usuário runtime,
-`MIGRATION_DATABASE_URL` para o migrador e `RUNTIME_PASSWORD` por ambiente.
-Execute `python -m app.manage migrate` com o ambiente backend instalado. A API
-nunca recebe a conexão do migrador. Não coloque credenciais no Git.
-
-## Validações automatizadas
-
-Com o ambiente virtual ativo, na raiz:
+Na raiz, com ambiente virtual ativo:
 
 ```text
-python -m pytest backend/tests -q
-python -m ruff check backend scripts/tokens.py
-python -m ruff format --check backend scripts/tokens.py
+python -m ruff check backend scripts/tokens.py scripts/audit_licenses.py
+python -m ruff format --check backend scripts/tokens.py scripts/audit_licenses.py
 python scripts/tokens.py --check
-```
-
-Em `web`: `npm run lint`, `npm run format:check`, `npm test`, `npm run build`.
-Para navegador: `npx playwright install chromium`, depois `npm run test:e2e`.
-Se usar o Edge já instalado, PowerShell: `$env:PLAYWRIGHT_CHANNEL='msedge'`
-antes de `npm run test:e2e`; bash: `PLAYWRIGHT_CHANNEL=msedge npm run test:e2e`.
-O teste inicia API/Vite nas portas 18000/15173 e encerra ao terminar; usa SQLite
-`web/e2e.db` ignorado pelo Git. Não sobrescreve o banco de desenvolvimento.
-Para testar contra PostgreSQL use o roteiro de Compose acima; a suíte rápida
-usa SQLite temporário e não substitui essa verificação.
-
-### Aceite automatizado dos contêineres
-
-Com os serviços iniciados pelo setup, na raiz (PowerShell):
-
-```powershell
-./scripts/test-compose.ps1
-```
-
-O script verifica saúde, UUID, migrações repetidas, reinício, proxy, páginas,
-usuários não root e volume PostgreSQL sem porta no host. Ele reinicia `db` e `api`;
-execute somente no ambiente local de teste. Não apaga volumes. Para portas
-personalizadas, informe `-ApiUrl` e `-WebUrl`. No Bash use o roteiro manual acima.
-
-Para executar os mesmos testes de navegador contra Nginx/API/PostgreSQL, em `web`:
-
-```powershell
-$env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:8080'
-$env:PLAYWRIGHT_CHANNEL = 'msedge'
-npm run test:e2e
-Remove-Item Env:PLAYWRIGHT_BASE_URL
-Remove-Item Env:PLAYWRIGHT_CHANNEL
-```
-
-Bash: `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npm run test:e2e`.
-Com `PLAYWRIGHT_BASE_URL` definido, o Playwright usa o ambiente existente e não
-inicia API/Vite locais. Para o perfil dev, use `http://127.0.0.1:5173` após subir
-os serviços de desenvolvimento. Sem a variável, permanece o fluxo SQLite isolado.
-
-## Falhas comuns
-
-- Fase 02 com banco da fase 01: repita o setup, que gera `RUNTIME_PASSWORD`, cria
-  o papel restrito e aplica 0002. A migração é aditiva, sem apagar a instalação.
-- Login sem administrador: execute o bootstrap explícito do README. Community
-  recusa bootstrap de uma segunda empresa; Cloud permite empresas distintas.
-- Cookie Secure em produção exige HTTPS. Não use `ENVIRONMENT=production` com
-  localhost HTTP como teste de login.
-- 403 CSRF: atualize o token em `/api/v1/auth/csrf`, confira cookies e Origin/CORS.
-- 429 de login: aguarde a janela/bloqueio progressivo. Não desative a proteção
-  para automatizar testes; reutilize uma sessão por projeto de navegador.
-
-- Docker ausente: instale Docker Desktop/Engine e Compose. WSL ausente não é erro
-  do projeto; configure-o e reinicie quando solicitado pelo instalador.
-- Daemon parado: inicie Docker e repita `docker info`.
-- Porta ocupada: altere `WEB_PORT`, `API_PORT` ou `DEV_PORT` e `CORS_ORIGINS`.
-- 503: confira `docker compose logs migrate api db` sem divulgar segredos;
-  execute migrações. Não apague volumes como solução automática.
-- Senha do banco alterada depois de criar o volume: trocar `.env` não muda a
-  senha já armazenada; faça manutenção explícita com backup, sem excluir dados.
-- Perfil dev: `docker compose --profile dev up -d --build db migrate api-dev web-dev`.
-- Microfone mobile: HTTP por IP LAN não é contexto seguro para navegador;
-  gravação web móvel exigirá HTTPS. Essa função ainda não existe na fase 01.
-
-## Aceite da fase 02
-
-Com Docker disponível, na raiz, PowerShell e Bash:
-
-```text
+python -m pytest backend/tests -q
 docker compose --profile test run --build --rm tests
 ```
 
-O perfil usa banco isolado `soldesk_test`, em tmpfs e sem porta no host. Não limpa
-o banco da aplicação. Os testes criam identificadores próprios, não dependem de
-senhas fixas e recusam executar a suíte de negócio em outro nome de banco.
-Sem esse perfil, os testes PostgreSQL ficam explicitamente como ignorados;
-uma execução SQLite não aprova o aceite de isolamento.
+Pytest sem URLs de teste pode pular PostgreSQL; não declarar RLS aprovado nesse caso.
+O perfil Compose usa test-db/test-redis e exige soldesk_test no fixture; não substitua
+essas URLs por banco real. Com imagem e dependências já preparadas:
+`docker compose --profile test run --no-deps --rm --pull never tests`.
+Teste upgrade novo a partir da revisão anterior em banco isolado, com duas
+organizações fictícias, RLS direto/HTTP/busca, concorrência e idempotência pertinentes.
+Não apagar volumes nem executar downgrade destrutivo para repetir testes.
 
-Roteiro manual com dados inventados:
+## Frontend e navegador
 
-1. No Community, faça bootstrap; ou no Cloud, execute o seed idempotente.
-2. Entre como administrador, cadastre cliente e uma referência externa fictícia.
-3. Pesquise nome/apelido com e sem acento, consulte e edite, marque inativo.
-4. Em Equipe, crie um convite e copie o link. Aceite em outro perfil de navegador;
-   repita o aceite para observar a recusa por uso único.
-5. Crie integrante com senha temporária, copie uma vez e entre em outro perfil:
-   acesso aos clientes só deve ocorrer após alterar a senha.
-6. Entre como técnico: equipe administrativa não aparece e promoção direta é
-   recusada. Desative esse membro como admin; a sessão perde acesso imediato.
-7. Não é possível rebaixar/desativar o último admin. Tente mudar o fuso IANA da
-   organização e confira o horário de cadastro no detalhe do cliente.
-8. Na outra empresa, UUID/nomes de clientes da primeira não são acessíveis.
-9. Use "Sair de todos os dispositivos" e confira o encerramento em outro perfil.
-
-E2E autenticado: defina `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD` **somente no
-ambiente**, com uma conta fictícia, e `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080`.
-No PowerShell defina também `PLAYWRIGHT_CHANNEL=msedge` para o Edge instalado.
-Em `web`, execute `npx playwright test --config playwright.identity.config.ts`.
-No Bash use as mesmas variáveis com `export`; Chromium precisa ser instalado
-com `npx playwright install chromium`. O teste não grava traces autenticados.
-As credenciais não são argumentos de linha de comando nem arquivos versionados.
-
-## Aceite da fase 03
-
-Repita o setup para construir os fontes atuais e aplicar 0003 no volume
-existente. Não apague volumes. A migração preserva instalação, organizações,
-equipe e clientes. Os comandos de backend e E2E autenticado acima agora incluem
-a fase 03: 24 pytest (5 de instalação, 10 de identidade e 9 de operação), 12
-Playwright autenticados (6 cenários em desktop/emulação móvel). A suíte
-`npm run test:e2e` mantém 4 regressões da instalação. `npm test` executa 6 Vitest.
-Execute também lint/formatação/build e `python scripts/tokens.py --check`.
-
-Use exclusivamente organização, contas e relatos fictícios:
-
-1. Em **Atendimentos → Novo registro**, escolha cliente e finalização. Informe
-   texto e fato retroativo. Antes de confirmar, o histórico padrão deve contar
-   zero; a opção de provisórios mostra o item identificado como não confirmado.
-2. Confira/edite o texto e confirme como autor. O horário do fato e recebimento
-   devem permanecer, com revisão separada. Outro administrador não pode confirmar.
-3. Crie duas finalizações e confirme pela fila **Minhas revisões**, em lote.
-4. Derive uma finalização para conhecimento/chamado: deve surgir outro rascunho
-   com o mesmo fato. Conhecimento enviado continua artigo rascunho, sem publicar.
-5. Abra chamado normal/urgente: encaminhamento imediato. Solicite esclarecimento,
-   responda, mencione integrante, transfira e mude prioridade. Os textos anteriores
-   e intervalos de entrada/saída em espera devem continuar consultáveis.
-6. Resolva, depois encerre e reabra. Mesmo código/ID, contador incrementado;
-   não deve encerrar automaticamente ao resolver.
-7. Consulte notificações e marque leitura. Outra pessoa/empresa não acessa o UUID.
-8. Duas abas editando a mesma revisão devem produzir 409 na segunda escrita.
-   Repetir criação com a mesma Idempotency-Key e corpo não duplica; corpo distinto
-   com a mesma chave produz 409. Esses casos também são automatizados no pytest.
-9. Em horário local ambíguo/inexistente por horário de verão, informe o ISO com
-   offset explícito. Editar só texto não pode truncar os segundos do fato.
-
-Regressão de persistência: `scripts/test-compose.ps1` executa migrações duas
-vezes e reinicia banco/API sem apagar dados. Transições:
-[docs/ESTADOS.md](docs/ESTADOS.md); contratos e limites:
-[docs/API_FASE_03.md](docs/API_FASE_03.md). Resultado executado:
-[docs/VALIDACAO_PROMPT_03.md](docs/VALIDACAO_PROMPT_03.md).
-
-## Aceite da fase 04: modo rápido, sem modelo
-
-Repita o setup: gera também chave aleatória de downloads, migra até 0004 sem
-apagar dados e inicia Redis/dispatcher/worker. Mantenha `TRANSCRIPTION_PROVIDER=mock`
-e `STORAGE_BACKEND=local`. Basta Docker/Git/navegador para o uso web básico.
-Redis e arquivos ficam em volumes privados; nenhuma porta de Redis/S3 é publicada.
-
-1. Entre em **Atendimentos**, selecione cliente e destino. Informe texto fictício,
-   opcionalmente com `Problema: ... Resultado: ...`; grave ou escolha áudio.
-2. No computador use `http://localhost:8080` ou `127.0.0.1`. Autorize o microfone
-   explicitamente, confira contador, pare, ouça a prévia, descarte/regrave e envie.
-   Microfone recusado/indisponível mantém digitação/upload. Em celular físico,
-   `http://IP-da-LAN` não é contexto seguro: use HTTPS de desenvolvimento com
-   certificado confiável/configuração de proxy/origem ou aguarde app nativo da fase 06.
-   O setup não expõe a instalação à LAN nem instala certificado automaticamente.
-3. Upload retorna sem esperar o worker. **Mock não reconhece fala**: reutiliza
-   somente o relato digitado e sinaliza simulação/incerteza. Áudio sem relato real
-   exige digitação antes de confirmar. Nenhum texto de sucesso/transcrição é inventado.
-4. Confira texto bruto/organizado, alertas de possível credencial e trechos incertos;
-   edite e confirme explicitamente. Fato/recebimento permanecem; processamento e
-   revisão têm tempos separados. Conhecimento continua rascunho.
-5. Como admin em **Configurar processamento**, edite rótulos/marcadores de templates
-   e glossário (palavras sem números). Nova versão não altera registros anteriores.
-   O texto livre sem marcadores é preservado; nada de diagnóstico inferido.
-6. Anexe PDF/PNG/JPEG/TXT fictício no chamado ou histórico por cliente. Prepare
-   acesso: URL exige a mesma sessão e expira em 120 s; outra empresa não tem acesso.
-7. Em ambiente fictício, `docker compose stop worker`; crie chamado urgente com
-   áudio, atribua/resolva manualmente. `docker compose up -d --wait worker` retoma
-   o job; transcrição posterior é comentário e não reabre o chamado. Sempre retome
-   o worker no fim do teste. Reprocessar/descarte ficam disponíveis conforme estado.
-8. Retenção padrão mantém arquivos. Somente selecione remoção após confirmação
-   ou N dias quando desejar essa política. Limpeza preserva metadados/auditoria.
-
-Saúde autenticada em `/api/v1/media/health` e no painel de configuração. No host:
-`docker compose exec worker python -m app.media_worker health`. Para operação
-somente textual, pare worker/worker-whisper, ajuste `TRANSCRIPTION_PROVIDER=disabled`
-e repita setup; upload de áudio informa indisponibilidade, texto/chamados funcionam.
-Ao alternar provedor, pare explicitamente o worker antigo antes do novo setup;
-os dois workers não devem consumir as mesmas filas com provedores diferentes.
-
-Testes automatizados: `docker compose --profile test run --build --rm tests`
-executa 43 pytest com PostgreSQL/Redis isolados e ffmpeg, sem modelo.
-O E2E autenticado passa a 24 casos; exporte também `E2E_CONTROL_WORKER=1` somente
-contra esta stack local para incluir parada/retomada real (sem a variável, esse
-aceite será pulado e não comprovará a fase). Credenciais fictícias só no ambiente.
-`npm run test:e2e` mantém 4 casos de instalação e `npm test` mantém 6 Vitest.
-
-## faster-whisper opcional
-
-Não está no modo rápido e não instala pesos por padrão. Obtenha explicitamente um
-modelo CTranslate2 com licença/procedência verificadas; coloque seus arquivos em
-`models/whisper` (ignorado pelo Git). Ausência do modelo causa erro amigável/retry,
-sem download. Semear áudio fictício e revisar manualmente também neste modo.
-
-1. `docker compose stop worker`
-2. Ajuste `TRANSCRIPTION_PROVIDER=faster_whisper` em `.env`.
-3. Repita setup ou use `docker compose --profile whisper up -d --build --wait api dispatcher worker-whisper`.
-4. `docker compose exec worker-whisper python -m app.media_worker health`.
-5. `docker stats --no-stream` para CPU/RAM; registre modelo/hardware, duração do
-   áudio, tempo de carga/processamento, memória de pico e precisão em português.
-
-Imagem limitada a 2 CPUs/3 GiB e tmpfs 128 MiB; inferência CPU/int8, duas threads,
-`HF_HUB_OFFLINE=1`, modelo montado somente leitura e `local_files_only=True`.
-Imagem construída/importada e recusa de modelo ausente testadas sem rede;
-**inferência e benchmark com modelo real permanecem pendentes**, sem promessa de
-velocidade. Para voltar, pare worker-whisper, ajuste mock e repita setup.
-
-## S3 compatível e antivírus opcionais
-
-Configure no ambiente do servidor ou `.env` ignorado `STORAGE_BACKEND=s3`, endpoint,
-bucket privado sem versionamento, região e chaves próprias. Perfil de exemplo
-RustFS usa `http://object-store:9000` e as chaves `S3_ACCESS_KEY`/`S3_SECRET_KEY`,
-vazias no exemplo; não há senha fixa, console nem porta no host.
+Em `web`, instalar do lock com `npm ci` e executar:
 
 ```text
-docker compose --profile s3 up -d --wait object-store
-docker compose run --rm migrate python -m app.media_worker storage-init
-docker compose run --rm migrate python -m app.media_worker storage-check
+npm run lint
+npm run format:check
+npm test
+npm run build
 ```
 
-`storage-init` cria bucket privado se ausente, sem política pública. `storage-check`
-escreve/lê/remove exclusivamente um objeto fictício novo. Repita setup para aplicar
-o backend à API/dispatcher/worker. Para AWS ou MinIO existente, configure endpoint
-HTTPS apropriado, bucket e IAM restrito; o perfil local não é exposição de produção.
-Trocar backend/bucket não migra objetos existentes. Backups/versões de S3 exigem
-lifecycle próprio. O adapter foi testado com RustFS real; MinIO não foi iniciado
-(imagem tentada retornou 401). Dados locais existentes não foram apagados.
+Build inclui TypeScript sem emissão e Vite. `npm run dev` abre Vite em localhost:5173.
+API_PROXY_TARGET seleciona a API de desenvolvimento; não configure produção.
+Tokens centralizados vêm de docs/tokens.json; `scripts/tokens.py --check` mede
+contraste, sem substituir teste de foco, teclado/leitor de tela ou dispositivo físico.
 
-ClamAV: `docker compose --profile antivirus up -d clamav`, espere inicializar
-assinaturas, ajuste `CLAMAV_ENABLED=true` e repita setup. Desligado por padrão.
-O hook INSTREAM foi testado com servidor TCP controlado (limpo/FOUND); daemon e
-atualização real de assinaturas não foram validados nesta fase.
+```text
+npx playwright install chromium
+npx playwright test --config playwright.config.ts --workers=1
+```
 
-Ditado Web Speech: admin precisa habilitar, navegador precisa suportar contexto
-seguro e usuário aceitar o aviso **antes** de ativar. Alguns fabricantes recebem
-áudio em seus serviços; não ative para dados privados. Não opera simultaneamente
-com MediaRecorder. Texto ao vivo fica separado do resultado do servidor. Serviço
-real do fabricante/Safari/iOS/aparelho físico não foram testados; fallback permanece.
+Sem PLAYWRIGHT_BASE_URL, a suíte pública inicia API SQLite/Vite nas portas
+18000/15173 e usa web/e2e.db ignorado; verifica somente instalação.
+Contra Docker local, definir PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080.
+Edge instalado: PLAYWRIGHT_CHANNEL=msedge. Não é teste Android/iOS físico.
 
-Evidências e pendências: [VALIDACAO_PROMPT_04](docs/VALIDACAO_PROMPT_04.md).
+Para os fluxos autenticados, prepare organização e credenciais fictícias por
+bootstrap/seed em instalação local Cloud. Defina E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD
+no ambiente, sem gravá-los em scripts ou repositório, e execute em web:
 
-## Aceite da Fase 05
+```text
+npx playwright test --config playwright.identity.config.ts
+```
 
-Repita setup para aplicar 0005 ao volume existente, sem apagar dados. Execute
-`docker compose --profile test run --build --rm tests`: 65 testes PostgreSQL,
-incluindo 22 novos casos parametrizados de conhecimento/relatórios. Repita lint,
-formatação, testes web, build e tokens conforme comandos anteriores. A suíte de
-identidade inclui 4 cenários novos × desktop/emulação móvel (32 casos ao todo),
-usando as mesmas variáveis de credenciais fictícias, com traces desativados e
-`E2E_CONTROL_WORKER=1`. `npm run test:e2e` mantém 4 regressões de instalação.
+E2E_CONTROL_WORKER=1 só na stack fictícia local: inclui parada/retomada real do worker.
+Sem essa variável, o cenário correspondente pode ser pulado; informar a cobertura.
+Confirme worker saudável ao fim. Não registrar senha, token ou trace com dados privados.
 
-Roteiro manual somente com dados fictícios:
+## Infraestrutura, fluxos e diagnóstico
 
-1. Técnico prepara artigo de registro, preenche título/problema/procedimento,
-   categoria/sistema e causa somente se relatada. Envia para revisão; não aparece
-   na busca pública. Revisor devolve com motivo; autor corrige e reenvia.
-2. Outro gestor/admin confere avisos e conteúdo; ambos os checkboxes são
-   necessários. Publica, consulta diferenças e abre a origem: fato/envio preservados.
-3. Busque `0x80070005`, `impressão`/`impressao` e `CFOP 5102`. Restrinja outro
-   artigo a cliente A: só entra com esse filtro, nunca em sugestões do B. Arquive
-   com motivo e confira busca explícita de arquivados.
-4. Em Relatórios, consulte hoje/semana/mês/início e livre; filtre cliente/pessoa/
-   equipe/categoria/sistema. Confira fatos no fuso da organização e comparação.
-   Finalização pendente não soma em confirmadas. A abre e B resolve: atores distintos.
-5. Resolva/encerre/reabra o mesmo Ticket: ações separadas e ticket único. Adicione
-   espera por esclarecimento: bruto/líquido, mediana/P90/n e aviso de amostra pequena.
-6. Técnico só vê si mesmo, inclusive exportando. Fórmulas de cliente/nome fictício
-   recebem apóstrofo no CSV; auditoria registra exportação sem texto de relato.
-7. Crie equipe como admin, veja composição atual e filtre. Pessoas começam em
-   ordem alfabética; não há classificação de competência. Gráfico tem rótulos e
-   tabela alternativa; confira largura móvel e temas. Sem dados há vazio explícito.
-8. Mude nome/fuso em Configurações e confira que políticas de áudio/conhecimento
-   continuam configuradas. Não use dados reais nestes testes.
-
-Definições: [METRICAS](docs/METRICAS.md). API: [Fase 05](docs/API_FASE_05.md).
-Limites e resultados observados: [VALIDACAO_PROMPT_05](docs/VALIDACAO_PROMPT_05.md).
-## Acesso web em celulares e contrato legado
-
-Android/iOS nativos foram descontinuados. Use a mesma URL da interface web
-no computador e no celular, com HTTPS em acesso remoto. Não há SDK nativo a instalar.
-A gravação depende das permissões e compatibilidade do navegador; digitação
-continua disponível. Nenhuma promessa de PWA ou funcionamento offline nesta etapa.
-
-Migração `0006a`, sessões bearer e seus testes de segurança foram preservados.
-O perfil isolado de testes usa PostgreSQL/Redis e dados fictícios; não rode
-cenários de alteração de estado contra produção.
-Contrato legado: [API de sessão](docs/API_FASE_06A.md).
+`scripts/test-compose.ps1` verifica saúde, UUID, migração repetida, reinício,
+proxy, usuário não root e volume/porta do banco; reinicia db/api. Apenas ambiente local.
+API `/api/v1/health` não comprova todos os subsistemas; mídia tem saúde autenticada.
+S3/ClamAV/Whisper e suas limitações: [operação](docs/OPERACAO_MIDIA.md).
+Smoke funcional: [uso](docs/USO.md). Recuperação ainda pendente: [backup](docs/BACKUP.md).
+Porta ocupada, Docker/WSL parado e URL/origem divergentes: corrigir configuração,
+não apagar dados. Arquivo grande/sem formato: conferir limites/MIME; microfone negado:
+usar digitação ou arquivo, sem inventar transcrição. Modelo ausente não é baixado.
+Resultados reais e não executados: [STATUS.md](STATUS.md).

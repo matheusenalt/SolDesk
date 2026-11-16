@@ -1,4 +1,4 @@
-# Permissões das fases 02–05
+# Permissões
 
 Todas as operações exigem sessão válida e vínculo ativo na organização corrente.
 O tenant é recuperado da sessão persistida, nunca aceito como credencial do cliente.
@@ -20,7 +20,7 @@ O tenant é recuperado da sessão persistida, nunca aceito como credencial do cl
 Todos os membros ativos veem todos os clientes da organização; restrição por
 cliente é evolução futura. O técnico não lista equipe nem promove a si mesmo.
 Um gestor não obtém acesso administrativo pela interface ou chamada direta à API.
-Conhecimento e relatórios seguem as regras da Fase 05 abaixo.
+Conhecimento e relatórios seguem as regras específicas abaixo.
 
 ## Registros e chamados
 
@@ -74,7 +74,7 @@ Templates antigos, trilha de acesso e histórico de processamento não têm excl
 ou edição pública. Revogar vínculo/sessão impede usar um link anteriormente
 emitido. Somente o worker recebe tarefa de transcrição; fila contém IDs, não áudio.
 
-## Conhecimento e relatórios — Fase 05
+## Conhecimento e relatórios
 
 | Recurso/ação | Regra |
 | --- | --- |
@@ -99,12 +99,12 @@ Restrição editorial por cliente controla busca/sugestão; não é ACL adiciona
 todos os membros ativos ainda veem clientes da própria empresa. Não promete
 sigilo entre membros com acesso ao mesmo cliente. Incluir técnico como revisor
 não amplia seu escopo gerencial. CSV exige CSRF e audita filtros/período/escopo.
-## Parte A da fase 06
+## API legada por token
 
-Bearer mobile mantém as mesmas permissões por empresa/usuário das fases anteriores;
+Bearer mobile mantém as mesmas permissões por empresa/usuário dos domínios descritos acima;
 não aceita organization_id do cliente para definir contexto. Cookie e bearer não
 são intercambiáveis. Refresh exige segredo de uso único, RLS por empresa/usuário
-e vínculo ativo. QR e server-info são públicos, não concedem acesso. Painel gerador
-é exibido ao administrador. App Community usa a primeira associação ativa; seleção
-de múltiplas empresas não implementada. Conhecimento publicado exige revisão
-editorial autorizada no painel. Cloud oficial permanece indisponível.
+e vínculo ativo. Server-info é público e não concede acesso; painel QR e app nativo
+foram descontinuados. Login por token usa a primeira associação ativa; não há seleção
+de múltiplas empresas nesse fluxo. Conhecimento publicado exige revisão
+editorial autorizada. Não há serviço Cloud oficial embutido no produto.

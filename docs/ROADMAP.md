@@ -1,47 +1,24 @@
-# Roadmap
+# Evolução do produto
 
-1. Protótipo local: arquitetura, tokens, saúde, identidade persistente e setup.
-2. Operação básica: organizações, autenticação, RLS, clientes e equipe.
-3. Registros, chamados, tempos, revisões e notificações.
-4. Áudio funcional: fila Redis, worker, revisão humana e storage.
-5. Produto ampliado: conhecimento, busca PostgreSQL e relatórios descritivos.
-6. Interface web responsiva: consolidar uso por computador e celular; apps nativos descontinuados.
-7. Conectores mock, ponta a ponta e revisão de segurança/privacidade.
+Estado implementado/testado em [STATUS](../STATUS.md); intenção em [VISAO](VISAO.md).
+Preservar FastAPI/React/PostgreSQL/RLS, segurança, versões e horários. Não reescrever o núcleo.
 
-Evoluções: restrição de acesso por cliente, SMTP opcional, busca semântica,
-push remoto e operação Cloud de produção. Prioridades do MVP em aberto.
-Cada fase exige validação e documentação próprias antes da próxima.
+| Ordem | Evolução | Reuso e aceite principal |
+|---|---|---|
+| 1 | Consolidação documental, identidade e gravação web | Uma interface responsiva, logo oficial, contraste, microfone e PWA sem cache sensível |
+| 2 | Validação humana independente por versão | Reutilizar Record/versões; separar áudio, fidelidade e resolução; outro leitor autorizado; concorrência/legado íntegro |
+| 3 | Atendimentos contínuos e atividade interna | Atualizações append-only, responsável/próxima ação e conclusão; não fingir cliente para trabalho interno |
+| 4 | Catálogo de sistemas | Entidade por organização e vínculo de cliente; preservar texto legado e contexto das versões |
+| 5 | Tarefas | Pessoa/equipe, cliente opcional, data/prioridade/status; conclusão simples, independente de chamado |
+| 6 | Calendário interno | Operação independente; integração CalDAV opcional em adaptador próprio |
+| 7 | Evolução de chamados | Prazo, inatividade descrita como falta de atualização, aceite/devolução e caso solicitante=responsável configurável |
+| 8 | Pesquisa global | Reusar PostgreSQL FTS/pg_trgm; códigos exatos primeiro; respeitar visibilidade por objeto e sinalizar não validado |
+| 9 | Confirmação técnica de conhecimento | Evento vinculado à versão, data/autor, obsolescência/revalidação sem apagar histórico |
+| 10 | Operação e piloto | CSV com prévia/deduplicação, anexos grandes, quotas, HTTPS, privacidade, backup/restauração e instalador Linux homologados |
 
-Licenciamento do código próprio: GNU AGPL v3 somente, aprovado pelo titular;
-instalações próprias, contribuições e eventual hospedagem comercial seguem a
-licença. A publicação inicial não encerra o aceite de infraestrutura da fase 01.
-O aceite Compose/PostgreSQL da fase 01 foi executado em Windows/WSL 2, incluindo
-testes de navegador contra os contêineres.
-
-Fase 02: organizações, autenticação, equipe, clientes e RLS implementados e
-validados localmente com PostgreSQL e E2E. Restrição por cliente é evolução futura; atualmente
-todos os membros ativos veem todos os clientes da organização.
-
-Fase 03: registros textuais, revisão própria/lote, histórico confirmado,
-chamados com conversa/menção/intervalos de espera, notificações internas,
-concorrência, idempotência e derivação implementados. Evidências e limites em
-[VALIDACAO_PROMPT_03](VALIDACAO_PROMPT_03.md). Sem novas dependências.
-
-Fase 04: áudio assíncrono, Redis/RQ, worker/dispatcher, armazenamento local/S3
-privado, anexos de cliente/chamado, links temporários, revisão humana, glossário,
-templates versionados, retenção auditada e ditado progressivo implementados.
-Mock é o padrão offline e não reconhece fala. faster-whisper é integração opcional;
-benchmark com modelo real permanece pendente, explicitamente previsto no prompt.
-Evidências: [VALIDACAO_PROMPT_04](VALIDACAO_PROMPT_04.md).
-Fase 05: conhecimento estruturado/revisado/versionado, busca PostgreSQL com códigos
-e acentos, contexto de cliente, sugestões e consultas agregadas implementados.
-Relatórios descritivos, eventos por ator, calendário/fuso, mediana/P90/pausas,
-equipes e CSV auditado com escopo próprio de técnico. Aceite local aprovado:
-65 pytest, 32 cenários autenticados e 4 regressões de instalação, lint/build/Docker;
-[métricas](METRICAS.md) e [validação](VALIDACAO_PROMPT_05.md).
-Publicada em main (`160297a`); [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43928535399),
-65 pytest PostgreSQL e 32 E2E Chromium Ubuntu em execução completa.
-O cliente Android/iOS foi descontinuado na etapa 08A, sem declarar aprovado
-seu aceite nativo anterior. API por token e migração 0006a permanecem por
-compatibilidade e integridade dos bancos existentes. O foco é a web responsiva.
-PWA e evolução de produto dependem de etapas próprias e validação posterior.
+Embeddings pequenos, pesquisa por voz, conectores externos e Nextcloud dependem
+de benefício medido e aprovação própria. Não instalar modelos nem vincular núcleo
+a uma empresa externa. Sem OCR, app nativo ou produção implícitos nesse planejamento.
+Importação/sincronização futura precisa de identidade externa única, procedência,
+conflitos explícitos e proteção dos campos locais; ausência na fonte não autoriza exclusão.
+Logo, regras de validação/aceite, retenção e plataformas homologadas dependem de decisão.

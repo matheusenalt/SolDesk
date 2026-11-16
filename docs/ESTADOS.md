@@ -1,8 +1,8 @@
-# Estados e horários das fases 03–05
+# Estados e horários
 
 As transições são validadas no servidor. `revision` é obrigatório nas edições,
 ações e comentários; uma versão desatualizada retorna 409. Não há confirmação
-automática nem exclusão física pela API/runtime. Processamento da Fase 04
+automática nem exclusão física de registros/chamados pela API/runtime. Processamento de áudio
 prepara conteúdo para revisão; nunca confirma/publica sozinho.
 
 ## Registro
@@ -17,9 +17,9 @@ prepara conteúdo para revisão; nunca confirma/publica sozinho.
 | `rascunho` ou `aguardando_revisao` | Editar texto conferido/horário | Mesmo estado, nova versão | Somente autor |
 | `rascunho`, `aguardando_revisao` ou `confirmado` | Cancelar com motivo | `cancelado` | Autor ou gestão |
 
-O envio de finalização/conhecimento passa diretamente à revisão nesta fase;
+O envio textual de finalização/conhecimento passa diretamente à revisão;
 `enviado` é uma etapa transitória conceitual. `processando`, `erro` e os campos de
-processamento são usados na Fase 04. Na Fase 05 o artigo vinculado começa como
+processamento pertencem ao ciclo do áudio. O artigo vinculado começa como
 rascunho e segue o ciclo editorial independente abaixo.
 Um chamado enviado usa exclusivamente as transições do Ticket e não pode ser
 cancelado pelo ciclo do Record. Um rascunho de chamado pode ser cancelado.
@@ -70,7 +70,7 @@ organização. O Record enviado não acompanha as mudanças de estado do Ticket.
 | `ocorrido_em` | Fato, sugerido agora; aceita retroativo, rejeita futuro; ajuste auditado com antes/depois |
 | `enviado_em` | Recebimento inicial no servidor, inclusive rascunho; imutável |
 | `capturado_em` | Horário informado pelo dispositivo, não confiável; não substitui recebimento/fato |
-| `processado_em` | Fim do processamento do áudio na fase 04; não substitui fato/recebimento |
+| `processado_em` | Fim do processamento do áudio; não substitui fato/recebimento |
 | `revisado_em` / `revisado_por` | Confirmação humana da finalização, preservados após cancelamento |
 | `publicado_em` | Publicação humana do conhecimento; não substitui fato/envio/revisão |
 
@@ -83,7 +83,7 @@ O histórico padrão contém somente finalizações `confirmado`. Provisórios s
 opcionais e sinalizados; cancelados não entram na contagem confirmada. O horário
 de revisão nunca substitui o horário do fato ou o recebimento.
 
-## Áudio e jobs (fase 04)
+## Áudio e jobs
 
 AudioJob: `aguardando` → `processando` → `concluido` ou `erro`; falha transitória
 retorna a `aguardando` com backoff limitado, descarte explícito → `descartado`.
@@ -94,14 +94,14 @@ Finalização/conhecimento: upload → `enviado`, worker → `processando`, conc
 → `aguardando_revisao`; erro definitivo → `erro`. Descarte permite digitar e
 revisar. Finalização somente entra no histórico após autor confirmar o texto e a
 conferência explícita do áudio, individual ou por item do lote. Conhecimento
-permanece rascunho e não publica nesta fase.
+permanece rascunho até a publicação editorial humana.
 
 Chamado: Record continua enviado; o ciclo de Ticket é independente do job. Pode
 abrir, atribuir e resolver com a fila parada. Conclusão acrescenta comentário
 `transcricao`/`transcricao_mock`, preserva estado resolvido e horários anteriores.
 Notificação interna informa preparo do texto, sem equivaler a aprovação humana.
 
-## Artigo — Fase 05
+## Artigo
 
 | Origem | Ação | Destino |
 | --- | --- | --- |
@@ -124,9 +124,9 @@ editoriais, separados de `Record.ocorrido_em`/`enviado_em`. Publicar artigo de
 Record conhecimento marca Record como publicado sem trocar o fato; registro de
 outro tipo mantém seu ciclo próprio. Cancelar origem de artigo publicado é
 recusado: arquive primeiro o artigo. Histórico anterior à migração não é inventado.
-## Parte A da fase 06
+## Interface web
 
-O app reutiliza estes estados e os apresenta com ícone e texto. Não cria estado
+A interface reutiliza estes estados e os apresenta com ícone e texto. Não cria estado
 de sucesso local antes da resposta da API. Finalização exige confirmação do autor;
 conhecimento continua editorial no painel. Captura e envio não trocam o horário
 do fato por revisão/publicação. Falha de rede permite reenvio manual idempotente
