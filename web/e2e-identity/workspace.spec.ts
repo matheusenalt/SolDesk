@@ -49,7 +49,15 @@ test('login, cadastro, busca sem acento, edição e consulta reais', async ({ pa
   await expect(edit).toHaveCount(0);
   await card.getByRole('button', { name: 'Consultar', exact: true }).click();
   await expect(workspace.getByText('Relato fictício de teste de interface.', { exact: true })).toBeVisible();
-  await expect(workspace.getByText('Histórico e arquivos serão disponibilizados nas próximas fases.')).toBeVisible();
+  await expect(workspace.getByText('Arquivos serão disponibilizados nas próximas fases.')).toBeVisible();
+  await workspace.getByRole('button', { name: 'Histórico por cliente', exact: true }).click();
+  const work = workspace.getByRole('region', { name: 'Atendimentos', exact: true });
+  await expect(work.getByRole('combobox', { name: 'Cliente', exact: true }).locator('option:checked')).toHaveText(`Merceária fictícia ${suffix}`);
+  await expect(work.getByText('Finalizações confirmadas: 0', { exact: true })).toBeVisible();
+  await workspace.getByRole('button', { name: 'Clientes', exact: true }).click();
+  await card.getByRole('button', { name: 'Consultar', exact: true }).click();
+  await workspace.getByRole('button', { name: 'Histórico por cliente', exact: true }).click();
+  await expect(work.getByRole('combobox', { name: 'Cliente', exact: true }).locator('option:checked')).toHaveText(`Merceária fictícia ${suffix}`);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
   expect(await page.evaluate(() => localStorage.length)).toBe(0);
 });

@@ -67,6 +67,32 @@ def migrate(settings):
                 )
             )
         connection.execute("GRANT SELECT, INSERT ON audit_event TO soldesk_runtime")
+        for table in (
+            "record",
+            "ticket",
+            "ticket_sequence",
+            "ticket_interval",
+            "knowledge_article",
+        ):
+            connection.execute(
+                sql.SQL("GRANT SELECT, INSERT, UPDATE ON {} TO soldesk_runtime").format(
+                    sql.Identifier(table)
+                )
+            )
+        for table in (
+            "record_version",
+            "ticket_event",
+            "ticket_comment",
+            "ticket_participant",
+            "request_receipt",
+        ):
+            connection.execute(
+                sql.SQL("GRANT SELECT, INSERT ON {} TO soldesk_runtime").format(
+                    sql.Identifier(table)
+                )
+            )
+        connection.execute("GRANT SELECT, INSERT ON notification TO soldesk_runtime")
+        connection.execute("GRANT UPDATE (lida_em) ON notification TO soldesk_runtime")
         connection.execute(
             "GRANT EXECUTE ON FUNCTION public.invitation_organization(text), "
             "public.membership_count(text) TO soldesk_runtime"

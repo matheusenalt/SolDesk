@@ -10,6 +10,7 @@ export async function request<T>(
   path: string,
   method = "GET",
   data?: unknown,
+  extraHeaders: Record<string, string> = {},
 ): Promise<T> {
   let csrf = "";
   if (method !== "GET") {
@@ -26,6 +27,7 @@ export async function request<T>(
     headers: {
       "Content-Type": "application/json",
       ...(csrf ? { "X-CSRF-Token": csrf } : {}),
+      ...extraHeaders,
     },
     ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
     signal: AbortSignal.timeout(15000),

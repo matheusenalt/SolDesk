@@ -16,19 +16,19 @@ export const strings = {
     "Não foi possível consultar o servidor. Confira a API e tente novamente.",
   foundation: "Ambiente inicial",
   foundationDescription:
-    "A estrutura está sendo preparada para receber seus atendimentos.",
+    "Entre na organização para registrar e acompanhar seus atendimentos.",
   future: "Nas próximas etapas",
   planned: "Planejado",
   cards: [
     {
       icon: "01",
-      title: "Histórico de clientes",
-      text: "Os detalhes de cada atendimento, preservados para a próxima conversa.",
+      title: "Áudio",
+      text: "Entrada por voz e processamento com revisão humana.",
     },
     {
       icon: "02",
-      title: "Chamados",
-      text: "Demandas com responsáveis, contexto e acompanhamento.",
+      title: "Arquivos",
+      text: "Anexos vinculados ao contexto de cada atendimento.",
     },
     {
       icon: "03",
@@ -43,7 +43,7 @@ export const strings = {
   cloud: "Cloud · ambiente de desenvolvimento",
   footer: "Construído para tornar o registro parte natural do suporte.",
   noBusiness:
-    "Históricos, chamados e arquivos serão disponibilizados nas próximas etapas.",
+    "Históricos e chamados por texto estão disponíveis na área da organização. Áudio, arquivos e publicação de conhecimento são planejados.",
 } as const;
 export const workspaceStrings = {
   title: "Área da organização",
@@ -97,7 +97,7 @@ export const workspaceStrings = {
   organizationName: "Nome da organização",
   slug: "Identificador da organização",
   timezone: "Fuso horário IANA",
-  history: "Histórico e arquivos serão disponibilizados nas próximas fases.",
+  history: "Arquivos serão disponibilizados nas próximas fases.",
   external: "Referência externa (opcional)",
   provider: "Provedor",
   identifier: "Identificador externo",

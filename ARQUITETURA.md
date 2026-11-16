@@ -79,7 +79,28 @@ Papéis e regras: [PERMISSOES](docs/PERMISSOES.md). Contratos e fronteiras:
 [API fase 02](docs/API_FASE_02.md). Mobile, Redis, áudio, SMTP e arquivos continuam
 fora desta fase.
 
-## Licenciamento
+## Fase 03: relato, revisão e operação
+
+Migração 0003 aditiva: Record/RecordVersion, Ticket/TicketSequence,
+TicketParticipant/TicketComment/TicketEvent/TicketInterval, KnowledgeArticle
+(somente rascunho), Notification e RequestReceipt. SQL congelado, FKs por tenant,
+RLS FORCE em todas as tabelas novas, leitura de notificações por destinatário.
+`work_schemas`, `work`, `work_routes` separam entrada, regras transacionais e HTTP.
+Não houve novas dependências nem serviços; worker/Redis permanecem na fase 04.
+
+Bloqueio da linha e revisão otimista evitam sobrescrita; recibo com hash e
+advisory lock transacional evitam criações duplicadas. Comentários, versões e
+eventos são apenas incluídos/consultados pelo runtime. O banco protege fatos
+originais e conteúdo confirmado com trigger; não há DELETE desses recursos.
+Lotes de revisão são atômicos. Somente o autor confirma finalizações.
+
+UI em `WorkArea`, textos em `work-strings`; API real, polling de 15 s, páginas
+de registros/revisões/histórico/chamados e três destinos. Conversão de horário
+IANA preserva o fato e exige offset em ambiguidades de horário de verão.
+Processamento/publicação não têm caminhos ativos. Contratos:
+[API fase 03](docs/API_FASE_03.md), [estados](docs/ESTADOS.md).
+
+## Licenciamento do código
 
 Código próprio sob GNU AGPL v3 somente (`AGPL-3.0-only`). Componentes terceiros
 mantêm suas licenças; inventário, condições de redistribuição e limites da revisão

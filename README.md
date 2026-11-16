@@ -1,7 +1,7 @@
 # SolDesk
 
 Plataforma independente de suporte com histórico, chamados e conhecimento.
-**Fase atual: 02, organizações, autenticação, equipe, clientes e auditoria.**
+**Fase atual: 03, registros, revisão pelo autor, chamados e notificações.**
 Dados por organização, PostgreSQL com RLS e sessões web com CSRF. Use somente
 dados fictícios enquanto as fases e a revisão de produção não estiverem concluídas.
 
@@ -29,7 +29,8 @@ dados fictícios enquanto as fases e a revisão de produção não estiverem con
 Os scripts copiam `.env.example` e geram senhas locais distintas para migração e
 usuário restrito da API (`RUNTIME_PASSWORD`). Não imprimem essas senhas, não
 criam credenciais de aplicação e não apagam volumes. Se já instalou a fase 01,
-execute novamente o setup para acrescentar a credencial runtime e a migração 0002.
+execute novamente o setup para acrescentar a credencial runtime e as migrações
+aditivas 0002–0003, preservando a instalação.
 A instalação não depende de chave de IA, GPU nem serviço pago.
 
 ## Portas
@@ -55,8 +56,16 @@ aleatórias exibidas uma única vez. Repetir não sobrescreve senhas existentes.
 `ALLOW_ORG_SIGNUP=false` é o padrão, inclusive em Cloud.
 
 Permissões: [docs/PERMISSOES.md](docs/PERMISSOES.md). Contratos, limites e CSRF:
-[docs/API_FASE_02.md](docs/API_FASE_02.md). Sem SMTP obrigatório, integrações
-externas, registros, chamados ou arquivos nesta fase.
+[docs/API_FASE_02.md](docs/API_FASE_02.md) e
+[docs/API_FASE_03.md](docs/API_FASE_03.md). Em **Atendimentos**, envie texto para
+finalização, chamado ou rascunho de conhecimento. Finalizações só entram no
+histórico confirmado após conferência do próprio autor, individual ou em lote.
+Chamados, inclusive urgentes, abrem diretamente e têm conversa, menções,
+esclarecimentos, transferência, resolução/encerramento e reabertura separados.
+Horários do fato e revisão são distintos; derive novos destinos preservando o
+fato original. [Transições e tempos](docs/ESTADOS.md). Notificações internas usam
+polling e leitura individual. Áudio/IA, uploads, publicação de conhecimento,
+relatórios, SMTP e integrações externas continuam para fases posteriores.
 
 Os arquivos originais de requisitos estão em [SolDesk_Prompts_v2](SolDesk_Prompts_v2/).
 ## Licença

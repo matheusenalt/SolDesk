@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { ApiError, request } from "./workspace-api";
 import { workspaceStrings as s } from "./strings";
+import { WorkArea } from "./WorkArea";
+import { workStrings } from "./work-strings";
 
 type Organization = {
   id: string;
@@ -108,6 +110,7 @@ export function Workspace() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState("clients");
+  const [workClient, setWorkClient] = useState<string | undefined>();
   const [authTab, setAuthTab] = useState(
     location.hash.startsWith("#convite=") ? "invitation" : "login",
   );
@@ -177,6 +180,7 @@ export function Workspace() {
   }, []);
   useEffect(() => {
     if (profile && !profile.must_change_password) {
+      if (tab !== "work") setWorkClient(undefined);
       setClients([]);
       setMembers([]);
       setSelected(null);
@@ -330,6 +334,7 @@ export function Workspace() {
                   });
                   setSearch("");
                   setOffset(0);
+                  setWorkClient(undefined);
                   await loadProfile();
                 });
               }}
@@ -368,6 +373,9 @@ export function Workspace() {
                 <button onClick={() => setTab("team")}>{s.team}</button>
               )}
               <button onClick={() => setTab("settings")}>{s.settings}</button>
+              <button disabled={busy} onClick={() => setTab("work")}>
+                {workStrings.title}
+              </button>
             </nav>
             {tab === "clients" && (
               <>
@@ -469,6 +477,14 @@ export function Workspace() {
                       </p>
                     ))}
                     <p>{s.history}</p>
+                    <button
+                      onClick={() => {
+                        setWorkClient(selected.id);
+                        setTab("work");
+                      }}
+                    >
+                      {workStrings.history}
+                    </button>
                   </article>
                 )}
                 {editor && (
@@ -728,6 +744,14 @@ export function Workspace() {
                 ))}
               </>
             )}
+            <WorkArea
+              key={profile.id + ":" + profile.organization_id}
+              userId={profile.id}
+              role={profile.role}
+              timezone={organization?.timezone || "America/Sao_Paulo"}
+              initialClient={workClient}
+              hidden={tab !== "work"}
+            />
             {tab === "settings" && (
               <>
                 {profile.role === "administrador" && organization && (

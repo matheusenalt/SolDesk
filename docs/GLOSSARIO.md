@@ -14,5 +14,11 @@ Estados em português sem acento: `aguardando_revisao`, `confirmado`, `publicado
 Fase 02: `ativo`, `inativo`; papéis `administrador`, `gestor`, `tecnico`.
 Datas adicionais: `criado_em`, `expira_em`, `usado_em`, `revogado_em`,
 `bloqueado_ate` e `window_em` (janela interna de limitação).
-As transições serão definidas nas fases correspondentes. Interface e documentos
-em pt-BR; strings web centralizadas em `web/src/strings.ts`.
+Fase 03 acrescenta RecordVersion, TicketSequence, TicketParticipant,
+TicketComment, TicketEvent, TicketInterval e RequestReceipt. Prioridades:
+`baixa`, `normal`, `alta`, `urgente`; estados em [ESTADOS](ESTADOS.md).
+`capturado_em` é do dispositivo, não confiável; `processado_em`/`publicado_em`
+reservados; `revisado_por` identifica o autor que confirmou. `entrada_em`/
+`saida_em` delimitam esperas, `resolvido_em`/`encerrado_em` são eventos distintos.
+Interface e documentos em pt-BR; strings web centralizadas em
+`web/src/strings.ts` e `web/src/work-strings.ts`.

@@ -1,10 +1,30 @@
 # Status do SolDesk
 
-Atualizado em 16/11/2026. **Fases 01–02 implementadas e validadas localmente com
-Docker/PostgreSQL e navegador. As fases 03–06 não foram implementadas.**
+Atualizado em 16/11/2026. **Fases 01–03 implementadas e validadas localmente com
+Docker/PostgreSQL e navegador. As fases 04–06 não foram implementadas.**
 Não pronto para produção.
 
 ## Funciona agora
+
+- Fase 03: registro textual com três destinos, original preservado, edição humana
+  versionada, fato/recebimento/revisão separados, retroativo auditado e futuro rejeitado.
+- Revisão individual ou lote atômico, exclusivamente pelo autor; histórico conta
+  somente finalizações confirmadas. Fila mostra idade e destaque acima de 24 h.
+- Chamados normais/urgentes abrem diretamente; sequência por organização, estados
+  explícitos, responsável/prioridade/categoria, comentários e menções, intervalos
+  de espera, resolução/encerramento distintos e reabertura no mesmo ticket.
+- Derivação cria rascunho ligado ao original e preserva o fato; conhecimento fica
+  somente como rascunho. Notificações internas próprias, polling e leitura.
+- Migração 0003 aditiva, RLS FORCE/FKs por empresa, trilhas sem alteração/exclusão
+  pelo runtime, trigger para fatos originais e conteúdo confirmado, revisão 409 e
+  idempotência para criação/derivação, inclusive concorrente.
+- **24 pytest aprovados** com PostgreSQL isolado (5 instalação, 10 identidade,
+  9 fase 03); **6 Vitest**, **12 Playwright autenticados** desktop/emulação móvel
+  e **4 regressões de instalação** aprovados contra Nginx/API/PostgreSQL.
+- Ruff e ESLint, formatação, TypeScript/Vite e builds Docker aprovados; 32 pares
+  de contraste/tokens aprovados. Migrações repetidas e reinício novamente
+  aprovados com UUID preservado e volume existente, sem apagar dados.
+- Sem novas dependências na fase 03; locks, inventários e texto AGPL preservados.
 
 - Fase 02: organizações, identidades e vínculos, sessões opacas, Argon2id, CSRF,
   revogação/logout global, bloqueio progressivo e rate limit persistente por IP/conta.
@@ -64,7 +84,6 @@ Não pronto para produção.
 
 ## Planejado
 
-03: registros, chamados, notificações, tempos e revisões.
 04: áudio, Redis/worker, storage e processamento.
 05: conhecimento, busca e métricas.
 06A: Expo/mobile e QR; 06B: conectores mock, ponta a ponta e privacidade.
@@ -73,7 +92,9 @@ Não pronto para produção.
 
 Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite e
 [API_FASE_02.md](docs/API_FASE_02.md) / [PERMISSOES.md](docs/PERMISSOES.md) para as
-regras. Aguardar instrução antes do prompt 03. Usar somente dados fictícios.
+regras. Fase 03: [API](docs/API_FASE_03.md), [estados](docs/ESTADOS.md) e
+[relatório](docs/VALIDACAO_PROMPT_03.md). Aguardar instrução antes do prompt 04.
+Usar somente dados fictícios.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).
 Fase 02: [relatório](docs/VALIDACAO_PROMPT_02.md).

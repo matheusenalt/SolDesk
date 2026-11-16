@@ -23,7 +23,7 @@ comparação/benchmark de transcrição, prazos de revisão, hospedagem Communit
 e integrações prioritárias.
 Finalizações: somente autor revisa, conforme requisitos. Artigos: proposta de
 gestor/admin publicar, sem autopublicação por padrão, ainda a confirmar quando
-a funcionalidade for implementada. Não há implementação de revisões nesta fase.
+a funcionalidade for implementada. Prazos rígidos de revisão continuam em aberto.
 
 ## Licenciamento aprovado pelo titular
 
@@ -58,7 +58,28 @@ a funcionalidade for implementada. Não há implementação de revisões nesta f
   apelidos não únicos, paginação offset estável por criação/UUID.
 - Mobile terá fluxo próprio na fase 06; nenhuma credencial mobile fictícia.
 
-## Fontes técnicas
+## Adotadas na fase 03
+
+- Finalizações são conferidas e confirmadas exclusivamente pelo autor, em tela
+  ou lote atômico. Não existe aprovação do gestor nem confirmação automática.
+- Pendência acima de 24 h recebe destaque visual; não é SLA obrigatório, ranking
+  ou avaliação do técnico. Só confirmados contam no histórico oficial.
+- Entrada exclusivamente textual e humana. Chamados abrem diretamente, inclusive
+  urgentes; conhecimento é somente rascunho, com publicação reservada à fase 05.
+- Conteúdo original/recebimento imutáveis; texto humano editado/versionado antes
+  de confirmar. Horários distintos, UTC no banco e IANA na interface. Hora local
+  ambígua/inexistente exige offset explícito, sem escolher silenciosamente.
+- Um registro tem um destino; Derivar cria outro rascunho com origem e mesmo
+  horário do fato. Não transforma nem apaga o original.
+- Idempotência opcional para criação/derivação, obrigatória no fluxo da UI;
+  escopo por organização/usuário/operação, chave em hash e lock transacional.
+- Técnico vê chamados próprios, atribuídos ou em que participa; gestão vê a fila
+  da empresa. Responsável/gestão opera, solicitante/gestão encerra. Resolver e
+  encerrar são ações separadas; reabertura mantém o ticket e o histórico.
+- Notificações internas por destinatário, polling de 15 s; sem serviço externo.
+- Sem novas tecnologias/dependências; AGPL e inventários anteriores preservados.
+
+## Referências técnicas
 
 - https://fastapi.tiangolo.com/tutorial/testing/
 - https://alembic.sqlalchemy.org/en/latest/tutorial.html

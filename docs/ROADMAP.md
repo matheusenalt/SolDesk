@@ -20,5 +20,11 @@ testes de navegador contra os contêineres.
 
 Fase 02: organizações, autenticação, equipe, clientes e RLS implementados e
 validados localmente com PostgreSQL e E2E. Restrição por cliente é evolução futura; atualmente
-todos os membros ativos veem todos os clientes da organização. Registros,
-chamados, relatórios operacionais e arquivos continuam nas próximas fases.
+todos os membros ativos veem todos os clientes da organização.
+
+Fase 03: registros textuais, revisão própria/lote, histórico confirmado,
+chamados com conversa/menção/intervalos de espera, notificações internas,
+concorrência, idempotência e derivação implementados. Evidências e limites em
+[VALIDACAO_PROMPT_03](VALIDACAO_PROMPT_03.md). Sem novas dependências.
+Áudio, arquivos e processamento permanecem na fase 04; publicação de conhecimento,
+busca e relatórios na fase 05. Parar após a fase 03, aguardando nova instrução.

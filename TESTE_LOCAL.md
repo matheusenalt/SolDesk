@@ -224,3 +224,41 @@ Em `web`, execute `npx playwright test --config playwright.identity.config.ts`.
 No Bash use as mesmas variáveis com `export`; Chromium precisa ser instalado
 com `npx playwright install chromium`. O teste não grava traces autenticados.
 As credenciais não são argumentos de linha de comando nem arquivos versionados.
+
+## Aceite da fase 03
+
+Repita o setup para construir os fontes atuais e aplicar 0003 no volume
+existente. Não apague volumes. A migração preserva instalação, organizações,
+equipe e clientes. Os comandos de backend e E2E autenticado acima agora incluem
+a fase 03: 24 pytest (5 de instalação, 10 de identidade e 9 de operação), 12
+Playwright autenticados (6 cenários em desktop/emulação móvel). A suíte
+`npm run test:e2e` mantém 4 regressões da instalação. `npm test` executa 6 Vitest.
+Execute também lint/formatação/build e `python scripts/tokens.py --check`.
+
+Use exclusivamente organização, contas e relatos fictícios:
+
+1. Em **Atendimentos → Novo registro**, escolha cliente e finalização. Informe
+   texto e fato retroativo. Antes de confirmar, o histórico padrão deve contar
+   zero; a opção de provisórios mostra o item identificado como não confirmado.
+2. Confira/edite o texto e confirme como autor. O horário do fato e recebimento
+   devem permanecer, com revisão separada. Outro administrador não pode confirmar.
+3. Crie duas finalizações e confirme pela fila **Minhas revisões**, em lote.
+4. Derive uma finalização para conhecimento/chamado: deve surgir outro rascunho
+   com o mesmo fato. Conhecimento enviado continua artigo rascunho, sem publicar.
+5. Abra chamado normal/urgente: encaminhamento imediato. Solicite esclarecimento,
+   responda, mencione integrante, transfira e mude prioridade. Os textos anteriores
+   e intervalos de entrada/saída em espera devem continuar consultáveis.
+6. Resolva, depois encerre e reabra. Mesmo código/ID, contador incrementado;
+   não deve encerrar automaticamente ao resolver.
+7. Consulte notificações e marque leitura. Outra pessoa/empresa não acessa o UUID.
+8. Duas abas editando a mesma revisão devem produzir 409 na segunda escrita.
+   Repetir criação com a mesma Idempotency-Key e corpo não duplica; corpo distinto
+   com a mesma chave produz 409. Esses casos também são automatizados no pytest.
+9. Em horário local ambíguo/inexistente por horário de verão, informe o ISO com
+   offset explícito. Editar só texto não pode truncar os segundos do fato.
+
+Regressão de persistência: `scripts/test-compose.ps1` executa migrações duas
+vezes e reinicia banco/API sem apagar dados. Transições:
+[docs/ESTADOS.md](docs/ESTADOS.md); contratos e limites:
+[docs/API_FASE_03.md](docs/API_FASE_03.md). Resultado executado:
+[docs/VALIDACAO_PROMPT_03.md](docs/VALIDACAO_PROMPT_03.md).
