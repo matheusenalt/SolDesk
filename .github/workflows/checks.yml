@@ -1,0 +1,26 @@
+name: Validações
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: pip install -r backend/requirements.lock && pip install --no-deps -e backend
+      - run: python -m ruff check backend scripts/tokens.py
+      - run: python -m ruff format --check backend scripts/tokens.py
+      - run: python -m pytest backend/tests -q
+      - run: python scripts/tokens.py --check
+      - run: npm ci
+        working-directory: web
+      - run: npm run lint && npm run format:check && npm test && npm run build
+        working-directory: web
