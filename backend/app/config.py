@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     runtime_password: str | None = None
     allow_org_signup: bool = False
     session_hours: int = 12
+    soldesk_instance_name: str = Field(default="Instância SolDesk", min_length=2, max_length=120)
     soldesk_mode: Literal["community", "cloud"] = "community"
     environment: Literal["development", "production", "test"] = "development"
     redis_url: str = "redis://redis:6379/0"

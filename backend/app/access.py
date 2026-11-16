@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, Request
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from app.models import AuditEvent, AuthSession, OrganizationMembership, User, now
+from app.models import AuditEvent, AuthSession, OrganizationMembership, User
 
 
 def set_context(db, organization_id="", user_id=""):
@@ -82,12 +82,10 @@ class Context:
 
 
 def context(request: Request, db=Depends(database, scope="function")):
-    from app.security import digest
+    from app.security import request_credential, validate_access
 
-    credential = request.cookies.get("soldesk_session", "")
-    session = db.get(AuthSession, digest(credential)) if credential else None
-    if session is None or session.revogado_em or session.expira_em <= now():
-        raise HTTPException(401, "Entre novamente para continuar")
+    credential, kind = request_credential(request)
+    session = validate_access(db, credential, kind)
     set_context(db, session.organization_id, session.user_id)
     member = db.scalar(
         select(OrganizationMembership).where(
@@ -104,6 +102,7 @@ def context(request: Request, db=Depends(database, scope="function")):
         "/api/v1/auth/password",
         "/api/v1/auth/logout",
         "/api/v1/auth/logout-all",
+        "/api/v1/mobile/auth/password",
     }
     if user.must_change_password and request.url.path not in allowed:
         raise HTTPException(403, "Troque a senha temporária para continuar")

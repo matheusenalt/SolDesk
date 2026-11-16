@@ -1,7 +1,8 @@
 # SolDesk
 
 Plataforma independente de suporte com histórico, chamados e conhecimento.
-**Fase atual: 05, conhecimento revisado, busca PostgreSQL e relatórios descritivos.**
+**SolDesk Web responsivo; Android/iOS nativos descontinuados.**
+Acesso por navegador em computadores e celulares; não há app nativo distribuído.
 Dados por organização, PostgreSQL com RLS e sessões web com CSRF. Use somente
 dados fictícios enquanto as fases e a revisão de produção não estiverem concluídas.
 
@@ -31,7 +32,7 @@ usuário restrito da API (`RUNTIME_PASSWORD`) e chave de assinatura de downloads
 Não imprimem esses segredos, não
 criam credenciais de aplicação e não apagam volumes. Se já instalou a fase 01,
 execute novamente o setup para acrescentar a credencial runtime e as migrações
-aditivas 0002–0005, preservando a instalação. O modo rápido padrão inicia Redis,
+aditivas 0002–0006a, preservando a instalação. O modo rápido padrão inicia Redis,
 dispatcher e worker mock, sem baixar modelo.
 A instalação não depende de chave de IA, GPU nem serviço pago.
 
@@ -47,6 +48,11 @@ A instalação não depende de chave de IA, GPU nem serviço pago.
 
 Atualize também `CORS_ORIGINS` se trocar portas. Para desenvolvimento com reload:
 `docker compose --profile dev up -d --build db migrate api-dev web-dev`.
+
+Nome público da instalação: `SOLDESK_INSTANCE_NAME`. A API permanece em loopback
+por padrão; acesso remoto deve usar HTTPS e configuração explícita.
+O contrato legado de sessão por token é preservado na API, com testes de
+segurança; isso não exige instalação de aplicativo nativo.
 
 Leia [TESTE_LOCAL.md](TESTE_LOCAL.md) para comandos manuais, desenvolvimento fora
 do Docker e validações. [STATUS.md](STATUS.md) informa o que foi realmente testado;
@@ -101,7 +107,9 @@ mediana, P90, amostra e pausas; pessoas começam em ordem alfabética, sem avali
 automática. Leia [definições das métricas](docs/METRICAS.md),
 [contratos da Fase 05](docs/API_FASE_05.md) e
 [validação da Fase 05](docs/VALIDACAO_PROMPT_05.md).
-Mobile, SMTP e conectores continuam planejados. Não avançar ao Prompt 06 sem instrução.
+Mobile está em validação na Parte A do Prompt 06; SMTP e conectores continuam
+planejados. Concluir aceite Android antes de aprovar a A; aguardar confirmação
+antes da Parte B.
 
 Os arquivos originais de requisitos estão em [SolDesk_Prompts_v2](SolDesk_Prompts_v2/).
 ## Licença

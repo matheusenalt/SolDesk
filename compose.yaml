@@ -47,6 +47,7 @@ services:
     environment: &api_environment
       DATABASE_URL: postgresql+psycopg://soldesk_runtime:${RUNTIME_PASSWORD}@db:5432/${POSTGRES_DB:-soldesk}
       SOLDESK_MODE: ${SOLDESK_MODE:-community}
+      SOLDESK_INSTANCE_NAME: ${SOLDESK_INSTANCE_NAME:-Instância SolDesk}
       ALLOW_ORG_SIGNUP: ${ALLOW_ORG_SIGNUP:-false}
       ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
@@ -66,7 +67,7 @@ services:
       CLAMAV_ENABLED: ${CLAMAV_ENABLED:-false}
     volumes: [media_data:/home/soldesk/media]
     ports:
-      - '127.0.0.1:${API_PORT:-8000}:8000'
+      - '${API_BIND_HOST:-127.0.0.1}:${API_PORT:-8000}:8000'
     depends_on:
       migrate:
         condition: service_completed_successfully

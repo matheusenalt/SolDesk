@@ -1,10 +1,33 @@
 # Status do SolDesk
 
-Atualizado em 16/11/2026. **Fases 01–05 implementadas e validadas localmente com
-Docker/PostgreSQL e navegador. Fase 06 não iniciada.**
+Atualizado em 16/11/2026. **SolDesk Web responsivo; Android/iOS nativos descontinuados.**
 Não pronto para produção.
 
 ## Funciona agora
+
+- Interface React única para computadores e navegadores móveis: clientes,
+  autenticação web/CSRF, registros, chamados, áudio/anexos, conhecimento e relatórios.
+- Compatibilidade da API preservada: sessão por token, refresh rotativo,
+  isolamento, revogação e migração aplicada `0006a`, sem alteração de dados.
+- Validação da descontinuação em 16/11/2026: **72 testes de backend** em
+  PostgreSQL/Redis isolados, **6 testes web** e **32 E2E autenticados** em Edge
+  desktop/emulação móvel, sem skips. Inclui clientes, sessão, convites, senha,
+  registros, chamados, áudio com microfone fictício, anexos, conhecimento e relatórios.
+- **4 regressões públicas de instalação** passaram em desktop/emulação móvel.
+- Ruff/ESLint, formatação, TypeScript, build web/contêiner e 32 pares de contraste
+  passaram. API e web retornam HTTP 200. O mock continua sem reconhecer fala.
+
+## Descontinuação nativa validada localmente — aguardando aprovação
+
+- Removidos cliente nativo, configuração Expo/RN, pipeline e painel de QR
+  exclusivo do aplicativo. Scripts de tokens/licenças passam a usar só a web.
+- Testes de segurança e contrato da API, migrações, RLS e histórico preservados.
+- Aceite Android anterior foi encerrado por descontinuação, não aprovado.
+  Histórico: [validação 06A](docs/VALIDACAO_PROMPT_06A.md).
+- PWA, redesign, novas funcionalidades e implantação não fazem parte desta alteração.
+- Sem commit/push desta etapa; aguardando aprovação após validação local.
+
+## Fases anteriores aprovadas
 
 - Fase 05: artigos estruturados, revisão editorial humana, devolução/arquivamento,
   versões/diferenças, política de papéis e autopublicação desligada por padrão.
@@ -157,7 +180,8 @@ Não pronto para produção.
 
 ## Planejado
 
-06A: Expo/mobile e QR; 06B: conectores mock, ponta a ponta e privacidade.
+06B: conectores mock, cenário completo ponta a ponta e revisão de privacidade.
+Cliente nativo 06A descontinuado; contrato de API e migração preservados conforme seção acima.
 
 ## Próximo passo necessário
 
@@ -165,7 +189,9 @@ Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite e
 [API_FASE_02.md](docs/API_FASE_02.md) / [PERMISSOES.md](docs/PERMISSOES.md) para as
 regras. Fase 05: [API](docs/API_FASE_05.md), [métricas](docs/METRICAS.md),
 [estados](docs/ESTADOS.md) e [relatório](docs/VALIDACAO_PROMPT_05.md).
-Aguardar instrução antes do Prompt 06; Fase 05 aprovada e publicada.
+Concluir a validação da descontinuação nativa, registrar evidências e aguardar
+aprovação antes de qualquer publicação ou próxima etapa. O aceite Android
+anterior não se aplica à interface web e não foi declarado aprovado.
 Usar somente dados fictícios.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).

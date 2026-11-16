@@ -1,4 +1,4 @@
-"""Fonte única de tokens → CSS web e constantes mobile; validação WCAG."""
+"""Fonte única de tokens → CSS web; validação WCAG."""
 
 import argparse
 import json
@@ -32,9 +32,7 @@ def generate(check=False):
         f"  --radius-xl: {data['radius-xl']};",
         "}",
     ]
-    mobile = {}
     for theme, mapping in data["themes"].items():
-        mobile[theme] = {key: colors[value] for key, value in mapping.items()}
         css.append(":root {" if theme == "light" else '[data-theme="dark"] {')
         css += [f"  --{key}: {colors[value]};" for key, value in mapping.items()]
         css.append("}")
@@ -61,10 +59,6 @@ def generate(check=False):
                 )
     outputs = {
         ROOT / "web/src/tokens.css": "\n".join(css) + "\n",
-        ROOT / "mobile/theme.ts": (
-            "// Gerado por scripts/tokens.py; não editar.\n"
-            "export const themes = " + json.dumps(mobile, indent=2) + " as const;\n"
-        ),
     }
     for path, content in outputs.items():
         if check:

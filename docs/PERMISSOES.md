@@ -99,3 +99,12 @@ Restrição editorial por cliente controla busca/sugestão; não é ACL adiciona
 todos os membros ativos ainda veem clientes da própria empresa. Não promete
 sigilo entre membros com acesso ao mesmo cliente. Incluir técnico como revisor
 não amplia seu escopo gerencial. CSV exige CSRF e audita filtros/período/escopo.
+## Parte A da fase 06
+
+Bearer mobile mantém as mesmas permissões por empresa/usuário das fases anteriores;
+não aceita organization_id do cliente para definir contexto. Cookie e bearer não
+são intercambiáveis. Refresh exige segredo de uso único, RLS por empresa/usuário
+e vínculo ativo. QR e server-info são públicos, não concedem acesso. Painel gerador
+é exibido ao administrador. App Community usa a primeira associação ativa; seleção
+de múltiplas empresas não implementada. Conhecimento publicado exige revisão
+editorial autorizada no painel. Cloud oficial permanece indisponível.

@@ -64,6 +64,7 @@ class AuthSession(Base):
     organization_id: Mapped[str] = mapped_column(ForeignKey("organization.id"), index=True)
     expira_em: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revogado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    client_kind: Mapped[str] = mapped_column(String(16), default="web")
 
 
 class CsrfGrant(Base):

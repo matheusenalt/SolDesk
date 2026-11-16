@@ -17,13 +17,13 @@ export const strings = {
   foundation: "Ambiente inicial",
   foundationDescription:
     "Entre na organização para registrar e acompanhar seus atendimentos.",
-  future: "Nas próximas etapas",
-  planned: "Planejado",
+  future: "Próximas validações e evoluções",
+  planned: "Em andamento e planejado",
   cards: [
     {
       icon: "01",
-      title: "Aplicativo mobile",
-      text: "Gravação e acesso no aplicativo nativo.",
+      title: "Evolução da interface web",
+      text: "Melhorias de navegação e uso em computadores e celulares.",
     },
     {
       icon: "02",
@@ -43,7 +43,7 @@ export const strings = {
   cloud: "Cloud · ambiente de desenvolvimento",
   footer: "Construído para tornar o registro parte natural do suporte.",
   noBusiness:
-    "Históricos, chamados, arquivos, conhecimento revisado e relatórios descritivos estão disponíveis na organização. O áudio usa mock offline por padrão. Mobile e integrações são planejados.",
+    "Históricos, chamados, arquivos, conhecimento revisado e relatórios descritivos estão disponíveis na organização pela interface web. O áudio usa mock offline por padrão. Integrações são planejadas.",
 } as const;
 export const workspaceStrings = {
   title: "Área da organização",

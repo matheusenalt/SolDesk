@@ -46,7 +46,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_origins=settings.allowed_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-        allow_headers=["Content-Type", "X-CSRF-Token", "Idempotency-Key", "X-Filename"],
+        allow_headers=[
+            "Content-Type",
+            "X-CSRF-Token",
+            "Idempotency-Key",
+            "X-Filename",
+            "Authorization",
+        ],
     )
 
     @app.middleware("http")
@@ -122,24 +128,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "product": "SolDesk",
             "api_version": "1.0.0",
             "instance_id": instance_id,
+            "instance_name": settings.soldesk_instance_name,
+            "mobile_protocol_version": 1 if revision == "0006a" else None,
             "mode": settings.soldesk_mode,
             "capabilities": ["health", "server_info"]
             + (
                 ["auth", "organizations", "clients", "audit"]
-                if revision in {"0002", "0003", "0004", "0005"}
+                if revision in {"0002", "0003", "0004", "0005", "0006a"}
                 else []
             )
             + (
                 ["records", "tickets", "notifications"]
-                if revision in {"0003", "0004", "0005"}
+                if revision in {"0003", "0004", "0005", "0006a"}
                 else []
             )
-            + (["attachments", "audio", "templates"] if revision in {"0004", "0005"} else [])
-            + (["knowledge", "search", "reports"] if revision == "0005" else []),
+            + (
+                ["attachments", "audio", "templates"]
+                if revision in {"0004", "0005", "0006a"}
+                else []
+            )
+            + (["knowledge", "search", "reports"] if revision in {"0005", "0006a"} else [])
+            + (["mobile_auth"] if revision == "0006a" else []),
         }
 
     from app.knowledge_routes import router as knowledge_router
     from app.media_routes import router as media_router
+    from app.mobile_routes import router as mobile_router
     from app.report_routes import router as report_router
     from app.routes import router
     from app.work_routes import router as work_router
@@ -149,6 +163,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media_router)
     app.include_router(knowledge_router)
     app.include_router(report_router)
+    app.include_router(mobile_router)
     return app
 
 

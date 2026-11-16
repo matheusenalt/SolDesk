@@ -19,6 +19,22 @@ Fase 05 não adicionou/alterou dependências, locks nem texto jurídico. Compara
 Git desses arquivos e SHA-256 de LICENSE conferidos novamente; inventários abaixo
 continuam aplicáveis. Extensões PostgreSQL unaccent/pg_trgm já eram usadas na Fase 02.
 
+### Descontinuação do cliente nativo — 16/11/2026
+
+O cliente nativo e seu painel de QR foram retirados. `qrcode` e `@types/qrcode`,
+usados exclusivamente por esse painel, saíram do manifesto e do lock web;
+o inventário atual voltou a **272 pacotes web**, todos com licença declarada.
+As **52 distribuições Python** e o texto jurídico AGPL foram preservados.
+O script de inventário não depende mais do pacote nativo.
+
+[LICENCAS_MOBILE](LICENCAS_MOBILE.json) é mantido como inventário histórico das
+595 dependências do cliente retirado, sem indicar instalação ou distribuição atual.
+Na revisão histórica, Expo/React Native/qrcode declaravam MIT; `node-forge`
+oferecia BSD-3-Clause OR GPL-2.0 e foi adotada a opção BSD-3-Clause; `argparse`
+declarava Python-2.0 com texto PSF. Esses registros são preservados para rastreabilidade.
+Nenhum SDK, APK, cache ou fonte de dependência foi incorporado ao repositório.
+Não foi executada nova consulta de vulnerabilidades em serviços externos nesta etapa.
+
 Inventário obtido dos metadados das 52 distribuições Python instaladas nas versões
 exatas do lock e dos 272 pacotes npm do lock (inclui ferramentas e opcionais de
 outras plataformas). Evidências: [Python](LICENCAS_PYTHON.json) e

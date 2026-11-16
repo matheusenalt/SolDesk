@@ -100,7 +100,7 @@ a funcionalidade for implementada. Prazos rígidos de revisão continuam em aber
   somente admin administra equipe/configurações. Gestor consulta equipe/auditoria.
 - Busca ignorando acentos/caixa com unaccent e pg_trgm; nomes únicos por empresa,
   apelidos não únicos, paginação offset estável por criação/UUID.
-- Mobile terá fluxo próprio na fase 06; nenhuma credencial mobile fictícia.
+- Decisão histórica substituída pela descontinuação nativa: interface web única; API e isolamento preservados.
 
 ## Adotadas na fase 03
 
@@ -174,3 +174,26 @@ a funcionalidade for implementada. Prazos rígidos de revisão continuam em aber
 - https://docs.docker.com/desktop/setup/install/windows-install/
 
 As fontes consultadas e versões efetivamente instaladas constam no relatório de validação.
+## Adotadas na Parte A da fase 06
+
+- Expo 58 e módulos oficiais audio/camera/crypto/file-system/linking/secure-store,
+  React Native 0.88 e React 19 nas versões compatíveis verificadas pelo Expo.
+- Token opaco curto + refresh rotativo; hashes em banco com RLS por usuário/empresa.
+  Replay concorrente falha fechado e revoga a família. Prazo absoluto não estendido.
+- Domínio/consulta pública/confirmação antes de login; nenhum Cloud embutido.
+  QR público, biblioteca qrcode no painel. HTTPS release; HTTP só com variante
+  dev e flag explícitas. API local permanece privada sem opt-in de binding LAN.
+- Nenhum modelo ou reconhecimento externo embarcado. Mock conserva texto humano.
+  Upload nativo usa o contrato binário existente e urgente independe do worker.
+- Polling interno, sem push remoto e sem fila offline completa. Prévia web tem
+  memória volátil e gravação desativada; não substitui teste nativo.
+- Aceite Android pendente; Parte B aguardará aprovação da A e confirmação posterior.
+
+## Descontinuação do cliente nativo — 16/11/2026
+
+A interface suportada passa a ser a web responsiva. Cliente nativo,
+pipeline e QR de abertura do aplicativo foram retirados. Decisões nativas
+anteriores acima são históricas e não orientam instalação atual.
+Migração 0006a, modelos e rotas bearer, RLS e testes de segurança foram
+preservados para não quebrar contratos/dados existentes. Não houve
+downgrade nem alteração de banco, redesign ou implementação de PWA.

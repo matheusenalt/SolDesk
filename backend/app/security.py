@@ -58,6 +58,19 @@ def issue_csrf(db, response, settings, session_token=None):
 def check_csrf(request: Request):
     if request.method not in {"POST", "PATCH", "PUT", "DELETE"}:
         return
+    credential, kind = request_credential(request)
+    if kind == "mobile":
+        if request.url.path in {
+            "/api/v1/auth/login",
+            "/api/v1/auth/password",
+            "/api/v1/organizations",
+            "/api/v1/invitations/accept",
+            "/api/v1/organizations/select",
+        }:
+            raise HTTPException(403, "Use o fluxo de autenticação do aplicativo")
+        with request.app.state.sessions() as db:
+            validate_access(db, credential, kind)
+        return
     settings = request.app.state.settings
     origin = request.headers.get("origin")
     if origin and origin not in settings.allowed_origins:
@@ -72,6 +85,25 @@ def check_csrf(request: Request):
         binding = digest(session_token) if session_token else None
         if grant is None or grant.expira_em <= now() or grant.session_hash != binding:
             raise HTTPException(403, "Atualize a página e tente novamente (CSRF)")
+
+
+def request_credential(request):
+    authorization = request.headers.get("authorization")
+    if authorization is not None:
+        if request.cookies.get("soldesk_session") or not authorization.startswith("Bearer "):
+            raise HTTPException(401, "Envie somente a sessão do aplicativo")
+        token = authorization[7:]
+        if not 40 <= len(token) <= 128 or not token.isascii() or any(c.isspace() for c in token):
+            raise HTTPException(401, "Entre novamente para continuar")
+        return token, "mobile"
+    return request.cookies.get("soldesk_session", ""), "web"
+
+
+def validate_access(db, token, kind):
+    item = db.get(AuthSession, digest(token)) if token else None
+    if item is None or item.client_kind != kind or item.revogado_em or item.expira_em <= now():
+        raise HTTPException(401, "Entre novamente para continuar")
+    return item
 
 
 def new_session(db, response, settings, user_id, organization_id):

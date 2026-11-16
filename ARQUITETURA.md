@@ -1,5 +1,18 @@
 # Arquitetura
 
+## Interface web e compatibilidade da API
+
+SolDesk usa uma única interface React responsiva para computador e navegador
+móvel. Android/iOS nativos foram descontinuados. Não há pipeline nativo nem
+painel de conexão por deep link; gravação e anexos continuam no navegador.
+
+A migração aplicada `0006a` é preservada: `client_kind`, MobileRefreshToken,
+RLS por usuário/empresa e hashes de tokens não foram removidos nem alterados.
+O contrato legado bearer mantém acesso curto, refresh rotativo/antirreplay e
+testes de segurança, independente de SDK nativo. Cookie/CSRF continuam sendo
+a autenticação da web. Nenhum modelo de negócio ou horário foi alterado.
+Contrato: [sessão por token](docs/API_FASE_06A.md).
+
 ## Fase 05: conhecimento e relatórios
 
 Migração aditiva 0005 amplia KnowledgeArticle e acrescenta ArticleVersion,
@@ -46,7 +59,6 @@ flowchart LR
   K --> P
   A --> F[Relatórios: fatos / eventos / fuso]
   F --> P
-  M[Mobile futuro] -.-> A
   A --> S[StorageBackend privado: local / S3 compatível]
   D[Dispatcher] --> P
   D --> R[(Redis / RQ)]
@@ -67,7 +79,7 @@ flowchart LR
   e logs JSON sem corpo, query ou mensagens internas de exceção.
 - Web usa proxy de mesma origem, consulta duas rotas reais, possui timeout,
   erro e nova tentativa; nenhum sucesso simulado ou login fictício.
-- Fonte de tokens JSON gera CSS web e constantes para o mobile futuro.
+- Fonte de tokens JSON gera CSS web e verifica contraste WCAG.
 
 ## Infraestrutura e fronteiras
 

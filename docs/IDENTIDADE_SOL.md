@@ -1,7 +1,7 @@
 # Identidade Sol
 
 Fonte única: [tokens.json](tokens.json). Execute `python scripts/tokens.py` para
-gerar CSS web e constantes mobile; `--check` detecta deriva e mede contraste.
+gerar CSS web; `--check` detecta deriva e mede contraste.
 
 ## Paleta oficial recebida
 
@@ -40,4 +40,4 @@ ou laranja sobre creme são proibidos. Acentos só em preenchimentos ou detalhes
 Foco de teclado tem contorno de texto; respeitar preferência de movimento reduzido.
 O teste calcula todos os pares de texto/feedback e contornos de controles usados;
 falha abaixo de 4,5:1 para texto e 3:1 para limites interativos. Não substitui QA
-de teclado, leitor de tela e layout. Mobile espelhará os mesmos valores gerados.
+de teclado, leitor de tela e layout. A interface web utiliza os valores gerados em computadores e celulares.

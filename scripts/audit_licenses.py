@@ -45,8 +45,14 @@ def main():
                 ],
             }
         )
-    lock = json.loads((ROOT / "web/package-lock.json").read_text())
-    npm_rows = [
+    write_report("LICENCAS_PYTHON.json", python_rows)
+    print("Python:", len(python_rows), Counter(r["license"] for r in python_rows))
+    npm_report("web", "LICENCAS_NPM.json")
+
+
+def npm_report(folder, report):
+    lock = json.loads((ROOT / folder / "package-lock.json").read_text())
+    rows = [
         {
             "package": name,
             "version": item.get("version"),
@@ -57,13 +63,11 @@ def main():
         for name, item in lock["packages"].items()
         if name
     ]
-    write_report("LICENCAS_PYTHON.json", python_rows)
-    write_report("LICENCAS_NPM.json", npm_rows)
-    print("Python:", len(python_rows), Counter(r["license"] for r in python_rows))
-    print("npm:", len(npm_rows), Counter(r["license"] for r in npm_rows))
+    write_report(report, rows)
+    print(folder, len(rows), Counter(r["license"] for r in rows))
     print(
         "npm sem licença declarada:",
-        [r["package"] for r in npm_rows if not r["license"]],
+        [r["package"] for r in rows if not r["license"]],
     )
 
 

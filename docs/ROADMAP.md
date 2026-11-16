@@ -5,7 +5,7 @@
 3. Registros, chamados, tempos, revisões e notificações.
 4. Áudio funcional: fila Redis, worker, revisão humana e storage.
 5. Produto ampliado: conhecimento, busca PostgreSQL e relatórios descritivos.
-6. Aplicativo mobile: Expo, QR seguro e conexão explícita ao servidor.
+6. Interface web responsiva: consolidar uso por computador e celular; apps nativos descontinuados.
 7. Conectores mock, ponta a ponta e revisão de segurança/privacidade.
 
 Evoluções: restrição de acesso por cliente, SMTP opcional, busca semântica,
@@ -41,4 +41,7 @@ equipes e CSV auditado com escopo próprio de técnico. Aceite local aprovado:
 [métricas](METRICAS.md) e [validação](VALIDACAO_PROMPT_05.md).
 Publicada em main (`160297a`); [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43928535399),
 65 pytest PostgreSQL e 32 E2E Chromium Ubuntu em execução completa.
-Parar após validar/documentar/publicar a Fase 05; não iniciar Prompt 06.
+O cliente Android/iOS foi descontinuado na etapa 08A, sem declarar aprovado
+seu aceite nativo anterior. API por token e migração 0006a permanecem por
+compatibilidade e integridade dos bancos existentes. O foco é a web responsiva.
+PWA e evolução de produto dependem de etapas próprias e validação posterior.

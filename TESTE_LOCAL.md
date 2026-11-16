@@ -400,3 +400,14 @@ Roteiro manual somente com dados fictícios:
 
 Definições: [METRICAS](docs/METRICAS.md). API: [Fase 05](docs/API_FASE_05.md).
 Limites e resultados observados: [VALIDACAO_PROMPT_05](docs/VALIDACAO_PROMPT_05.md).
+## Acesso web em celulares e contrato legado
+
+Android/iOS nativos foram descontinuados. Use a mesma URL da interface web
+no computador e no celular, com HTTPS em acesso remoto. Não há SDK nativo a instalar.
+A gravação depende das permissões e compatibilidade do navegador; digitação
+continua disponível. Nenhuma promessa de PWA ou funcionamento offline nesta etapa.
+
+Migração `0006a`, sessões bearer e seus testes de segurança foram preservados.
+O perfil isolado de testes usa PostgreSQL/Redis e dados fictícios; não rode
+cenários de alteração de estado contra produção.
+Contrato legado: [API de sessão](docs/API_FASE_06A.md).

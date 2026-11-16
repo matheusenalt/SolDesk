@@ -124,3 +124,10 @@ editoriais, separados de `Record.ocorrido_em`/`enviado_em`. Publicar artigo de
 Record conhecimento marca Record como publicado sem trocar o fato; registro de
 outro tipo mantém seu ciclo próprio. Cancelar origem de artigo publicado é
 recusado: arquive primeiro o artigo. Histórico anterior à migração não é inventado.
+## Parte A da fase 06
+
+O app reutiliza estes estados e os apresenta com ícone e texto. Não cria estado
+de sucesso local antes da resposta da API. Finalização exige confirmação do autor;
+conhecimento continua editorial no painel. Captura e envio não trocam o horário
+do fato por revisão/publicação. Falha de rede permite reenvio manual idempotente
+na mesma tela; não é uma fila offline persistente.

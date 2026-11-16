@@ -41,3 +41,8 @@ system; ausência de causa exibida como "Não informada". Datas editoriais:
 Estados adicionais: `devolvido`, `arquivado`. Filtros de período:
 `dia`, `semana`, `mes`, `inicio`, `livre`; granularity `dia`, `semana`, `mes`.
 Métricas/ações e atribuição estão definidas em [METRICAS](METRICAS.md).
+Fase 06 Parte A: MobileRefreshToken, family_id (família de rotação), client_kind
+(`web`/`mobile`). Campos de resposta temporal `acesso_expira_em` e
+`renovacao_expira_em`; persistência usa expira_em/usado_em/revogado_em.
+instance_name é nome público da instalação; instance_id continua identidade,
+nunca credencial. Cliente nativo e painel QR descontinuados; termos da sessão legada preservados na API.

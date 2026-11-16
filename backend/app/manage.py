@@ -103,6 +103,12 @@ def migrate(settings):
         )
         connection.execute("GRANT SELECT, INSERT, UPDATE ON team TO soldesk_runtime")
         connection.execute(
+            "GRANT SELECT, INSERT, UPDATE ON mobile_refresh_token TO soldesk_runtime"
+        )
+        connection.execute(
+            "GRANT EXECUTE ON FUNCTION public.mobile_refresh_context(text) TO soldesk_runtime"
+        )
+        connection.execute(
             "GRANT EXECUTE ON FUNCTION public.media_organizations() TO soldesk_runtime"
         )
         connection.execute(
