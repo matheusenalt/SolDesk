@@ -93,7 +93,7 @@ PowerShell:
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e './backend[dev]'
 $env:DATABASE_URL = 'sqlite:///./soldesk.db'
-.\.venv\Scripts\alembic.exe -c backend/alembic.ini upgrade head
+.\.venv\Scripts\alembic.exe -c backend/alembic.ini upgrade 0001
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
@@ -103,13 +103,17 @@ Bash:
 python3 -m venv .venv
 .venv/bin/python -m pip install -e './backend[dev]'
 export DATABASE_URL=sqlite:///./soldesk.db
-.venv/bin/alembic -c backend/alembic.ini upgrade head
+.venv/bin/alembic -c backend/alembic.ini upgrade 0001
 .venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
 Em outro terminal: `cd web`, `npm ci`, `npm run dev`. Abra http://localhost:5173.
-Para PostgreSQL local, configure `DATABASE_URL=postgresql+psycopg://...`, crie o
-banco fora da aplicação e execute o mesmo Alembic. Não coloque credenciais no Git.
+SQLite executa somente as rotas de instalação da fase 01 e a migração 0001.
+Operações da fase 02 exigem PostgreSQL; não existe autenticação simulada SQLite.
+Para PostgreSQL local, configure `DATABASE_URL` para o usuário runtime,
+`MIGRATION_DATABASE_URL` para o migrador e `RUNTIME_PASSWORD` por ambiente.
+Execute `python -m app.manage migrate` com o ambiente backend instalado. A API
+nunca recebe a conexão do migrador. Não coloque credenciais no Git.
 
 ## Validações automatizadas
 
@@ -161,6 +165,16 @@ os serviços de desenvolvimento. Sem a variável, permanece o fluxo SQLite isola
 
 ## Falhas comuns
 
+- Fase 02 com banco da fase 01: repita o setup, que gera `RUNTIME_PASSWORD`, cria
+  o papel restrito e aplica 0002. A migração é aditiva, sem apagar a instalação.
+- Login sem administrador: execute o bootstrap explícito do README. Community
+  recusa bootstrap de uma segunda empresa; Cloud permite empresas distintas.
+- Cookie Secure em produção exige HTTPS. Não use `ENVIRONMENT=production` com
+  localhost HTTP como teste de login.
+- 403 CSRF: atualize o token em `/api/v1/auth/csrf`, confira cookies e Origin/CORS.
+- 429 de login: aguarde a janela/bloqueio progressivo. Não desative a proteção
+  para automatizar testes; reutilize uma sessão por projeto de navegador.
+
 - Docker ausente: instale Docker Desktop/Engine e Compose. WSL ausente não é erro
   do projeto; configure-o e reinicie quando solicitado pelo instalador.
 - Daemon parado: inicie Docker e repita `docker info`.
@@ -172,3 +186,41 @@ os serviços de desenvolvimento. Sem a variável, permanece o fluxo SQLite isola
 - Perfil dev: `docker compose --profile dev up -d --build db migrate api-dev web-dev`.
 - Microfone mobile: HTTP por IP LAN não é contexto seguro para navegador;
   gravação web móvel exigirá HTTPS. Essa função ainda não existe na fase 01.
+
+## Aceite da fase 02
+
+Com Docker disponível, na raiz, PowerShell e Bash:
+
+```text
+docker compose --profile test run --build --rm tests
+```
+
+O perfil usa banco isolado `soldesk_test`, em tmpfs e sem porta no host. Não limpa
+o banco da aplicação. Os testes criam identificadores próprios, não dependem de
+senhas fixas e recusam executar a suíte de negócio em outro nome de banco.
+Sem esse perfil, os testes PostgreSQL ficam explicitamente como ignorados;
+uma execução SQLite não aprova o aceite de isolamento.
+
+Roteiro manual com dados inventados:
+
+1. No Community, faça bootstrap; ou no Cloud, execute o seed idempotente.
+2. Entre como administrador, cadastre cliente e uma referência externa fictícia.
+3. Pesquise nome/apelido com e sem acento, consulte e edite, marque inativo.
+4. Em Equipe, crie um convite e copie o link. Aceite em outro perfil de navegador;
+   repita o aceite para observar a recusa por uso único.
+5. Crie integrante com senha temporária, copie uma vez e entre em outro perfil:
+   acesso aos clientes só deve ocorrer após alterar a senha.
+6. Entre como técnico: equipe administrativa não aparece e promoção direta é
+   recusada. Desative esse membro como admin; a sessão perde acesso imediato.
+7. Não é possível rebaixar/desativar o último admin. Tente mudar o fuso IANA da
+   organização e confira o horário de cadastro no detalhe do cliente.
+8. Na outra empresa, UUID/nomes de clientes da primeira não são acessíveis.
+9. Use "Sair de todos os dispositivos" e confira o encerramento em outro perfil.
+
+E2E autenticado: defina `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD` **somente no
+ambiente**, com uma conta fictícia, e `PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080`.
+No PowerShell defina também `PLAYWRIGHT_CHANNEL=msedge` para o Edge instalado.
+Em `web`, execute `npx playwright test --config playwright.identity.config.ts`.
+No Bash use as mesmas variáveis com `export`; Chromium precisa ser instalado
+com `npx playwright install chromium`. O teste não grava traces autenticados.
+As credenciais não são argumentos de linha de comando nem arquivos versionados.

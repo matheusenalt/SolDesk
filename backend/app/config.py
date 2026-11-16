@@ -8,9 +8,15 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "sqlite:///./soldesk.db"
+    migration_database_url: str | None = None
+    runtime_password: str | None = None
+    allow_org_signup: bool = False
+    session_hours: int = 12
     soldesk_mode: Literal["community", "cloud"] = "community"
     environment: Literal["development", "production", "test"] = "development"
-    cors_origins: str = "http://localhost:8080,http://localhost:5173"
+    cors_origins: str = (
+        "http://localhost:8080,http://localhost:5173,http://127.0.0.1:8080,http://127.0.0.1:5173"
+    )
 
     @field_validator("cors_origins")
     @classmethod

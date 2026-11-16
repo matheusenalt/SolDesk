@@ -16,11 +16,43 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: pip install -r backend/requirements.lock && pip install --no-deps -e backend
-      - run: python -m ruff check backend scripts/tokens.py
-      - run: python -m ruff format --check backend scripts/tokens.py
+      - run: python -m ruff check backend scripts/tokens.py scripts/audit_licenses.py
+      - run: python -m ruff format --check backend scripts/tokens.py scripts/audit_licenses.py
       - run: python -m pytest backend/tests -q
       - run: python scripts/tokens.py --check
       - run: npm ci
         working-directory: web
       - run: npm run lint && npm run format:check && npm test && npm run build
         working-directory: web
+  postgres:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Preparar segredos temporários de teste
+        shell: bash
+        run: |
+          umask 077
+          cp .env.example .env
+          sed -i "s/^POSTGRES_PASSWORD=$/POSTGRES_PASSWORD=$(openssl rand -hex 32)/" .env
+          sed -i "s/^RUNTIME_PASSWORD=$/RUNTIME_PASSWORD=$(openssl rand -hex 32)/" .env
+          sed -i 's/^SOLDESK_MODE=community$/SOLDESK_MODE=cloud/' .env
+      - name: Testes reais PostgreSQL e RLS
+        run: docker compose --profile test run --build --rm tests
+      - name: Subir instalação Cloud fictícia
+        run: bash scripts/setup.sh
+      - run: npm ci && npx playwright install --with-deps chromium
+        working-directory: web
+      - name: Interface com autenticação real
+        shell: bash
+        run: |
+          credentials=$(docker compose run --rm migrate python -m app.manage seed-demo --json)
+          export E2E_ADMIN_EMAIL=$(printf '%s' "$credentials" | jq -r '.[0].email')
+          export E2E_ADMIN_PASSWORD=$(printf '%s' "$credentials" | jq -r '.[0].password')
+          export PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080
+          cd web
+          npx playwright test --config playwright.identity.config.ts

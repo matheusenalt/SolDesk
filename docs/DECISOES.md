@@ -37,7 +37,28 @@ a funcionalidade for implementada. Não há implementação de revisões nesta f
   obrigatório da fase 01; essa condição substitui a autorização anterior de avanço.
 - Inventário e condições de terceiros em [LICENCAS.md](LICENCAS.md).
 
-## Referências técnicas
+## Adotadas na fase 02
+
+- PostgreSQL obrigatório para operações autenticadas; SQLite preservado apenas
+  para o aceite rápido das rotas de instalação da fase 01.
+- Conta runtime separada e RLS com FORCE; contexto transacional e repositório
+  único. Migração aditiva, sem exclusão de volumes ou dados existentes.
+- Sessões opacas em cookies HttpOnly/Secure em produção/SameSite Strict;
+  CSRF com grant persistente vinculado à sessão. Sem JWT/localStorage na web.
+- Argon2id via argon2-cffi; dependências e licenças incluídas nos inventários.
+- Rate limit persistente por IP/conta e bloqueio progressivo sem Redis nesta fase.
+- Community: só bootstrap explícito de uma empresa. Cloud: cadastro público
+  somente com ALLOW_ORG_SIGNUP, padrão desligado. Seed de duas empresas só em
+  Cloud não produtivo; idempotente e sem redefinir credenciais existentes.
+- Identidades compartilhadas não têm senha global redefinida por admin de uma
+  só empresa. Convites para contas existentes exigem a senha atual do titular.
+- Todos os membros ativos acessam todos os clientes da sua organização;
+  somente admin administra equipe/configurações. Gestor consulta equipe/auditoria.
+- Busca ignorando acentos/caixa com unaccent e pg_trgm; nomes únicos por empresa,
+  apelidos não únicos, paginação offset estável por criação/UUID.
+- Mobile terá fluxo próprio na fase 06; nenhuma credencial mobile fictícia.
+
+## Fontes técnicas
 
 - https://fastapi.tiangolo.com/tutorial/testing/
 - https://alembic.sqlalchemy.org/en/latest/tutorial.html

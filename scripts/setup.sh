@@ -17,6 +17,12 @@ if grep -Eq '^POSTGRES_PASSWORD=[[:space:]]*$' .env; then
   chmod 600 .env
   echo 'Senha aleatória local gerada em .env; não compartilhar esse arquivo.'
 fi
+if ! grep -q '^RUNTIME_PASSWORD=' .env; then printf '\nRUNTIME_PASSWORD=\n' >> .env; fi
+if grep -Eq '^RUNTIME_PASSWORD=[[:space:]]*$' .env; then
+  runtime_password=$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')
+  sed -i "s/^RUNTIME_PASSWORD=[[:space:]]*$/RUNTIME_PASSWORD=$runtime_password/" .env
+  chmod 600 .env
+fi
 docker compose config --quiet
 docker compose up -d --build --wait db api web
 docker compose run --rm migrate

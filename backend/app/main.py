@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from starlette.exceptions import HTTPException
 
 from app.config import Settings
@@ -37,12 +37,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="SolDesk API", version="1.0.0", lifespan=lifespan)
     app.state.sessions = sessions
+    app.state.settings = settings
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
-        allow_credentials=False,
-        allow_methods=["GET", "OPTIONS"],
-        allow_headers=["Content-Type"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
+        allow_headers=["Content-Type", "X-CSRF-Token"],
     )
 
     @app.middleware("http")
@@ -78,13 +79,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         titles = {404: "Recurso não encontrado", 405: "Método não permitido"}
         return problem(
             exc.status_code,
-            titles.get(exc.status_code, "Solicitação recusada"),
+            titles.get(exc.status_code, str(exc.detail)),
             request.state.request_id,
         )
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, _exc):
         return problem(422, "Confira os dados informados", request.state.request_id)
+
+    @app.exception_handler(IntegrityError)
+    async def conflict_error(request: Request, _exc):
+        return problem(
+            409, "Cadastro já existente ou referência inválida", request.state.request_id
+        )
 
     @app.get("/api/v1/health", tags=["Instalação"])
     def health():
@@ -105,6 +112,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 if installation is None:
                     return problem(503, "Instalação não inicializada; execute as migrações")
                 instance_id = installation.instance_id
+                revision = session.scalar(text("SELECT version_num FROM alembic_version"))
         except SQLAlchemyError:
             return problem(503, "Banco de dados indisponível; confira as migrações")
         return {
@@ -112,9 +120,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "api_version": "1.0.0",
             "instance_id": instance_id,
             "mode": settings.soldesk_mode,
-            "capabilities": ["health", "server_info"],
+            "capabilities": ["health", "server_info"]
+            + (["auth", "organizations", "clients", "audit"] if revision == "0002" else []),
         }
 
+    from app.routes import router
+
+    app.include_router(router)
     return app
 
 

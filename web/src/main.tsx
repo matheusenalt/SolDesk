@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { loadStatus, type ServerInfo } from "./api";
 import { strings as s } from "./strings";
+import { Workspace } from "./Workspace";
 import "./styles.css";
 
 function App() {
@@ -131,6 +132,7 @@ function App() {
             </div>
           )}
         </section>
+        <Workspace />
         <section className="next" aria-labelledby="next-title">
           <div className="section-title">
             <h2 id="next-title">{s.future}</h2>

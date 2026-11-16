@@ -16,4 +16,9 @@ Licenciamento do código próprio: GNU AGPL v3 somente, aprovado pelo titular;
 instalações próprias, contribuições e eventual hospedagem comercial seguem a
 licença. A publicação inicial não encerra o aceite de infraestrutura da fase 01.
 O aceite Compose/PostgreSQL da fase 01 foi executado em Windows/WSL 2, incluindo
-testes de navegador contra os contêineres. O prompt 02 não foi iniciado nesta entrega.
+testes de navegador contra os contêineres.
+
+Fase 02: organizações, autenticação, equipe, clientes e RLS implementados e
+validados localmente com PostgreSQL e E2E. Restrição por cliente é evolução futura; atualmente
+todos os membros ativos veem todos os clientes da organização. Registros,
+chamados, relatórios operacionais e arquivos continuam nas próximas fases.

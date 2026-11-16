@@ -29,6 +29,17 @@ if ($content -match '(?m)^POSTGRES_PASSWORD=\s*$') {
     [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), $content, (New-Object Text.UTF8Encoding $false))
     Write-Host 'Senha aleatória local gerada em .env; não compartilhar esse arquivo.'
 }
+$content = [IO.File]::ReadAllText((Join-Path (Get-Location) '.env'))
+if ($content -notmatch '(?m)^RUNTIME_PASSWORD=') { $content += "`nRUNTIME_PASSWORD=`n" }
+if ($content -match '(?m)^RUNTIME_PASSWORD=\s*$') {
+    $runtimeBytes = New-Object byte[] 32
+    $runtimeRng = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $runtimeRng.GetBytes($runtimeBytes) } finally { $runtimeRng.Dispose() }
+    $runtimePassword = -join ($runtimeBytes | ForEach-Object { $_.ToString('x2') })
+    $content = [regex]::Replace($content, '(?m)^RUNTIME_PASSWORD=\s*$', "RUNTIME_PASSWORD=$runtimePassword")
+    [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), $content, (New-Object Text.UTF8Encoding $false))
+    Write-Host 'Senha do usuário restrito gerada localmente; não compartilhar .env.'
+}
 Invoke-Checked 'docker' @('compose', 'config', '--quiet')
 Invoke-Checked 'docker' @('compose', 'up', '-d', '--build', '--wait', 'db', 'api', 'web')
 Invoke-Checked 'docker' @('compose', 'run', '--rm', 'migrate')

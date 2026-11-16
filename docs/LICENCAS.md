@@ -15,7 +15,7 @@ O código-fonte oficial está em https://github.com/matheusenalt/SolDesk.
 
 ## Revisão das dependências da fase 01
 
-Inventário obtido dos metadados das 38 distribuições Python instaladas nas versões
+Inventário obtido dos metadados das 42 distribuições Python instaladas nas versões
 exatas do lock e dos 272 pacotes npm do lock (inclui ferramentas e opcionais de
 outras plataformas). Evidências: [Python](LICENCAS_PYTHON.json) e
 [npm](LICENCAS_NPM.json). Reproduzir com `python scripts/audit_licenses.py` no
@@ -28,6 +28,7 @@ ambiente de desenvolvimento. O script exige as versões Python iguais ao lock.
 | LGPL-3.0-only: psycopg e psycopg-binary | Bibliotecas separadas, sem modificação local. Preservar LGPL, acesso ao fonte correspondente e possibilidade de substituição/religação conforme a forma de distribuição. Não relicenciar essas bibliotecas como código próprio. |
 | MPL-2.0: certifi e lightningcss/opcionais | Copyleft por arquivo; manter avisos, licença e fonte dos arquivos cobertos ao redistribuir. Não houve modificação nem incorporação de seus fontes no SolDesk. lightningcss integra as ferramentas de build. |
 | CC-BY-4.0: caniuse-lite | Dados usados pelas ferramentas de build; preservar atribuição/licença e indicar mudanças se esses dados forem redistribuídos. Não é licença do código próprio do SolDesk. |
+| MIT/MIT-0/BSD: Argon2-cffi, bindings, cffi e pycparser | Adicionados na fase 02 para hash Argon2id; licenças permissivas compatíveis com a licença do código próprio. Preservar os avisos dos pacotes e da implementação nativa. |
 
 Não foi identificada licença incompatível no conjunto inventariado e no uso atual.
 O `colorama` não declara expressão SPDX nos metadados; seu arquivo LICENSE.txt

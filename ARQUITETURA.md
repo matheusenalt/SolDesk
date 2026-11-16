@@ -44,16 +44,40 @@ O aceite reproduzível está em `scripts/test-compose.ps1`; o Playwright aceita
 
 SQLite é exclusivamente alternativa de desenvolvimento/testes rápidos. Testes
 SQLite não comprovam PostgreSQL, RLS ou persistência entre contêineres.
-Na fase 02, a API deverá abandonar o papel inicial superusuário de bootstrap,
-usar papel runtime separado e tenant por transação, com teste de RLS sem filtro.
-Nenhuma entidade de negócio será exposta antes dessas proteções.
+Na fase 02, a API usa `soldesk_runtime`, sem superusuário/BYPASSRLS e sem ser dona
+das tabelas. Migração/bootstrap usam conexão separada, nunca entregue à API.
+`Context.query/get` aplica o tenant da sessão e `set_config(..., true)` define
+o contexto por transação. Políticas RLS com FORCE reforçam a separação. Testes
+com SQL sem filtro e conexão reutilizada demonstram a barreira no PostgreSQL.
 
 Redis e o worker só serão adicionados na fase de áudio. Armazenamento de arquivos
 será uma abstração `StorageBackend`, com implementação local e S3/MinIO compatível,
 URLs temporárias e auditoria. Não há uploads ou conectores nesta fase.
 
 VPS/produção, TLS, backup/restauração e revisão de segurança ainda não validados.
-Não usar esta base com dados reais antes de implementar autenticação e isolamento.
+Use apenas dados fictícios até a revisão de produção e segurança do produto.
+
+## Fase 02: identidade e organização
+
+`Organization`, `User`, `OrganizationMembership`, `Client`, `ClientExternalRef`,
+`Invitation` e `AuditEvent` adicionados em migração aditiva 0002. O esquema SQL
+é um snapshot congelado, independente dos modelos de futuras fases. Datas
+TIMESTAMPTZ em UTC; fuso IANA por organização, aplicado na interface.
+
+Sessões opacas (12 h), hashes Argon2id, CSRF sincronizado no servidor, revogação,
+convites de uso único e rate limit persistente. Usuário global pode ter vários
+vínculos; o ID selecionado não autoriza acesso sem vínculo ativo. Tabelas internas
+de autenticação global não têm CRUD público. Redefinição de senha de identidade
+compartilhada é limitada para impedir tomada de acesso entre organizações.
+
+Clientes usam unaccent/pg_trgm, índices GIN, nome normalizado único por empresa e
+paginação offset. Referências externas são apenas armazenadas, com FK composta
+por empresa/cliente. Auditoria administrativa não armazena segredos e o runtime
+não recebe permissão para alterar/apagar auditoria.
+
+Papéis e regras: [PERMISSOES](docs/PERMISSOES.md). Contratos e fronteiras:
+[API fase 02](docs/API_FASE_02.md). Mobile, Redis, áudio, SMTP e arquivos continuam
+fora desta fase.
 
 ## Licenciamento
 

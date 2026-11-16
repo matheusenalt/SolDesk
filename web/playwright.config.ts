@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   webServer: externalBaseURL ? undefined : [
     {
-      command: `${python} -m alembic -c ../backend/alembic.ini upgrade head && ${python} -m uvicorn app.main:app --host 127.0.0.1 --port 18000 --no-access-log`,
+      command: `${python} -m alembic -c ../backend/alembic.ini upgrade 0001 && ${python} -m uvicorn app.main:app --host 127.0.0.1 --port 18000 --no-access-log`,
       env: { DATABASE_URL: 'sqlite:///./e2e.db', CORS_ORIGINS: 'http://127.0.0.1:15173' },
       url: 'http://127.0.0.1:18000/api/v1/health',
       reuseExistingServer: false,

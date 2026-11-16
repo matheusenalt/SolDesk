@@ -38,6 +38,24 @@
     ]
   },
   {
+    "name": "argon2-cffi",
+    "version": "25.1.0",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "argon2_cffi-25.1.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "argon2-cffi-bindings",
+    "version": "26.2.0",
+    "license": "MIT",
+    "classifiers": [],
+    "license_files": [
+      "argon2_cffi_bindings-26.2.0.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
     "name": "certifi",
     "version": "2026.10.23",
     "license": "MPL-2.0",
@@ -46,6 +64,15 @@
     ],
     "license_files": [
       "certifi-2026.10.23.dist-info/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "cffi",
+    "version": "2.1.1",
+    "license": "MIT-0",
+    "classifiers": [],
+    "license_files": [
+      "cffi-2.1.1.dist-info/licenses/LICENSE"
     ]
   },
   {
@@ -218,6 +245,15 @@
     "classifiers": [],
     "license_files": [
       "psycopg_binary-3.3.9.dist-info/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pycparser",
+    "version": "3.12",
+    "license": "BSD-3-Clause",
+    "classifiers": [],
+    "license_files": [
+      "pycparser-3.12.dist-info/licenses/LICENSE"
     ]
   },
   {

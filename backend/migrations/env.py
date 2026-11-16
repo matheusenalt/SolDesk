@@ -5,7 +5,8 @@ from app.config import Settings
 from app.database import Base
 
 config = context.config
-url = Settings().database_url
+settings = Settings()
+url = settings.migration_database_url or settings.database_url
 
 if context.is_offline_mode():
     context.configure(url=url, target_metadata=Base.metadata, literal_binds=True)

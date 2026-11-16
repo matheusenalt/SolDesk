@@ -15,8 +15,11 @@ from app.main import create_app
 def database(tmp_path, monkeypatch):
     url = f"sqlite:///{(tmp_path / 'test.db').as_posix()}"
     monkeypatch.setenv("DATABASE_URL", url)
+    monkeypatch.setenv("SOLDESK_MODE", "community")
+    monkeypatch.setenv("CORS_ORIGINS", "http://localhost:8080,http://localhost:5173")
     config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
-    command.upgrade(config, "head")
+    monkeypatch.delenv("MIGRATION_DATABASE_URL", raising=False)
+    command.upgrade(config, "0001")
     return url, config
 
 
@@ -32,7 +35,7 @@ def test_health_and_info_persist_across_restart_and_repeat_migration(database):
             "installation",
             "alembic_version",
         }
-    command.upgrade(config, "head")
+    command.upgrade(config, "0001")
     with TestClient(create_app(Settings(database_url=url))) as client:
         assert client.get("/api/v1/server-info").json() == first
 
@@ -46,10 +49,10 @@ def test_unmigrated_database_is_not_reported_healthy(tmp_path):
             assert "sqlite" not in response.text
 
 
-def test_problem_details_and_no_business_routes(database):
+def test_problem_details_and_business_requires_postgresql(database):
     with TestClient(create_app(Settings(database_url=database[0]))) as client:
         response = client.get("/api/v1/clients")
-        assert response.status_code == 404
+        assert response.status_code == 503
         assert response.headers["content-type"] == "application/problem+json"
         assert response.headers["x-content-type-options"] == "nosniff"
         assert response.json()["request_id"] == response.headers["x-request-id"]
