@@ -6,6 +6,8 @@ import { AudioCapture } from "./AudioCapture";
 import { AudioReview, FilePanel, MediaConfiguration } from "./MediaPanels";
 import { uploadFile } from "./media-api";
 import { mediaStrings as ms } from "./media-strings";
+import { RelatedArticles } from "./KnowledgeArea";
+import { insightStrings as ins } from "./insight-strings";
 
 export type Entry = {
   id: string;
@@ -30,6 +32,9 @@ export type Entry = {
   template_version_id: string | null;
   template_version: number | null;
   ditado_texto: string | null;
+  category: string;
+  system: string;
+  article_status: string | null;
 };
 type Ticket = {
   id: string;
@@ -40,6 +45,7 @@ type Ticket = {
   assignee_id: string;
   priority: string;
   category: string;
+  system: string;
   status: string;
   revision: number;
   reopen_count: number;
@@ -85,6 +91,8 @@ type Props = {
   timezone: string;
   initialClient?: string;
   hidden?: boolean;
+  focus?: { id: string; ticket: boolean };
+  onArticle: (id: string) => void;
 };
 
 const transitions: Record<string, string[]> = {
@@ -128,6 +136,8 @@ export function WorkArea({
   timezone,
   initialClient,
   hidden,
+  focus,
+  onArticle,
 }: Props) {
   const [tab, setTab] = useState(initialClient ? "history" : "new");
   const [busy, setBusy] = useState(false);
@@ -284,6 +294,21 @@ export function WorkArea({
       setOffset(0);
     }
   }, [initialClient]);
+  useEffect(() => {
+    if (!focus || hidden) return;
+    void perform(async () => {
+      if (focus.ticket) {
+        setSelected(null);
+        setTab("mine");
+        await openTicket(focus.id);
+      } else {
+        setTicket(null);
+        setTab("records");
+        setSelected(await request<Entry>(`/records/${focus.id}`));
+        setVersions([]);
+      }
+    });
+  }, [focus, hidden]);
 
   function occurrence(data: FormData) {
     const explicit = get(data, "explicit_time");
@@ -310,11 +335,12 @@ export function WorkArea({
             ocorrido_em: occurrence(data),
             capturado_em: new Date().toISOString(),
             submit: shouldSend,
+            category: get(data, "category"),
+            system: get(data, "system"),
             ...(kind === "chamado"
               ? {
                   assignee_id: get(data, "assignee_id") || userId,
                   priority: get(data, "priority"),
-                  category: get(data, "category"),
                 }
               : {}),
           },
@@ -606,12 +632,16 @@ export function WorkArea({
                   ))}
                 </select>
               </label>
-              <label>
-                {s.category}
-                <input name="category" maxLength={80} />
-              </label>
             </>
           )}
+          <label>
+            {s.category}
+            <input name="category" maxLength={80} />
+          </label>
+          <label>
+            {ins.system}
+            <input name="system" maxLength={80} />
+          </label>
           <AudioCapture
             file={audioFile}
             onFile={(file) => {
@@ -654,6 +684,9 @@ export function WorkArea({
             {s.confirmedTotal}: {confirmedTotal}
           </p>
           {clientId && <FilePanel ownerType="client" ownerId={clientId} />}
+          {clientId && (
+            <RelatedArticles clientId={clientId} onOpen={onArticle} />
+          )}
         </>
       )}
       {["records", "reviews", "history"].includes(tab) && (
@@ -726,7 +759,28 @@ export function WorkArea({
               {s.edited}: {selected.texto_organizado}
             </p>
           )}
-          {selected.article_id && <p>{s.articleDraft}</p>}
+          {selected.article_id && (
+            <p>
+              {selected.article_status === "rascunho"
+                ? s.articleDraft
+                : ins.states[selected.article_status || "rascunho"]}
+            </p>
+          )}
+          <button
+            disabled={busy}
+            onClick={() =>
+              void perform(async () => {
+                const item = await request<{ id: string }>(
+                  "/knowledge/articles",
+                  "POST",
+                  { record_id: selected.id },
+                );
+                onArticle(item.id);
+              })
+            }
+          >
+            {ins.create}
+          </button>
           {selected.template_version && (
             <p>
               {ms.templateVersion}: {selected.template_version}
@@ -769,6 +823,8 @@ export function WorkArea({
                         {
                           revision: selected.revision,
                           texto_organizado: get(data, "texto_organizado"),
+                          category: get(data, "category"),
+                          system: get(data, "system"),
                           ...(get(data, "explicit_time") ||
                           get(data, "ocorrido_em") !==
                             localInput(selected.ocorrido_em, timezone)
@@ -795,6 +851,22 @@ export function WorkArea({
                     />
                   </label>
                   {timeFields(selected.ocorrido_em)}
+                  <label>
+                    {s.category}
+                    <input
+                      name="category"
+                      maxLength={80}
+                      defaultValue={selected.category}
+                    />
+                  </label>
+                  <label>
+                    {ins.system}
+                    <input
+                      name="system"
+                      maxLength={80}
+                      defaultValue={selected.system}
+                    />
+                  </label>
                   <button disabled={busy}>{s.save}</button>
                 </form>
                 {selected.status === "aguardando_revisao" &&
@@ -1044,6 +1116,11 @@ export function WorkArea({
             {ticket.closed_by_name || "—"} · {s.reopens}: {ticket.reopen_count}
           </p>
           <FilePanel ownerType="ticket" ownerId={ticket.id} />
+          <RelatedArticles
+            key={ticket.id + ":" + ticket.revision}
+            ticketId={ticket.id}
+            onOpen={onArticle}
+          />
           <form
             className="workspace-form"
             onSubmit={(event) => {
@@ -1057,6 +1134,7 @@ export function WorkArea({
                         assignee_id: get(data, "assignee_id"),
                         priority: get(data, "priority"),
                         category: get(data, "category"),
+                        system: get(data, "system"),
                       }
                     : {}),
                   ...(get(data, "status")
@@ -1102,6 +1180,15 @@ export function WorkArea({
                 name="category"
                 maxLength={80}
                 defaultValue={ticket.category}
+                disabled={!canOperate}
+              />
+            </label>
+            <label>
+              {ins.system}
+              <input
+                name="system"
+                maxLength={80}
+                defaultValue={ticket.system}
                 disabled={!canOperate}
               />
             </label>

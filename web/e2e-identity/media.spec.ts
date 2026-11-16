@@ -87,7 +87,7 @@ test('MediaRecorder real com microfone fictício: prévia, cancelamento e conhec
   const response = await accepted; expect(response.status()).toBe(202); const value = await response.json();
   const review = area.getByRole('region', { name: 'Processamento do áudio', exact: true });
   await expect(review.getByText(/Texto preparado — exige revisão/)).toBeVisible({ timeout: 30000 });
-  await expect(area.getByText('◷ Rascunho de conhecimento; publicação ainda indisponível.', { exact: true })).toBeVisible();
+  await expect(area.getByText('◷ Rascunho de conhecimento; revisão editorial necessária.', { exact: true })).toBeVisible();
   await expect(area.getByRole('button', { name: 'Conferi e confirmo', exact: true })).toHaveCount(0);
   const record = await (await page.request.get(`/api/v1/records/${value.record.id}`)).json();
   expect(record.publicado_em).toBeNull(); expect(record.article_status).toBe('rascunho');

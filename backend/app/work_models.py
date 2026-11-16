@@ -34,6 +34,8 @@ class Record(Base):
     cancellation_reason: Mapped[str | None] = mapped_column(Text)
     template_version_id: Mapped[str | None] = mapped_column(String(36))
     ditado_texto: Mapped[str | None] = mapped_column(Text)
+    category: Mapped[str] = mapped_column(String(80), default="")
+    system: Mapped[str] = mapped_column(String(80), default="")
 
 
 class RecordVersion(Base):
@@ -73,6 +75,7 @@ class Ticket(Base):
     closed_by: Mapped[str | None] = mapped_column(ForeignKey("app_user.id"))
     priority: Mapped[str] = mapped_column(String(16), default="normal")
     category: Mapped[str] = mapped_column(String(80), default="")
+    system: Mapped[str] = mapped_column(String(80), default="")
     status: Mapped[str] = mapped_column(String(32), default="aberto", index=True)
     revision: Mapped[int] = mapped_column(Integer, default=1)
     reopen_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -134,6 +137,25 @@ class KnowledgeArticle(Base):
     status: Mapped[str] = mapped_column(String(24), default="rascunho")
     text: Mapped[str] = mapped_column(Text)
     criado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    title: Mapped[str] = mapped_column(String(200), default="")
+    problem: Mapped[str] = mapped_column(Text, default="")
+    context: Mapped[str] = mapped_column(Text, default="")
+    confirmed_cause: Mapped[str] = mapped_column(Text, default="")
+    procedure: Mapped[str] = mapped_column(Text, default="")
+    result: Mapped[str] = mapped_column(Text, default="")
+    keywords: Mapped[list] = mapped_column(JSON, default=list)
+    category: Mapped[str] = mapped_column(String(80), default="")
+    system: Mapped[str] = mapped_column(String(80), default="")
+    client_id: Mapped[str | None] = mapped_column(ForeignKey("client.id"))
+    template_version_id: Mapped[str | None] = mapped_column(ForeignKey("template_version.id"))
+    revision: Mapped[int] = mapped_column(Integer, default=1)
+    reviewer_id: Mapped[str | None] = mapped_column(ForeignKey("app_user.id"))
+    atualizado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    enviado_revisao_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    publicado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    arquivado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    review_comment: Mapped[str] = mapped_column(Text, default="")
+    search_text: Mapped[str] = mapped_column(Text, default="")
 
 
 class Notification(Base):

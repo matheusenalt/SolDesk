@@ -193,11 +193,24 @@ def edit_organization(
     body: OrganizationChange, request: Request, ctx=Depends(context, scope="function")
 ):
     ctx.require_admin()
-    item = ctx.db.get(Organization, ctx.organization_id)
+    item = ctx.db.scalar(
+        select(Organization).where(Organization.id == ctx.organization_id).with_for_update()
+    )
     before = {"name": item.name, "timezone": item.timezone, "settings": item.settings}
-    for key, value in body.model_dump().items():
-        setattr(item, key, value)
-    ctx.audit(request, "organizacao_alterada", "Organization", item.id, before, body.model_dump())
+    for key, value in body.model_dump(exclude_unset=True).items():
+        if key == "settings":
+            if value is not None:
+                item.settings = {**item.settings, **value}
+        else:
+            setattr(item, key, value)
+    ctx.audit(
+        request,
+        "organizacao_alterada",
+        "Organization",
+        item.id,
+        before,
+        {"name": item.name, "timezone": item.timezone, "settings": item.settings},
+    )
     return organization_data(item)
 
 

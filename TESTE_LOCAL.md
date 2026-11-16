@@ -364,3 +364,39 @@ com MediaRecorder. Texto ao vivo fica separado do resultado do servidor. Serviç
 real do fabricante/Safari/iOS/aparelho físico não foram testados; fallback permanece.
 
 Evidências e pendências: [VALIDACAO_PROMPT_04](docs/VALIDACAO_PROMPT_04.md).
+
+## Aceite da Fase 05
+
+Repita setup para aplicar 0005 ao volume existente, sem apagar dados. Execute
+`docker compose --profile test run --build --rm tests`: 65 testes PostgreSQL,
+incluindo 22 novos casos parametrizados de conhecimento/relatórios. Repita lint,
+formatação, testes web, build e tokens conforme comandos anteriores. A suíte de
+identidade inclui 4 cenários novos × desktop/emulação móvel (32 casos ao todo),
+usando as mesmas variáveis de credenciais fictícias, com traces desativados e
+`E2E_CONTROL_WORKER=1`. `npm run test:e2e` mantém 4 regressões de instalação.
+
+Roteiro manual somente com dados fictícios:
+
+1. Técnico prepara artigo de registro, preenche título/problema/procedimento,
+   categoria/sistema e causa somente se relatada. Envia para revisão; não aparece
+   na busca pública. Revisor devolve com motivo; autor corrige e reenvia.
+2. Outro gestor/admin confere avisos e conteúdo; ambos os checkboxes são
+   necessários. Publica, consulta diferenças e abre a origem: fato/envio preservados.
+3. Busque `0x80070005`, `impressão`/`impressao` e `CFOP 5102`. Restrinja outro
+   artigo a cliente A: só entra com esse filtro, nunca em sugestões do B. Arquive
+   com motivo e confira busca explícita de arquivados.
+4. Em Relatórios, consulte hoje/semana/mês/início e livre; filtre cliente/pessoa/
+   equipe/categoria/sistema. Confira fatos no fuso da organização e comparação.
+   Finalização pendente não soma em confirmadas. A abre e B resolve: atores distintos.
+5. Resolva/encerre/reabra o mesmo Ticket: ações separadas e ticket único. Adicione
+   espera por esclarecimento: bruto/líquido, mediana/P90/n e aviso de amostra pequena.
+6. Técnico só vê si mesmo, inclusive exportando. Fórmulas de cliente/nome fictício
+   recebem apóstrofo no CSV; auditoria registra exportação sem texto de relato.
+7. Crie equipe como admin, veja composição atual e filtre. Pessoas começam em
+   ordem alfabética; não há classificação de competência. Gráfico tem rótulos e
+   tabela alternativa; confira largura móvel e temas. Sem dados há vazio explícito.
+8. Mude nome/fuso em Configurações e confira que políticas de áudio/conhecimento
+   continuam configuradas. Não use dados reais nestes testes.
+
+Definições: [METRICAS](docs/METRICAS.md). API: [Fase 05](docs/API_FASE_05.md).
+Limites e resultados observados: [VALIDACAO_PROMPT_05](docs/VALIDACAO_PROMPT_05.md).

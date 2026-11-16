@@ -1,4 +1,4 @@
-# Permissões das fases 02–04
+# Permissões das fases 02–05
 
 Todas as operações exigem sessão válida e vínculo ativo na organização corrente.
 O tenant é recuperado da sessão persistida, nunca aceito como credencial do cliente.
@@ -20,7 +20,7 @@ O tenant é recuperado da sessão persistida, nunca aceito como credencial do cl
 Todos os membros ativos veem todos os clientes da organização; restrição por
 cliente é evolução futura. O técnico não lista equipe nem promove a si mesmo.
 Um gestor não obtém acesso administrativo pela interface ou chamada direta à API.
-Relatórios e publicação de artigos não têm autorização ativa nesta fase.
+Conhecimento e relatórios seguem as regras da Fase 05 abaixo.
 
 ## Registros e chamados
 
@@ -73,3 +73,29 @@ Não existe recuperação pública que revele a existência de um e-mail, nem SM
 Templates antigos, trilha de acesso e histórico de processamento não têm exclusão
 ou edição pública. Revogar vínculo/sessão impede usar um link anteriormente
 emitido. Somente o worker recebe tarefa de transcrição; fila contém IDs, não áudio.
+
+## Conhecimento e relatórios — Fase 05
+
+| Recurso/ação | Regra |
+| --- | --- |
+| Buscar publicados / consultar publicado ou arquivado | Membro ativo na organização; busca de arquivado exige filtro explícito |
+| Restrito a cliente | Contexto daquele cliente na busca/sugestão; gerais participam também; nunca outra empresa |
+| Preparar artigo | Acesso ao registro; autoria editorial do solicitante autenticado |
+| Consultar rascunho/devolvido/revisão | Autor ou revisor configurado |
+| Editar/enviar à revisão | Autor; rascunho/devolvido; revision atual |
+| Fila editorial | Papel autorizado pela política da empresa |
+| Publicar/devolver | Papel autorizado; outro autor por padrão; duas conferências na publicação e comentário na devolução |
+| Alterar política | Admin; autopublicação desligada por padrão |
+| Arquivar com motivo | Revisor autorizado |
+| Reabrir arquivado | Autor; volta a rascunho, fora da busca publicada |
+| Abrir origem | Permissão própria de Record/Ticket, independente do artigo |
+| Relatórios e CSV | Gestão: empresa; técnico: somente autoria/ações/amostras/responsabilidade próprias |
+| Consultar outra pessoa por ID | Técnico recebe 403; equipe intersecta seu próprio escopo |
+| Consultas de artigos | Gestão sem filtro pessoa/equipe, agregado sem leitor; indisponível por pessoa |
+| Equipes | Gestão lê; admin cria/edita integrantes da própria empresa com revision |
+| Excluir versões/consultas/auditoria | Não permitido ao runtime |
+
+Restrição editorial por cliente controla busca/sugestão; não é ACL adicional:
+todos os membros ativos ainda veem clientes da própria empresa. Não promete
+sigilo entre membros com acesso ao mesmo cliente. Incluir técnico como revisor
+não amplia seu escopo gerencial. CSV exige CSRF e audita filtros/período/escopo.

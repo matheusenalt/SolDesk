@@ -278,7 +278,11 @@ def process_audio(organization_id, identifier, settings=None):
             else:
                 record.status, record.texto_organizado = "aguardando_revisao", draft["text"]
                 if record.article_id:
-                    db.get(KnowledgeArticle, record.article_id).text = draft["text"]
+                    from app.knowledge import sync_source
+
+                    sync_source(
+                        ctx, REQUEST, db.get(KnowledgeArticle, record.article_id), draft["text"]
+                    )
             record.revision += 1
             record_event(ctx, REQUEST, record, "audio_processado")
             db.add(
@@ -327,7 +331,10 @@ def cleanup_organization(settings, organization_id):
                 expired = mode == "apos_dias" and asset.enviado_em <= now() - timedelta(
                     days=policy.get("retention_days", 30)
                 )
-                confirmed = mode == "apos_confirmacao" and record.status == "confirmado"
+                confirmed = mode == "apos_confirmacao" and record.status in {
+                    "confirmado",
+                    "publicado",
+                }
                 active = db.scalar(
                     select(AudioJob.id)
                     .where(
@@ -494,6 +501,9 @@ def main():
             log_job_description=False,
             disable_default_exception_handler=True,
             job_monitoring_interval=10,
+            # RQ bloqueia até TTL - 15 s sem trabalho; mantenha o heartbeat
+            # abaixo dos 120 s usados pela saúde, inclusive com a fila ociosa.
+            worker_ttl=90,
         )
         worker.work(logging_level="WARNING")
 

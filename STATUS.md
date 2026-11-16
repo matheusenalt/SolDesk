@@ -1,10 +1,29 @@
 # Status do SolDesk
 
-Atualizado em 16/11/2026. **Fases 01–04 implementadas e validadas localmente com
-Docker/PostgreSQL e navegador. As fases 05–06 não foram implementadas.**
+Atualizado em 16/11/2026. **Fases 01–05 implementadas e validadas localmente com
+Docker/PostgreSQL e navegador. Fase 06 não iniciada.**
 Não pronto para produção.
 
 ## Funciona agora
+
+- Fase 05: artigos estruturados, revisão editorial humana, devolução/arquivamento,
+  versões/diferenças, política de papéis e autopublicação desligada por padrão.
+- Busca PostgreSQL português/unaccent/trigramas e código literal; filtro de
+  cliente/categoria/sistema/publicação, trechos destacados sem HTML e origem com
+  autorização própria. Publicados separados de rascunhos/fila; restritos não
+  entram em sugestões de outros clientes. Consultas agregadas sem leitor.
+- Relatórios factuais com calendário/fuso, comparação anterior, filtros e equipes,
+  autoria de cada ação, ações/tickets únicos, mediana/P90/n e pausas. Técnico só
+  recebe números próprios; CSV auditado, fórmulas prefixadas e histórico completo.
+- Migração 0005 aplicada ao PostgreSQL local e de testes; **65 pytest**, **32
+  cenários Playwright autenticados** (30 na suíte completa + 2 repetidos após
+  corrigir uma asserção) e **4 regressões de instalação** aprovados, sem skips
+  obrigatórios, Edge desktop/emulação móvel. Worker realmente parado/retomado.
+- Build web/Docker, 6 Vitest, Ruff/ESLint/formatação, 32 pares de tokens, setup
+  PowerShell, migrações repetidas e persistência após reinício aprovados. Saúde
+  do worker ocioso corrigida com heartbeat compatível. Exemplos JSON/CSV gerados
+  pela API com dados fictícios em [exemplos](docs/exemplos/README.md).
+  Evidências: [VALIDACAO_PROMPT_05](docs/VALIDACAO_PROMPT_05.md).
 
 - Fase 04: anexos privados de cliente/chamado, storage local/S3 compatível,
   validação de bytes/assinatura/tamanho/MIME, áudio real decodificado e duração
@@ -133,15 +152,15 @@ Não pronto para produção.
 
 ## Planejado
 
-05: conhecimento, busca e métricas.
 06A: Expo/mobile e QR; 06B: conectores mock, ponta a ponta e privacidade.
 
 ## Próximo passo necessário
 
 Consultar [TESTE_LOCAL.md](TESTE_LOCAL.md) para reproduzir o aceite e
 [API_FASE_02.md](docs/API_FASE_02.md) / [PERMISSOES.md](docs/PERMISSOES.md) para as
-regras. Fase 04: [API](docs/API_FASE_04.md), [estados](docs/ESTADOS.md) e
-[relatório](docs/VALIDACAO_PROMPT_04.md). Aguardar instrução antes do prompt 05.
+regras. Fase 05: [API](docs/API_FASE_05.md), [métricas](docs/METRICAS.md),
+[estados](docs/ESTADOS.md) e [relatório](docs/VALIDACAO_PROMPT_05.md).
+Publicar o aceite da Fase 05 e aguardar instrução antes do Prompt 06.
 Usar somente dados fictícios.
 
 Evidências, comandos, versões e arquivos: [relatório da fase 01](docs/VALIDACAO_PROMPT_01.md).

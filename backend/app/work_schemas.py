@@ -40,6 +40,7 @@ class RecordCreate(Occurrence):
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority = "normal"
     category: str = Field(default="", max_length=80)
+    system: str = Field(default="", max_length=80)
 
 
 class TicketCreate(RecordCreate):
@@ -49,6 +50,8 @@ class TicketCreate(RecordCreate):
 class RecordEdit(Occurrence):
     revision: int = Field(ge=1)
     texto_organizado: str = Field(min_length=1, max_length=20000)
+    category: str | None = Field(default=None, max_length=80)
+    system: str | None = Field(default=None, max_length=80)
 
 
 class RecordAction(Input):
@@ -82,6 +85,7 @@ class TicketEdit(Input):
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority | None = None
     category: str | None = Field(default=None, max_length=80)
+    system: str | None = Field(default=None, max_length=80)
 
 
 class CommentCreate(Input):

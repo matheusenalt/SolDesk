@@ -33,5 +33,10 @@ templates versionados, retenção auditada e ditado progressivo implementados.
 Mock é o padrão offline e não reconhece fala. faster-whisper é integração opcional;
 benchmark com modelo real permanece pendente, explicitamente previsto no prompt.
 Evidências: [VALIDACAO_PROMPT_04](VALIDACAO_PROMPT_04.md).
-Publicação de conhecimento, busca e relatórios continuam na fase 05.
-Parar após a fase 04, aguardando nova instrução.
+Fase 05: conhecimento estruturado/revisado/versionado, busca PostgreSQL com códigos
+e acentos, contexto de cliente, sugestões e consultas agregadas implementados.
+Relatórios descritivos, eventos por ator, calendário/fuso, mediana/P90/pausas,
+equipes e CSV auditado com escopo próprio de técnico. Aceite local aprovado:
+65 pytest, 32 cenários autenticados e 4 regressões de instalação, lint/build/Docker;
+[métricas](METRICAS.md) e [validação](VALIDACAO_PROMPT_05.md).
+Parar após validar/documentar/publicar a Fase 05; não iniciar Prompt 06.

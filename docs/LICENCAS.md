@@ -13,7 +13,11 @@ As obrigações de disponibilizar fonte correspondente e preservar avisos se apl
 conforme a distribuição e, para versões modificadas acessíveis pela rede, seção 13.
 O código-fonte oficial está em https://github.com/matheusenalt/SolDesk.
 
-## Revisão das dependências até a fase 04
+## Revisão das dependências até a fase 05
+
+Fase 05 não adicionou/alterou dependências, locks nem texto jurídico. Comparação
+Git desses arquivos e SHA-256 de LICENSE conferidos novamente; inventários abaixo
+continuam aplicáveis. Extensões PostgreSQL unaccent/pg_trgm já eram usadas na Fase 02.
 
 Inventário obtido dos metadados das 52 distribuições Python instaladas nas versões
 exatas do lock e dos 272 pacotes npm do lock (inclui ferramentas e opcionais de

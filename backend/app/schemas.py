@@ -92,7 +92,14 @@ class ClientInput(Input):
 class OrganizationChange(Input):
     name: str = Field(min_length=2, max_length=160)
     timezone: str = "America/Sao_Paulo"
-    settings: dict[str, bool] = Field(default_factory=dict, max_length=20)
+    settings: dict[str, bool] | None = Field(default=None, max_length=20)
+
+    @field_validator("settings")
+    @classmethod
+    def reserved_settings(cls, value):
+        if value and any(key in {"media", "knowledge"} for key in value):
+            raise ValueError("Use as rotas próprias para configurar áudio e conhecimento")
+        return value
 
     @field_validator("timezone")
     @classmethod

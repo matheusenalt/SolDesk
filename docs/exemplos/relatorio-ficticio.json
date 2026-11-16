@@ -1,0 +1,313 @@
+{
+  "scope": "organizacao",
+  "notice": "Estatísticas refletem apenas atendimentos registrados.",
+  "interpretation_context": "Muitos chamados abertos podem refletir demanda, especialização, distribuição desigual, escalonamento adequado, complexidade não medida ou classificação equivocada. Os números não explicam essas causas; a gestão interpreta os fatos.",
+  "generated_at": "2026-11-16T18:22:13.560596+00:00",
+  "period": {
+    "preset": "inicio",
+    "start_date": "2026-11-16",
+    "end_date": "2026-11-16",
+    "start_utc": "2026-11-16T03:00:00+00:00",
+    "end_utc": "2026-11-17T03:00:00+00:00",
+    "timezone": "America/Sao_Paulo"
+  },
+  "filters": {
+    "preset": "inicio",
+    "start_date": null,
+    "end_date": null,
+    "client_id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+    "responsible_id": null,
+    "team_id": null,
+    "category": "",
+    "system": "",
+    "granularity": "dia",
+    "history_offset": 0
+  },
+  "totals": {
+    "registered_records": 3,
+    "cancelled_records": 0,
+    "confirmed_finalizations": 1,
+    "awaiting_review": 1,
+    "other_provisional_finalizations": 0,
+    "abriu": {
+      "actions": 1,
+      "unique_tickets": 1
+    },
+    "assumiu": {
+      "actions": 1,
+      "unique_tickets": 1
+    },
+    "comentou": {
+      "actions": 0,
+      "unique_tickets": 0
+    },
+    "encaminhou": {
+      "actions": 0,
+      "unique_tickets": 0
+    },
+    "movimentou": {
+      "actions": 3,
+      "unique_tickets": 1
+    },
+    "resolveu": {
+      "actions": 1,
+      "unique_tickets": 1
+    },
+    "encerrou": {
+      "actions": 1,
+      "unique_tickets": 1
+    },
+    "reabriu": {
+      "actions": 1,
+      "unique_tickets": 1
+    },
+    "aguardando_terceiros": {
+      "actions": 0,
+      "unique_tickets": 0
+    }
+  },
+  "comparison": {
+    "period": {
+      "start_date": "2026-11-15",
+      "end_date": "2026-11-15",
+      "start_utc": "2026-11-15T03:00:00+00:00",
+      "end_utc": "2026-11-16T03:00:00+00:00"
+    },
+    "totals": {
+      "registered_records": 0,
+      "cancelled_records": 0,
+      "confirmed_finalizations": 0,
+      "awaiting_review": 0,
+      "other_provisional_finalizations": 0,
+      "abriu": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "assumiu": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "comentou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "encaminhou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "movimentou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "resolveu": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "encerrou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "reabriu": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "aguardando_terceiros": {
+        "actions": 0,
+        "unique_tickets": 0
+      }
+    }
+  },
+  "people": [
+    {
+      "id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+      "name": "Pessoa ficticia do exemplo",
+      "registered_records": 3,
+      "cancelled_records": 0,
+      "confirmed_finalizations": 1,
+      "awaiting_review": 1,
+      "other_provisional_finalizations": 0,
+      "abriu": {
+        "actions": 1,
+        "unique_tickets": 1
+      },
+      "assumiu": {
+        "actions": 1,
+        "unique_tickets": 1
+      },
+      "comentou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "encaminhou": {
+        "actions": 0,
+        "unique_tickets": 0
+      },
+      "movimentou": {
+        "actions": 3,
+        "unique_tickets": 1
+      },
+      "resolveu": {
+        "actions": 1,
+        "unique_tickets": 1
+      },
+      "encerrou": {
+        "actions": 1,
+        "unique_tickets": 1
+      },
+      "reabriu": {
+        "actions": 1,
+        "unique_tickets": 1
+      },
+      "aguardando_terceiros": {
+        "actions": 0,
+        "unique_tickets": 0
+      }
+    }
+  ],
+  "series": [
+    {
+      "bucket": "2026-11-16",
+      "person_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+      "person_name": "Pessoa ficticia do exemplo",
+      "records": 3,
+      "actions": {
+        "abriu": 1,
+        "assumiu": 1,
+        "movimentou": 3,
+        "resolveu": 1,
+        "encerrou": 1,
+        "reabriu": 1
+      }
+    }
+  ],
+  "classifications": [
+    {
+      "person_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+      "person_name": "Pessoa ficticia do exemplo",
+      "category": "impressoras",
+      "system": "Sistema fictício",
+      "records": 2
+    },
+    {
+      "person_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+      "person_name": "Pessoa ficticia do exemplo",
+      "category": "rede",
+      "system": "Sistema fictício",
+      "records": 1
+    }
+  ],
+  "ticket_distribution": [
+    {
+      "category": "rede",
+      "system": "Sistema fictício",
+      "priority": "normal",
+      "unique_tickets": 1
+    }
+  ],
+  "clients": [
+    {
+      "id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+      "name": "Cliente de exemplo fictício Fase 05",
+      "records": 3
+    }
+  ],
+  "article_consultations": [],
+  "article_consultations_scope": "agregado_organizacao_sem_leitor",
+  "times": {
+    "first_action": {
+      "gross": {
+        "median_seconds": 0.162,
+        "p90_seconds": 0.162,
+        "n": 1,
+        "warning": "Amostra pequena (n < 5); interprete os tempos com cautela."
+      },
+      "net": {
+        "median_seconds": 0.162,
+        "p90_seconds": 0.162,
+        "n": 1,
+        "warning": "Amostra pequena (n < 5); interprete os tempos com cautela."
+      }
+    },
+    "resolution": {
+      "gross": {
+        "median_seconds": 0.162,
+        "p90_seconds": 0.162,
+        "n": 1,
+        "warning": "Amostra pequena (n < 5); interprete os tempos com cautela."
+      },
+      "net": {
+        "median_seconds": 0.162,
+        "p90_seconds": 0.162,
+        "n": 1,
+        "warning": "Amostra pequena (n < 5); interprete os tempos com cautela."
+      }
+    },
+    "resolution_unique_tickets": 1,
+    "excluded_samples": 0
+  },
+  "queue": [
+    {
+      "id": "33dc1455-2f89-4277-b261-a4b800ee0671",
+      "code": "SD-000001",
+      "client_id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+      "client_name": "Cliente de exemplo fictício Fase 05",
+      "assignee_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+      "assignee_name": "Pessoa ficticia do exemplo",
+      "priority": "normal",
+      "status": "reaberto",
+      "category": "rede",
+      "system": "Sistema fictício",
+      "age_seconds": 0.347562
+    }
+  ],
+  "workload": [
+    {
+      "date": "2026-11-16",
+      "records": 3,
+      "active_tickets": 1,
+      "pending_review_current_by_fact": 1
+    }
+  ],
+  "missing_history_tickets": 0,
+  "history": {
+    "total": 3,
+    "items": [
+      {
+        "id": "9e022b1e-88b4-4f81-9b74-e397c2af1c29",
+        "client_id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+        "client_name": "Cliente de exemplo fictício Fase 05",
+        "author_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+        "author_name": "Pessoa ficticia do exemplo",
+        "type": "chamado",
+        "status": "enviado",
+        "ocorrido_em": "2026-11-16T18:22:13.202079+00:00",
+        "category": "rede",
+        "system": "Sistema fictício"
+      },
+      {
+        "id": "405c09a0-a21c-4ee9-aa57-379ab8aaa9be",
+        "client_id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+        "client_name": "Cliente de exemplo fictício Fase 05",
+        "author_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+        "author_name": "Pessoa ficticia do exemplo",
+        "type": "finalizacao",
+        "status": "aguardando_revisao",
+        "ocorrido_em": "2026-11-16T18:22:13.075208+00:00",
+        "category": "impressoras",
+        "system": "Sistema fictício"
+      },
+      {
+        "id": "b08a23ed-9b90-436c-ab76-d4c82762b44f",
+        "client_id": "b7970b7c-927a-4fd3-9343-5191e63e4a13",
+        "client_name": "Cliente de exemplo fictício Fase 05",
+        "author_id": "22f1c832-ed71-48c6-b485-51cef68c771b",
+        "author_name": "Pessoa ficticia do exemplo",
+        "type": "finalizacao",
+        "status": "confirmado",
+        "ocorrido_em": "2026-11-16T18:22:12.907265+00:00",
+        "category": "impressoras",
+        "system": "Sistema fictício"
+      }
+    ]
+  }
+}

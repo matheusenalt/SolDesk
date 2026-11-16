@@ -45,7 +45,7 @@ export const workStrings = {
   versions: "Versões e trilha do relato",
   derive: "Derivar",
   deriveType: "Destino do novo rascunho",
-  articleDraft: "◷ Rascunho de conhecimento; publicação ainda indisponível.",
+  articleDraft: "◷ Rascunho de conhecimento; revisão editorial necessária.",
   noAutomation:
     "Relatos por texto ou áudio. Todo conteúdo processado exige conferência humana; não há confirmação automática.",
   refreshConversation: "Atualizar conversa",

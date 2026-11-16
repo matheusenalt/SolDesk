@@ -18,10 +18,11 @@ Fase 03 acrescenta RecordVersion, TicketSequence, TicketParticipant,
 TicketComment, TicketEvent, TicketInterval e RequestReceipt. Prioridades:
 `baixa`, `normal`, `alta`, `urgente`; estados em [ESTADOS](ESTADOS.md).
 `capturado_em` é do dispositivo, não confiável; `processado_em` é preenchido pelo
-worker na fase 04, `publicado_em` segue reservado; `revisado_por` identifica o autor que confirmou. `entrada_em`/
+worker na fase 04, `publicado_em` é editorial na fase 05; `revisado_por` identifica o autor que confirmou. `entrada_em`/
 `saida_em` delimitam esperas, `resolvido_em`/`encerrado_em` são eventos distintos.
 Interface e documentos em pt-BR; strings web centralizadas em
-`web/src/strings.ts`, `web/src/work-strings.ts` e `web/src/media-strings.ts`.
+`web/src/strings.ts`, `web/src/work-strings.ts`, `web/src/media-strings.ts` e
+`web/src/insight-strings.ts`.
 
 Fase 04: Attachment (arquivo com um dono), AudioJob (tentativa histórica de
 processamento), TemplateVersion (configuração imutável versionada), GlossaryTerm
@@ -31,3 +32,12 @@ remoção do objeto, preservando metadados. Job usa `aguardando`, `processando`,
 `concluido`, `erro`, `descartado`; retenção `manter`, `apos_confirmacao`, `apos_dias`.
 `ditado_texto` é original opcional do navegador, separado da transcrição do
 servidor; `raw_text`, `normalized_text`, `organized_text` identificam estágios.
+
+Fase 05: ArticleVersion (snapshot/diferenças), ArticleConsultation (consulta
+sem leitor), Team (equipe atual de relatórios). Campos editoriais em inglês:
+title, problem, context, confirmed_cause, procedure, result, keywords, category,
+system; ausência de causa exibida como "Não informada". Datas editoriais:
+`enviado_revisao_em`, `publicado_em`, `arquivado_em`, `atualizado_em`.
+Estados adicionais: `devolvido`, `arquivado`. Filtros de período:
+`dia`, `semana`, `mes`, `inicio`, `livre`; granularity `dia`, `semana`, `mes`.
+Métricas/ações e atribuição estão definidas em [METRICAS](METRICAS.md).

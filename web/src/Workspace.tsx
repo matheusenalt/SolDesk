@@ -3,13 +3,16 @@ import { ApiError, request } from "./workspace-api";
 import { workspaceStrings as s } from "./strings";
 import { WorkArea } from "./WorkArea";
 import { workStrings } from "./work-strings";
+import { KnowledgeArea, RelatedArticles } from "./KnowledgeArea";
+import { ReportArea } from "./ReportArea";
+import { insightStrings } from "./insight-strings";
 
 type Organization = {
   id: string;
   name: string;
   timezone: string;
   slug: string;
-  settings: Record<string, boolean>;
+  settings: Record<string, unknown>;
 };
 type Profile = {
   id: string;
@@ -109,7 +112,55 @@ export function Workspace() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [tab, setTab] = useState("clients");
+  const initialHash = location.hash.slice(1).split("=");
+  const [tab, setTab] = useState(
+    initialHash[0] === "artigo"
+      ? "knowledge"
+      : ["registro", "chamado"].includes(initialHash[0])
+        ? "work"
+        : "clients",
+  );
+  const [articleId, setArticleId] = useState<string | undefined>(
+    initialHash[0] === "artigo" ? initialHash[1] : undefined,
+  );
+  const [sourceFocus, setSourceFocus] = useState<
+    { id: string; ticket: boolean } | undefined
+  >(
+    ["registro", "chamado"].includes(initialHash[0])
+      ? { id: initialHash[1], ticket: initialHash[0] === "chamado" }
+      : undefined,
+  );
+  function navigateSource(id: string, ticket = false) {
+    setWorkClient(undefined);
+    setSourceFocus({ id, ticket });
+    setTab("work");
+    history.replaceState(null, "", `#${ticket ? "chamado" : "registro"}=${id}`);
+  }
+  function navigateArticle(id: string) {
+    setArticleId(id);
+    setTab("knowledge");
+    history.replaceState(null, "", `#artigo=${id}`);
+  }
+  useEffect(() => {
+    const followHash = () => {
+      const [kind, identifier] = location.hash.slice(1).split("=");
+      if (!identifier) return;
+      if (kind === "artigo") {
+        setArticleId(identifier);
+        setTab("knowledge");
+      } else if (kind === "registro" || kind === "chamado") {
+        setWorkClient(undefined);
+        setSourceFocus({ id: identifier, ticket: kind === "chamado" });
+        setTab("work");
+      }
+    };
+    addEventListener("hashchange", followHash);
+    addEventListener("popstate", followHash);
+    return () => {
+      removeEventListener("hashchange", followHash);
+      removeEventListener("popstate", followHash);
+    };
+  }, []);
   const [workClient, setWorkClient] = useState<string | undefined>();
   const [authTab, setAuthTab] = useState(
     location.hash.startsWith("#convite=") ? "invitation" : "login",
@@ -376,6 +427,12 @@ export function Workspace() {
               <button disabled={busy} onClick={() => setTab("work")}>
                 {workStrings.title}
               </button>
+              <button disabled={busy} onClick={() => setTab("knowledge")}>
+                {insightStrings.knowledge}
+              </button>
+              <button disabled={busy} onClick={() => setTab("reports")}>
+                {insightStrings.reports}
+              </button>
             </nav>
             {tab === "clients" && (
               <>
@@ -485,6 +542,10 @@ export function Workspace() {
                     >
                       {workStrings.history}
                     </button>
+                    <RelatedArticles
+                      clientId={selected.id}
+                      onOpen={navigateArticle}
+                    />
                   </article>
                 )}
                 {editor && (
@@ -751,7 +812,28 @@ export function Workspace() {
               timezone={organization?.timezone || "America/Sao_Paulo"}
               initialClient={workClient}
               hidden={tab !== "work"}
+              focus={sourceFocus}
+              onArticle={navigateArticle}
             />
+            {tab === "knowledge" && (
+              <KnowledgeArea
+                key={profile.organization_id}
+                userId={profile.id}
+                role={profile.role}
+                timezone={organization?.timezone || "America/Sao_Paulo"}
+                initialArticle={articleId}
+                onSource={navigateSource}
+              />
+            )}
+            {tab === "reports" && (
+              <ReportArea
+                key={profile.organization_id}
+                role={profile.role}
+                timezone={organization?.timezone || "America/Sao_Paulo"}
+                onSource={navigateSource}
+                onArticle={navigateArticle}
+              />
+            )}
             {tab === "settings" && (
               <>
                 {profile.role === "administrador" && organization && (
@@ -765,7 +847,6 @@ export function Workspace() {
                         await request("/organizations/current", "PATCH", {
                           name: formValue(data, "name"),
                           timezone: formValue(data, "timezone"),
-                          settings: organization.settings,
                         });
                         await loadProfile();
                         setMessage(s.saved);

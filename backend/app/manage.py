@@ -99,6 +99,10 @@ def migrate(settings):
         )
         connection.execute("GRANT SELECT, INSERT ON template_version TO soldesk_runtime")
         connection.execute(
+            "GRANT SELECT, INSERT ON article_version, article_consultation TO soldesk_runtime"
+        )
+        connection.execute("GRANT SELECT, INSERT, UPDATE ON team TO soldesk_runtime")
+        connection.execute(
             "GRANT EXECUTE ON FUNCTION public.media_organizations() TO soldesk_runtime"
         )
         connection.execute(

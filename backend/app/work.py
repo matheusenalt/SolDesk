@@ -129,13 +129,17 @@ def record_data(ctx, item):
         "cancellation_reason",
         "template_version_id",
         "ditado_texto",
+        "category",
+        "system",
     )
     result = {field: getattr(item, field) for field in fields}
     result["author_name"] = ctx.db.get(User, item.author_id).name
     result["client_name"] = ctx.get(Client, item.client_id).name
     result["provisional"] = item.status not in {"confirmado", "publicado"}
     result["age_seconds"] = max(0, int((now() - item.enviado_em).total_seconds()))
-    result["article_status"] = "rascunho" if item.article_id else None
+    result["article_status"] = (
+        ctx.get(KnowledgeArticle, item.article_id).status if item.article_id else None
+    )
     from app.media_models import TemplateVersion
 
     template = (
@@ -200,6 +204,7 @@ def ticket_snapshot(item):
         "revision",
         "priority",
         "category",
+        "system",
         "assignee_id",
         "opened_by",
         "resolved_by",
@@ -234,6 +239,7 @@ def ticket_event(ctx, request, item, change, before=None):
 
 def send_record(ctx, request, item, assignee_id=None, priority="normal", category=""):
     if item.type == "chamado":
+        item.category = category
         assignee_id = assignee_id or item.author_id
         active_member(ctx, assignee_id)
         sequence = ctx.db.scalar(
@@ -252,6 +258,7 @@ def send_record(ctx, request, item, assignee_id=None, priority="normal", categor
             assignee_id=assignee_id,
             priority=priority,
             category=category,
+            system=item.system,
         )
         ctx.db.add(ticket)
         ctx.db.flush()
@@ -265,14 +272,9 @@ def send_record(ctx, request, item, assignee_id=None, priority="normal", categor
         item.status = "aguardando_revisao"
         if item.type == "conhecimento":
             if not item.article_id:
-                article = KnowledgeArticle(
-                    organization_id=ctx.organization_id,
-                    record_id=item.id,
-                    author_id=item.author_id,
-                    text=item.texto_organizado or item.texto_original,
-                )
-                ctx.db.add(article)
-                ctx.db.flush()
+                from app.knowledge import new_article
+
+                article = new_article(ctx, request, item)
                 item.article_id = article.id
         notify(ctx, item.author_id, "registro_pronto_revisao", "record", item.id)
 
@@ -281,6 +283,8 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
     payload = body.model_dump(mode="json")
     if payload.get("ditado_texto") is None:
         payload.pop("ditado_texto", None)
+    if not payload.get("system"):
+        payload.pop("system", None)
     fingerprint = digest(json.dumps(payload, sort_keys=True, ensure_ascii=False))
     key_hash = None
     if key is not None:
@@ -325,8 +329,8 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
 
         if not media_preferences(ctx)["live_dictation_enabled"]:
             raise HTTPException(403, "Ditado ao vivo desabilitado pela organização")
-    if body.type != "chamado" and (body.assignee_id or body.priority != "normal" or body.category):
-        raise HTTPException(422, "Responsável, prioridade e categoria são campos de chamado")
+    if body.type != "chamado" and (body.assignee_id or body.priority != "normal"):
+        raise HTTPException(422, "Responsável e prioridade são campos de chamado")
     received = now()
     occurred = source.ocorrido_em if source else body.ocorrido_em or received
     item = Record(
@@ -341,6 +345,8 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
         origem_record_id=source.id if source else None,
         ditado_texto=body.ditado_texto,
         template_version_id=template.id,
+        category=body.category,
+        system=body.system,
         texto_organizado=draft["text"] if draft["text"] != body.texto_original else None,
     )
     ctx.db.add(item)
@@ -378,11 +384,16 @@ def edit_record(ctx, request, item, body):
         raise HTTPException(409, "O conteúdo deste registro está bloqueado; use Derivar")
     before = json_record(ctx, item)
     item.texto_organizado = body.texto_organizado
+    for field in ("category", "system"):
+        if getattr(body, field) is not None:
+            setattr(item, field, getattr(body, field))
     if body.ocorrido_em:
         item.ocorrido_em = body.ocorrido_em
     item.revision += 1
     if item.article_id:
-        ctx.get(KnowledgeArticle, item.article_id).text = body.texto_organizado
+        from app.knowledge import sync_source
+
+        sync_source(ctx, request, ctx.get(KnowledgeArticle, item.article_id), body.texto_organizado)
     if before["ocorrido_em"] != item.ocorrido_em.isoformat():
         ctx.audit(
             request,
@@ -399,8 +410,12 @@ def edit_record(ctx, request, item, body):
 def act_record(ctx, request, item, body):
     before = json_record(ctx, item)
     if body.action in {"processar", "publicar"}:
-        raise HTTPException(409, "Processamento e publicação não estão disponíveis nesta fase")
+        raise HTTPException(
+            409, "Use o processamento de áudio ou o fluxo editorial da Base de Conhecimento"
+        )
     if body.action == "cancelar":
+        if item.article_id and ctx.get(KnowledgeArticle, item.article_id).status == "publicado":
+            raise HTTPException(409, "Arquive o artigo publicado antes de cancelar sua origem")
         if item.author_id != ctx.user.id and ctx.membership.role == "tecnico":
             raise HTTPException(403, "Ação não permitida para este registro")
         if item.status == "cancelado" or item.type == "chamado" and item.ticket_id:
@@ -478,7 +493,7 @@ def change_ticket(ctx, request, item, body):
     operate_ticket(ctx, item, closing=body.status == "encerrado")
     if any(
         getattr(body, field) is not None and getattr(body, field) != getattr(item, field)
-        for field in ("assignee_id", "priority", "category")
+        for field in ("assignee_id", "priority", "category", "system")
     ):
         operate_ticket(ctx, item)
     before = ticket_snapshot(item)
@@ -499,6 +514,8 @@ def change_ticket(ctx, request, item, body):
             pending.enfileirado_em = None
     if body.category is not None:
         item.category = body.category
+    if body.system is not None:
+        item.system = body.system
     if body.status:
         transition_ticket(ctx, item, body.status)
     item.revision += 1
@@ -552,6 +569,7 @@ def ticket_data(ctx, item):
         "closed_by",
         "priority",
         "category",
+        "system",
         "status",
         "revision",
         "reopen_count",

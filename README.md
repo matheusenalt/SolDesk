@@ -1,7 +1,7 @@
 # SolDesk
 
 Plataforma independente de suporte com histórico, chamados e conhecimento.
-**Fase atual: 04, áudio assíncrono, anexos privados e templates versionados.**
+**Fase atual: 05, conhecimento revisado, busca PostgreSQL e relatórios descritivos.**
 Dados por organização, PostgreSQL com RLS e sessões web com CSRF. Use somente
 dados fictícios enquanto as fases e a revisão de produção não estiverem concluídas.
 
@@ -31,7 +31,7 @@ usuário restrito da API (`RUNTIME_PASSWORD`) e chave de assinatura de downloads
 Não imprimem esses segredos, não
 criam credenciais de aplicação e não apagam volumes. Se já instalou a fase 01,
 execute novamente o setup para acrescentar a credencial runtime e as migrações
-aditivas 0002–0004, preservando a instalação. O modo rápido padrão inicia Redis,
+aditivas 0002–0005, preservando a instalação. O modo rápido padrão inicia Redis,
 dispatcher e worker mock, sem baixar modelo.
 A instalação não depende de chave de IA, GPU nem serviço pago.
 
@@ -76,7 +76,7 @@ descarte. O **mock padrão reutiliza o texto digitado e NÃO reconhece fala**.
 O faster-whisper é opcional, offline com modelo instalado explicitamente no
 servidor; reconhecimento real e desempenho ainda precisam de benchmark.
 Chamados urgentes podem ser resolvidos com o worker parado; o resultado posterior
-é acrescentado à conversa. Conhecimento continua somente rascunho.
+é acrescentado à conversa. Artigos derivados seguem o fluxo editorial da Fase 05.
 
 Anexos de cliente/chamado usam armazenamento privado local ou S3 compatível,
 links curtos vinculados à sessão e auditoria. Administradores configuram glossário,
@@ -84,8 +84,24 @@ templates versionados, retenção (padrão manter) e ditado opcional com aviso d
 privacidade. [Contrato da Fase 04](docs/API_FASE_04.md),
 [teste local e provedores opcionais](TESTE_LOCAL.md) e
 [relatório de validação](docs/VALIDACAO_PROMPT_04.md).
-Publicação de conhecimento, relatórios, SMTP e integrações externas continuam
-para fases posteriores. A Fase 05 aguarda nova instrução.
+Na **Base de Conhecimento**, prepare um artigo a partir de registro acessível,
+preencha os campos com o conteúdo relatado e envie para revisão. Por padrão,
+gestor/administrador diferente do autor publica após duas conferências humanas.
+Autopublicação fica desligada; o administrador configura os papéis e essa opção
+na política editorial. Há devolução comentada, diferenças de versões e arquivamento.
+Busca em português sem acento combina texto completo, trigramas e código exato;
+não retorna rascunhos/revisões. Artigos restritos exigem filtro do respectivo cliente
+e não são sugeridos em chamados de outro cliente. Fonte mantém suas permissões.
+
+Em **Relatórios**, consulte períodos no fuso da empresa, compare a janela anterior,
+filtre cliente/pessoa/equipe/categoria/sistema e exporte CSV auditado. Técnico vê
+somente seus números; gestão vê a organização. Ações e tickets únicos, resolução
+e encerramento, finalizações confirmadas e pendentes ficam separados. Tempos têm
+mediana, P90, amostra e pausas; pessoas começam em ordem alfabética, sem avaliação
+automática. Leia [definições das métricas](docs/METRICAS.md),
+[contratos da Fase 05](docs/API_FASE_05.md) e
+[validação da Fase 05](docs/VALIDACAO_PROMPT_05.md).
+Mobile, SMTP e conectores continuam planejados. Não avançar ao Prompt 06 sem instrução.
 
 Os arquivos originais de requisitos estão em [SolDesk_Prompts_v2](SolDesk_Prompts_v2/).
 ## Licença

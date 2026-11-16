@@ -1,5 +1,38 @@
 # Arquitetura
 
+## Fase 05: conhecimento e relatórios
+
+Migração aditiva 0005 amplia KnowledgeArticle e acrescenta ArticleVersion,
+ArticleConsultation e Team, com RLS FORCE. FKs compostas protegem cliente/template
+e autor/revisor na empresa. Versões/consultas são append-only para o runtime;
+triggers protegem origem/autoria/conteúdo publicado e classificação de Record revisado.
+Artigos anteriores recebem snapshot de importação sem inventar ator/template histórico.
+
+`knowledge.py` / `knowledge_routes.py`: fluxo editorial humano, revisão otimista
+409 e locks Record → artigo, compatíveis com worker. Conteúdo editorial editado
+não é sobrescrito pelo processamento. Busca combina tsvector português/GIN,
+unaccent/trigramas/GIN e trecho literal de códigos; trigger atualiza índices.
+Destaques são offsets de texto renderizados pelo React, sem HTML do banco.
+Publicados gerais são o padrão; filtro de cliente acrescenta os restritos daquele
+cliente. Origem mantém permissão própria. Consultas guardam artigo/empresa/data,
+sem identidade do leitor. Strings em `insight-strings`; UI KnowledgeArea/ReportArea
+integrada a WorkArea e cadastro de clientes, com links navegáveis por hash.
+
+`reports.py` / `report_routes.py`: métricas definidas antes do código em
+[METRICAS](docs/METRICAS.md), por autoria de Record e ator de TicketEvent.
+Calendários no fuso IANA viram limites UTC independentes; mediana/P90/n e pausas
+unificadas/recortadas, sem duração presumida. Técnico tem escopo próprio, gestão
+consulta a empresa, inclusive no CSV. Equipe/classificação atuais não simulam
+histórico passado. Pessoas em ordem alfabética; gráfico tem tabela equivalente.
+
+Agregação inicial em memória limitada a 10 mil registros, 10 mil tickets, 50 mil
+eventos, 20 mil intervalos e 50 mil consultas; excesso retorna 422 sem truncar.
+Períodos até 3661 dias. Tela pagina histórico em 100; CSV exporta histórico completo
+dentro dos limites. Carga de produção exige medição futura. Não há dependência
+nova, busca vetorial ou serviço externo. Nome/fuso da organização preservam as
+políticas aninhadas de mídia/conhecimento; alterações usam rotas e locks próprios.
+Contrato: [API Fase 05](docs/API_FASE_05.md).
+
 Monorepo: API Python/FastAPI + Pydantic, SQLAlchemy 2 e Alembic; web React,
 TypeScript, Vite e Tailwind CSS v4; PostgreSQL 17 no Compose. Sem microserviços
 de negócio nesta fase. Contrato OpenAPI disponível em `/docs` e `/openapi.json`.
@@ -9,6 +42,10 @@ flowchart LR
   N[Navegador] --> W[Web / Nginx]
   W --> A[API FastAPI]
   A --> P[(PostgreSQL)]
+  A --> K[Conhecimento: revisão humana / versões]
+  K --> P
+  A --> F[Relatórios: fatos / eventos / fuso]
+  F --> P
   M[Mobile futuro] -.-> A
   A --> S[StorageBackend privado: local / S3 compatível]
   D[Dispatcher] --> P

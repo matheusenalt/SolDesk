@@ -32,8 +32,8 @@ export const strings = {
     },
     {
       icon: "03",
-      title: "Conhecimento",
-      text: "Experiências revisadas que ajudam nos próximos atendimentos.",
+      title: "Operação em produção",
+      text: "Implantação, backup e revisão final de segurança e privacidade.",
     },
   ],
   instanceId: "Identificador da instalação",
@@ -43,7 +43,7 @@ export const strings = {
   cloud: "Cloud · ambiente de desenvolvimento",
   footer: "Construído para tornar o registro parte natural do suporte.",
   noBusiness:
-    "Históricos, chamados e arquivos estão disponíveis na organização. O processamento de áudio usa mock offline por padrão; transcrição real é opcional. Publicação de conhecimento e mobile são planejados.",
+    "Históricos, chamados, arquivos, conhecimento revisado e relatórios descritivos estão disponíveis na organização. O áudio usa mock offline por padrão. Mobile e integrações são planejados.",
 } as const;
 export const workspaceStrings = {
   title: "Área da organização",

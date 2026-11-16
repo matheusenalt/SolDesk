@@ -1,5 +1,49 @@
 # Decisões
 
+## Fase 05 — editorial e gestão descritiva
+
+- Métricas escritas em [METRICAS](METRICAS.md) antes da implementação. Nenhuma
+  medida de competência/complexidade, ranking de pessoas ou conclusão automática.
+  Pessoa começa em ordem alfabética; reordenação manual é consulta, sem pontuação.
+- Política editorial por empresa: administrador/gestor publicam por padrão;
+  **autor publicar o próprio artigo fica desligado**. Admin pode habilitar e mudar
+  papéis explicitamente. Publicação exige conferir conteúdo e avisos; devolução
+  exige comentário. Nem IA nem worker publicam. Conteúdo não informado fica vazio/
+  identificado, sem completar causa, procedimento ou código por suposição.
+- Artigo geral ou restrito ao contexto de cliente. Restrito aparece na busca com
+  cliente correspondente, cadastro e sugestões daquele cliente; não é ACL nova
+  entre membros que já acessam todos os clientes da empresa. Fonte continua com
+  autorização própria. Arquivar preserva versões; reabrir retira da busca até revisão.
+- Busca PostgreSQL sem serviço novo: português/unaccent + trigramas + substring
+  literal escapada para códigos. Trecho destacado é texto/offset, nunca HTML SQL.
+  Semântica/pgvector fica para evolução. Aviso fiscal é heurística, não valida CFOP.
+- Consultas editoriais não armazenam identidade do leitor. Agregado de gestão
+  sem filtro pessoa/equipe; não atribuir leitura a técnico ou classificar leitores.
+- Calendário/fuso atual da empresa, limites UTC semiabertos independentes;
+  comparação anterior com igual quantidade de dias locais. Estado confirmado é
+  o atual, agrupado pelo fato original; não fingir fotografia histórica da revisão.
+- Registros por autor, ações por ator, atribuições por destinatário. Cada ciclo
+  resolvido é amostra; reabertura mantém ticket único, encerrar é ação diferente.
+  Mediana/P90/n; pausa é união recortada, sem dupla subtração. Nada de duração
+  presencial/SLA presumido a partir de envio. Equipe/classificação são atuais.
+- Distribuição por prioridade/categoria/sistema considera tickets únicos com
+  ações do escopo/período, usando classificação atual; não explica causas.
+- CSV usa mesmo escopo/filtros, BOM/aspas/apóstrofo para fórmulas e auditoria sem
+  relato. Histórico completo dentro dos limites, sem truncar nas 100 linhas da UI.
+  Conversão/regravação por planilha não é certificada universalmente.
+- Sem nova dependência. AGPL-3.0-only e inventários preservados. Nenhum código
+  de outro projeto/empregador foi acessado/copiado para esta fase.
+- Correções de regressão: alteração de nome/fuso preserva políticas aninhadas;
+  atualização do hash no mesmo documento abre artigo/origem sem exigir reload;
+  filtro mantém cliente selecionado mesmo ao pesquisar outra lista de opções.
+- Aceite Docker detectou heartbeat RQ ocioso mais lento que o limite da saúde.
+  Worker usa TTL de 90 s (dequeue bloqueante até 75 s) para manter heartbeat
+  dentro de 120 s, sem afrouxar a detecção de worker indisponível.
+
+Referências primárias: [PostgreSQL FTS](https://www.postgresql.org/docs/17/textsearch-controls.html),
+[pg_trgm](https://www.postgresql.org/docs/17/pgtrgm.html),
+[OWASP CSV Injection](https://community.owasp.org/attacks/CSV_Injection).
+
 ## Adotadas na fase 01
 
 - Monorepo novo, sem copiar código ou dados de outros projetos.

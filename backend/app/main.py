@@ -126,20 +126,29 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "capabilities": ["health", "server_info"]
             + (
                 ["auth", "organizations", "clients", "audit"]
-                if revision in {"0002", "0003", "0004"}
+                if revision in {"0002", "0003", "0004", "0005"}
                 else []
             )
-            + (["records", "tickets", "notifications"] if revision in {"0003", "0004"} else [])
-            + (["attachments", "audio", "templates"] if revision == "0004" else []),
+            + (
+                ["records", "tickets", "notifications"]
+                if revision in {"0003", "0004", "0005"}
+                else []
+            )
+            + (["attachments", "audio", "templates"] if revision in {"0004", "0005"} else [])
+            + (["knowledge", "search", "reports"] if revision == "0005" else []),
         }
 
+    from app.knowledge_routes import router as knowledge_router
     from app.media_routes import router as media_router
+    from app.report_routes import router as report_router
     from app.routes import router
     from app.work_routes import router as work_router
 
     app.include_router(router)
     app.include_router(work_router)
     app.include_router(media_router)
+    app.include_router(knowledge_router)
+    app.include_router(report_router)
     return app
 
 

@@ -1,8 +1,9 @@
-# Estados e horários da fase 03
+# Estados e horários das fases 03–05
 
 As transições são validadas no servidor. `revision` é obrigatório nas edições,
 ações e comentários; uma versão desatualizada retorna 409. Não há confirmação
-automática, processamento por IA nem exclusão física pela API/runtime.
+automática nem exclusão física pela API/runtime. Processamento da Fase 04
+prepara conteúdo para revisão; nunca confirma/publica sozinho.
 
 ## Registro
 
@@ -18,8 +19,8 @@ automática, processamento por IA nem exclusão física pela API/runtime.
 
 O envio de finalização/conhecimento passa diretamente à revisão nesta fase;
 `enviado` é uma etapa transitória conceitual. `processando`, `erro` e os campos de
-processamento estão reservados à fase 04. Publicação de conhecimento e estado
-`publicado` só serão habilitados na fase 05. O artigo vinculado continua rascunho.
+processamento são usados na Fase 04. Na Fase 05 o artigo vinculado começa como
+rascunho e segue o ciclo editorial independente abaixo.
 Um chamado enviado usa exclusivamente as transições do Ticket e não pode ser
 cancelado pelo ciclo do Record. Um rascunho de chamado pode ser cancelado.
 
@@ -71,7 +72,7 @@ organização. O Record enviado não acompanha as mudanças de estado do Ticket.
 | `capturado_em` | Horário informado pelo dispositivo, não confiável; não substitui recebimento/fato |
 | `processado_em` | Fim do processamento do áudio na fase 04; não substitui fato/recebimento |
 | `revisado_em` / `revisado_por` | Confirmação humana da finalização, preservados após cancelamento |
-| `publicado_em` | Reservado para publicação de conhecimento na fase 05 |
+| `publicado_em` | Publicação humana do conhecimento; não substitui fato/envio/revisão |
 
 PostgreSQL armazena TIMESTAMPTZ, respostas incluem offset e a interface usa o
 fuso IANA da organização. Editar somente texto preserva a precisão do fato.
@@ -99,3 +100,27 @@ Chamado: Record continua enviado; o ciclo de Ticket é independente do job. Pode
 abrir, atribuir e resolver com a fila parada. Conclusão acrescenta comentário
 `transcricao`/`transcricao_mock`, preserva estado resolvido e horários anteriores.
 Notificação interna informa preparo do texto, sem equivaler a aprovação humana.
+
+## Artigo — Fase 05
+
+| Origem | Ação | Destino |
+| --- | --- | --- |
+| Registro acessível | Preparar artigo | `rascunho`, autoria do solicitante |
+| `rascunho` ou `devolvido` | Autor envia título/problema/procedimento preenchidos | `aguardando_revisao` |
+| `aguardando_revisao` | Revisor devolve com comentário | `devolvido` |
+| `aguardando_revisao` | Revisor confirma conteúdo e avisos | `publicado` |
+| `publicado` | Revisor arquiva com motivo | `arquivado` |
+| `arquivado` | Autor reabre para edição | `rascunho` |
+
+Padrão: gestor/admin publicam; autor não publica a si mesmo. Admin configura
+papéis/autopublicação. Editar somente em rascunho/devolvido e pelo autor; toda
+mudança inclui versão com ator/data/diferenças. Arquivado some da busca padrão;
+reabrir também retira da busca até nova aprovação. Artigo publicado não recebe
+atualização automática de conteúdo do worker. Origem cancelada impede publicar;
+origem com job ativo impede enviar à revisão.
+
+`enviado_revisao_em`, `publicado_em`, `arquivado_em` e `atualizado_em` são tempos
+editoriais, separados de `Record.ocorrido_em`/`enviado_em`. Publicar artigo de
+Record conhecimento marca Record como publicado sem trocar o fato; registro de
+outro tipo mantém seu ciclo próprio. Cancelar origem de artigo publicado é
+recusado: arquive primeiro o artigo. Histórico anterior à migração não é inventado.
