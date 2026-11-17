@@ -49,6 +49,7 @@ class ReportFilters(Input):
     team_id: str | None = Field(default=None, min_length=36, max_length=36)
     category: str = Field(default="", max_length=80)
     system: str = Field(default="", max_length=80)
+    system_id: str | None = Field(default=None, min_length=36, max_length=36)
     granularity: Literal["dia", "semana", "mes"] = "dia"
     history_offset: int = Field(default=0, ge=0)
 
@@ -120,6 +121,12 @@ def people_scope(ctx, filters):
 
 def load_facts(ctx, filters, people):
     record_query, ticket_query = ctx.query(Record), ctx.query(Ticket)
+    if filters.system_id:
+        from app.system_models import SoftwareSystem
+
+        ctx.get(SoftwareSystem, filters.system_id)
+        record_query = record_query.where(Record.system_id == filters.system_id)
+        ticket_query = ticket_query.where(Ticket.system_id == filters.system_id)
     if filters.client_id:
         ctx.get(Client, filters.client_id)
     for field in ("client_id", "category", "system"):
@@ -498,6 +505,7 @@ def report(ctx, filters, instant=None, *, full_history=False):
             )
             and (not filters.category or articles[v.article_id].category == filters.category)
             and (not filters.system or articles[v.article_id].system == filters.system)
+            and (not filters.system_id or articles[v.article_id].system_id == filters.system_id)
         )
         article_views = [
             {"article_id": key, "title": articles[key].title, "consultations": value}
@@ -547,6 +555,9 @@ def report(ctx, filters, instant=None, *, full_history=False):
                     "id": r.id,
                     "client_id": r.client_id,
                     "client_name": clients.get(r.client_id),
+                    "system_id": r.system_id,
+                    "system_name_snapshot": r.system_name_snapshot,
+                    "legacy_system_snapshot": r.legacy_system_snapshot,
                     "author_id": r.author_id,
                     "author_name": people[r.author_id],
                     "type": r.type,

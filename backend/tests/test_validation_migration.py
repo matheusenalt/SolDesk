@@ -93,6 +93,7 @@ def test_upgrade_from_previous_preserves_legacy_and_two_tenants(pg_settings, mon
         migrate(settings)
         for row in before:
             row["internal_activity"] = False
+            row.update(system_id=None, system_name_snapshot=None, legacy_system_snapshot=None)
         with engine.connect() as db:
             assert (
                 db.execute(text("SELECT to_jsonb(r) FROM record r ORDER BY id")).scalars().all()

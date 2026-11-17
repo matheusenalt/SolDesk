@@ -57,3 +57,11 @@ marcador explícito e imutável de atividade interna; next_action é a próxima 
 retomada_em é o agendamento UTC e finalizado_em é a conclusão operacional, distintos
 de ocorrido_em. result é o resultado humano; assignee_id é o responsável atual.
 pending é calculado, sem alterar o estado gravado no vencimento.
+## Catálogo de sistemas
+
+- `SoftwareSystem`: sistema cadastrado no catálogo da organização.
+- `ClientSystem`: vínculo cliente/sistema, com versão em uso e observação opcionais.
+- `SystemReconciliation`: decisão humana imutável sobre classificação do legado.
+- `system_id`: referência opcional ao catálogo, sempre limitada à empresa autenticada.
+- `system_name_snapshot`: nome do catálogo preservado no momento da seleção.
+- `legacy_system_snapshot`: texto original preservado no momento da classificação.

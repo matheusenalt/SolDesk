@@ -46,3 +46,10 @@ mediante autorização; não considerar a experiência completa já disponível.
 Interfaces de validação independente e atendimentos contínuos implementadas na web.
 A abertura principal oferece Finalização e Em andamento; catálogos estruturados de
 sistemas são a próxima evolução autorizada, mantendo campos e histórico textuais.
+## Catálogo de sistemas: dados e API disponíveis
+
+Implementados cadastro por empresa, vínculos N:N com clientes, versão em uso,
+seleção e filtros estruturados, preservação do texto legado e reconciliação manual.
+Migração aditiva e testes de isolamento, integridade e concorrência disponíveis.
+Pendente: gerenciamento web, combobox acessível e interface de reconciliação.
+Consulte o [contrato](API_SISTEMAS.md) e os resultados atuais no [status](../STATUS.md).

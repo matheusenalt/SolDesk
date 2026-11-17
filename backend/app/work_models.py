@@ -7,9 +7,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 from app.models import new_id, now
+from app.system_models import SystemFields
 
 
-class Record(Base):
+class Record(SystemFields, Base):
     __tablename__ = "record"
     __table_args__ = (UniqueConstraint("organization_id", "id"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
@@ -73,7 +74,7 @@ class TicketSequence(Base):
     value: Mapped[int] = mapped_column(Integer, default=0)
 
 
-class Ticket(Base):
+class Ticket(SystemFields, Base):
     __tablename__ = "ticket"
     __table_args__ = (
         UniqueConstraint("organization_id", "id"),
@@ -143,7 +144,7 @@ class TicketInterval(Base):
     saida_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
-class KnowledgeArticle(Base):
+class KnowledgeArticle(SystemFields, Base):
     __tablename__ = "knowledge_article"
     __table_args__ = (UniqueConstraint("organization_id", "id"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)

@@ -233,3 +233,39 @@ as verificações. Repetição focada: 4 PASSOU em desktop/móvel. Suíte final:
 Fechamento autorizado em 17/11/2026: interfaces 09B e 10B aprovadas pelos testes
 acima e incluídas no conjunto da etapa 10. Implementação validada, pronta para
 publicação pelo fluxo do projeto antes do catálogo. Demais limitações permanecem.
+## Catálogo de sistemas — Parte A, 17/11/2026
+
+**Funciona agora:** API de catálogo por empresa, nomes normalizados únicos,
+ativação/inativação, vínculos N:N cliente/sistema com versão e observações,
+seleção e filtros em registros, atendimentos, chamados, conhecimento e relatórios.
+Texto legado preservado; classificação manual assistida com sugestões, aceite ou
+rejeição explícitos, revisão, idempotência e histórico. Não há vínculo automático.
+**Parcial:** catálogo disponível pela API; gerenciamento web, combobox acessível e
+reconciliação visual aguardam a Parte B. Nenhuma implementação da etapa seguinte.
+
+| Verificação executada | Resultado |
+|---|---|
+| Backend completo PostgreSQL/Redis/ffmpeg isolados | PASSOU: 106 testes, 179,20 s; 1 aviso upstream Starlette/httpx |
+| Catálogo, concorrência, idempotência, migração e fidelidade focados | PASSOU: 24 testes na última rodada focada |
+| Migração 0011 com legado e duas empresas | PASSOU: dados anteriores intactos, RLS e FKs; reversão vazia e bloqueio com dados novos |
+| Ruff e formatação Python | PASSOU: 55 arquivos |
+| ESLint, formatação, TypeScript e Vite | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Docker local | PASSOU: imagens reconstruídas; desenvolvimento confirmado; revisão 0011; API anuncia systems |
+| Navegador autenticado: ciclos, conhecimento, relatórios e chamados | PASSOU: 20 cenários desktop/móvel emulado, 2,3 min |
+| Smoke público local | PASSOU: 4 cenários, 35,3 s |
+| Documentação | PASSOU: links locais conferidos; contrato e guias atualizados |
+| Interface do catálogo, ASR real e dispositivos físicos | NÃO EXECUTADO: fora desta Parte A |
+
+Nenhuma dependência nova, modelo instalado, banco de produção ou serviço empresarial
+acessado. Migração aditiva; seleção guarda instantâneos e preserva horários do fato.
+Classificação material exige nova validação de fidelidade, mantendo as anteriores.
+Problemas corrigidos na implementação: conflito de revisão em edição concorrente,
+preservação de espaços do legado e compatibilidade da idempotência sem system_id.
+Na revisão documental, linhas em branco extras foram corrigidas. Limitações de logo,
+PWA, reconhecimento real de fala e restauração homologada continuam existentes.
+
+Publicação anterior concluída: [bf2fb0b](https://github.com/matheusenalt/SolDesk/commit/bf2fb0be1803b1da753ce83686aae30b87574ad7),
+push OK e [GitHub Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44124050455).
+A Parte A atual permanece sem commit/push, aguardando revisão. A etapa completa
+depende da Parte B. [Contrato e testes do catálogo](docs/API_SISTEMAS.md).

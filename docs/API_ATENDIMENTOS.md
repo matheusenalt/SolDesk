@@ -190,3 +190,10 @@ fidelidade e revisão individual usam as rotas acima; validar depois preserva o
 registro e não altera a resolução. Etiquetas identificam o estado da fidelidade.
 Testes reais de interface em [evolution.spec.ts](../web/e2e-identity/evolution.spec.ts).
 As menções anteriores à interface pendente descrevem o estado da entrega de API.
+## Contexto estruturado de sistema
+
+Criação e edição de registros aceitam `system_id` opcional. Listagens de registros,
+chamados e atendimentos aceitam filtro pelo mesmo campo, limitado à empresa e ao
+escopo autorizado. Atualizações e derivados herdam os instantâneos históricos do
+registro de origem quando não há nova seleção explícita. O texto legado permanece.
+Consulte o [contrato do catálogo](API_SISTEMAS.md) para inativação e reconciliação.

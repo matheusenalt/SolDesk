@@ -85,6 +85,7 @@ def open_attendance(
 @router.get("")
 def list_attendances(
     mine: bool = False,
+    system_id: str | None = Query(default=None, min_length=36, max_length=36),
     pending: bool = False,
     status: Literal["em_andamento", "aguardando_retomada", "finalizado"] | None = None,
     offset: int = Query(default=0, ge=0),
@@ -92,6 +93,11 @@ def list_attendances(
     ctx=Depends(context, scope="function"),
 ):
     q = query(ctx)
+    if system_id:
+        from app.system_models import SoftwareSystem
+
+        ctx.get(SoftwareSystem, system_id)
+        q = q.where(Record.system_id == system_id)
     if mine:
         q = q.where(Attendance.assignee_id == ctx.user.id)
     if status:

@@ -74,3 +74,9 @@ Código próprio sob GNU AGPL v3 somente (`AGPL-3.0-only`), escolhida pelo titul
 Texto oficial preservado em [LICENSE](LICENSE). Instalação própria, contribuições
 e hospedagem comercial seguem os termos da licença. Dependências e condições de
 terceiros: [licenciamento](docs/LICENCAS.md). Nenhum dado ou código privado de empregadores.
+
+## Catálogo de sistemas
+
+Catálogo estruturado disponível na API, com vínculos N:N por cliente, versão em
+uso, instantâneos históricos e reconciliação manual do texto legado. A interface
+do catálogo está pendente. Consulte o [contrato de sistemas](docs/API_SISTEMAS.md).

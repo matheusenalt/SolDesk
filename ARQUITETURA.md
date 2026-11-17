@@ -232,3 +232,21 @@ TextValidation/ValidationQueue consultam a versão material no servidor e valida
 somente após conferência explícita. Conflito/rede mostram erro sem fabricar sucesso;
 retry de atendimento mantém a chave e recupera o registro antes de reenviar áudio.
 Textos novos estão centralizados em evolution-strings.ts; não há cache offline.
+## Catálogo estruturado de sistemas
+
+A migração `0011` acrescenta SoftwareSystem, ClientSystem e SystemReconciliation.
+O nome normalizado é calculado no PostgreSQL, com unicidade por organização,
+independentemente de caixa, acentos ou espaços extras. Vínculos cliente/sistema
+guardam versão em uso e observações. Não há dependência ou serviço novo.
+
+Record, Ticket e KnowledgeArticle recebem `system_id`, `system_name_snapshot` e
+`legacy_system_snapshot` opcionais. O campo textual permanece preservado; não há
+backfill automático. A reconciliação humana registra decisões imutáveis com ator,
+data, revisão e idempotência. Classificação material de Record exige nova validação
+de fidelidade e preserva o histórico anterior. Seleções novas rejeitam inativos;
+contexto histórico herdado continua válido.
+
+RLS forçada, FKs compostas, bloqueios e revisões protegem empresas e concorrência.
+A pesquisa de artigos passa a indexar o instantâneo em novas gravações. A reversão
+bloqueia antes de remover estrutura se houver dados novos no catálogo.
+[Contrato e evidências](docs/API_SISTEMAS.md). Interface específica pendente.

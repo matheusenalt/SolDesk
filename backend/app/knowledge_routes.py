@@ -39,6 +39,7 @@ class ArticleSearch(Input):
     q: str = Field(default="", max_length=200)
     category: str = Field(default="", max_length=80)
     system: str = Field(default="", max_length=80)
+    system_id: str | None = Field(default=None, min_length=36, max_length=36)
     client_id: str | None = Field(default=None, min_length=36, max_length=36)
     status: Literal["publicado", "arquivado"] = "publicado"
     start_date: date | None = None
@@ -63,6 +64,7 @@ class ArticleEdit(Input):
     keywords: list[str] = Field(default_factory=list, max_length=30)
     category: str = Field(default="", max_length=80)
     system: str = Field(default="", max_length=80)
+    system_id: str | None = Field(default=None, min_length=36, max_length=36)
     client_id: str | None = Field(default=None, min_length=36, max_length=36)
 
     @field_validator("keywords")

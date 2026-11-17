@@ -73,12 +73,18 @@ def new_record(
 @router.get("/records", tags=["Registros"])
 def records(
     mine: bool = True,
+    system_id: str | None = Query(default=None, min_length=36, max_length=36),
     status: str | None = Query(default=None, max_length=32),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     ctx=Depends(context, scope="function"),
 ):
     query = record_query(ctx)
+    if system_id:
+        from app.system_models import SoftwareSystem
+
+        ctx.get(SoftwareSystem, system_id)
+        query = query.where(Record.system_id == system_id)
     if mine:
         query = query.where(Record.author_id == ctx.user.id)
     if status:
@@ -294,11 +300,17 @@ def new_ticket(
 def tickets(
     status: TicketState | None = None,
     mine: bool = False,
+    system_id: str | None = Query(default=None, min_length=36, max_length=36),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
     ctx=Depends(context, scope="function"),
 ):
     query = ticket_query(ctx)
+    if system_id:
+        from app.system_models import SoftwareSystem
+
+        ctx.get(SoftwareSystem, system_id)
+        query = query.where(Ticket.system_id == system_id)
     if status:
         query = query.where(Ticket.status == status)
     if mine:

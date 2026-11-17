@@ -29,6 +29,9 @@ CONTENT = (
 )
 SNAPSHOT = (
     *CONTENT,
+    "system_id",
+    "system_name_snapshot",
+    "legacy_system_snapshot",
     "status",
     "template_version_id",
     "review_comment",
@@ -119,6 +122,9 @@ def new_article(ctx, request, record):
         category=record.category,
         system=record.system,
     )
+    from app.system_routes import copy_system
+
+    copy_system(record, item)
     ctx.db.add(item)
     ctx.db.flush()
     article_event(ctx, request, item, "artigo_criado")
@@ -197,6 +203,10 @@ def edit_article(ctx, request, item, body):
         ctx.get(Client, body.client_id)
     for key in CONTENT:
         setattr(item, key, getattr(body, key))
+    if "system_id" in body.model_fields_set:
+        from app.system_routes import select_system
+
+        select_system(ctx, item, body.system_id)
     item.revision += 1
     item.atualizado_em = now()
     article_event(ctx, request, item, "artigo_editado")
@@ -296,6 +306,11 @@ def snippet(item, query):
 
 def search_articles(ctx, filters):
     query = ctx.query(KnowledgeArticle).where(KnowledgeArticle.status == filters.status)
+    if filters.system_id:
+        from app.system_models import SoftwareSystem
+
+        ctx.get(SoftwareSystem, filters.system_id)
+        query = query.where(KnowledgeArticle.system_id == filters.system_id)
     if filters.client_id:
         ctx.get(Client, filters.client_id)
         query = query.where(

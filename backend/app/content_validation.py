@@ -58,6 +58,10 @@ def capture_version(ctx, record, event):
     if record.internal_activity:
         content["record"]["internal_activity"] = True
         canonical = json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    if record.system_id:
+        for key in ("system_id", "system_name_snapshot", "legacy_system_snapshot"):
+            content["record"][key] = getattr(record, key)
+        canonical = json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     previous = latest_version(ctx, record.id)
     if previous and previous.canonical_snapshot == canonical:
         return

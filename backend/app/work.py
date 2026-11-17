@@ -152,6 +152,9 @@ def record_data(ctx, item):
         "ditado_texto",
         "category",
         "system",
+        "system_id",
+        "system_name_snapshot",
+        "legacy_system_snapshot",
     )
     result = {field: getattr(item, field) for field in fields}
     result["author_name"] = ctx.db.get(User, item.author_id).name
@@ -237,6 +240,9 @@ def ticket_snapshot(item):
         "aberto_em",
         "resolvido_em",
         "encerrado_em",
+        "system_id",
+        "system_name_snapshot",
+        "legacy_system_snapshot",
     )
     return {
         field: getattr(item, field).isoformat()
@@ -285,6 +291,9 @@ def send_record(ctx, request, item, assignee_id=None, priority="normal", categor
             system=item.system,
         )
         ctx.db.add(ticket)
+        from app.system_routes import copy_system
+
+        copy_system(item, ticket)
         ctx.db.flush()
         item.ticket_id = ticket.id
         item.status = "enviado"
@@ -309,6 +318,8 @@ def create_record(
     payload = body.model_dump(mode="json")
     if not payload.get("internal_activity"):
         payload.pop("internal_activity", None)
+    if payload.get("system_id") is None:
+        payload.pop("system_id", None)
     if payload.get("ditado_texto") is None:
         payload.pop("ditado_texto", None)
     if not payload.get("system"):
@@ -385,6 +396,12 @@ def create_record(
         system=body.system,
         texto_organizado=draft["text"] if draft["text"] != body.texto_original else None,
     )
+    from app.system_routes import copy_system, select_system
+
+    if body.system_id:
+        select_system(ctx, item, body.system_id)
+    elif source or parent:
+        copy_system(source or parent, item)
     ctx.db.add(item)
     ctx.db.flush()
     if body.submit:
@@ -420,6 +437,10 @@ def edit_record(ctx, request, item, body):
         raise HTTPException(409, "O conteúdo deste registro está bloqueado; use Derivar")
     before = json_record(ctx, item)
     item.texto_organizado = body.texto_organizado
+    if "system_id" in body.model_fields_set:
+        from app.system_routes import select_system
+
+        select_system(ctx, item, body.system_id)
     for field in ("category", "system"):
         if getattr(body, field) is not None:
             setattr(item, field, getattr(body, field))
@@ -533,6 +554,11 @@ def change_ticket(ctx, request, item, body):
     ):
         operate_ticket(ctx, item)
     before = ticket_snapshot(item)
+    if "system_id" in body.model_fields_set:
+        operate_ticket(ctx, item)
+        from app.system_routes import select_system
+
+        select_system(ctx, item, body.system_id)
     if body.assignee_id and body.assignee_id != item.assignee_id:
         participant(ctx, item, body.assignee_id)
         item.assignee_id = body.assignee_id
@@ -612,6 +638,9 @@ def ticket_data(ctx, item):
         "aberto_em",
         "resolvido_em",
         "encerrado_em",
+        "system_id",
+        "system_name_snapshot",
+        "legacy_system_snapshot",
     )
     result = {field: getattr(item, field) for field in fields}
     result["client_name"] = ctx.get(Client, item.client_id).name

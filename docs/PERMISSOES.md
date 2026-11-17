@@ -127,3 +127,10 @@ somente os próprios registros quando não participa mais do ciclo. Confirmaçã
 operacional do conteúdo não compartilha estes atendimentos com toda a empresa.
 Validação da fidelidade continua permitida ao leitor autorizado, sem conceder edição.
 RLS forçada e FKs compostas protegem Attendance; empresa vem da sessão no servidor.
+## Catálogo de sistemas
+
+Administrador e gestor administram catálogo, vínculos e reconciliação manual.
+Técnicos consultam o catálogo e selecionam sistemas nos registros que já podem
+operar. Acesso aos registros e relatórios mantém as permissões existentes.
+Nenhum papel recebe acesso entre empresas. Sistemas inativos permanecem nos
+históricos; não há endpoint de exclusão. [Contrato](API_SISTEMAS.md).
