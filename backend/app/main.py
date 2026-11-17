@@ -129,26 +129,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "api_version": "1.0.0",
             "instance_id": instance_id,
             "instance_name": settings.soldesk_instance_name,
-            "mobile_protocol_version": 1 if revision == "0006a" else None,
+            "mobile_protocol_version": 1 if revision in {"0006a", "0009"} else None,
             "mode": settings.soldesk_mode,
             "capabilities": ["health", "server_info"]
             + (
                 ["auth", "organizations", "clients", "audit"]
-                if revision in {"0002", "0003", "0004", "0005", "0006a"}
+                if revision in {"0002", "0003", "0004", "0005", "0006a", "0009"}
                 else []
             )
             + (
                 ["records", "tickets", "notifications"]
-                if revision in {"0003", "0004", "0005", "0006a"}
+                if revision in {"0003", "0004", "0005", "0006a", "0009"}
                 else []
             )
             + (
                 ["attachments", "audio", "templates"]
-                if revision in {"0004", "0005", "0006a"}
+                if revision in {"0004", "0005", "0006a", "0009"}
                 else []
             )
-            + (["knowledge", "search", "reports"] if revision in {"0005", "0006a"} else [])
-            + (["mobile_auth"] if revision == "0006a" else []),
+            + (["knowledge", "search", "reports"] if revision in {"0005", "0006a", "0009"} else [])
+            + (["mobile_auth"] if revision in {"0006a", "0009"} else [])
+            + (["text_validation"] if revision == "0009" else []),
         }
 
     from app.knowledge_routes import router as knowledge_router

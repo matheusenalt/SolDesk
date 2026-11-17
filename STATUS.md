@@ -14,6 +14,8 @@ Atualizado em 17/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
 - Conhecimento estruturado com revisão editorial humana, versões e busca PostgreSQL;
   relatórios factuais com fuso/filtros/equipes, CSV auditado e escopo próprio do técnico.
 - Interface única, strings pt-BR centralizadas, temas e contraste; não há cliente nativo.
+- API de fidelidade independente: versão material/hash exatos, conferência por leitor
+  autorizado, histórico imutável e pendências; interface específica ainda pendente.
 
 ## Parcial ou com limitações
 
@@ -22,8 +24,8 @@ Atualizado em 17/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
   Ver [identidade e medições](docs/IDENTIDADE_SOL.md).
 - Mock reutiliza texto humano; **não reconhece fala**. faster-whisper opcional existe,
   mas inferência/qualidade/desempenho reais não foram homologados.
-- Finalização exige cliente; validação pelo autor segue acoplada ao ciclo do registro.
-  Não existe validação humana independente por versão para qualquer leitor autorizado.
+- Finalização ainda exige cliente. A API já oferece validação independente por versão;
+  a interface específica permanece pendente. A confirmação operacional legada foi preservada.
 - Sistema/software é texto, não catálogo; busca é de clientes/artigos, não global.
 - Chamados não possuem todo o fluxo futuro de prazo/aceite/inatividade; equipe serve
   aos relatórios. Relatórios são limitados em memória e não têm benchmark produtivo.
@@ -33,7 +35,7 @@ Atualizado em 17/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
 
 ## Planejado — não implementado
 
-Atendimento contínuo/atividade interna; validação independente; catálogo de sistemas;
+Atendimento contínuo/atividade interna; interface da validação independente; catálogo de sistemas;
 tarefas e calendário; busca global/por voz/semântica; confirmação técnica por versão;
 instalação PWA com ícones oficiais; CSV/sincronização externa; Nextcloud opcional; instalador Linux completo.
 Detalhes e decisões: [visão](docs/VISAO.md) e [evolução](docs/ROADMAP.md).
@@ -113,4 +115,46 @@ A repetição completa final teve 54 PASSOU, sem reconstruções concorrentes.
 Silêncio exige escuta humana; não há detector automático. beforeunload não garante
 aviso ao encerrar aplicativos móveis. Sem rascunho offline, inferência real ou teste
 de HTTPS remoto/produção. Upload continua 25 MiB por padrão/teto 64 MiB; 80 MB pendente.
-Implementação atual aguarda revisão, **sem commit/push próprio**.
+Gravação web/base PWA publicadas em [0a8c1d2](https://github.com/matheusenalt/SolDesk/commit/0a8c1d2e2fef2c45a9d4c60d3a8bc2620050a679), com [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/44101292033).
+
+## Fidelidade independente — dados e API
+
+Implementado: RecordContentVersion/ContentValidation; SHA-256 do conteúdo canônico,
+versão material, autor de origem, pessoa/data da validação e histórico append-only.
+Uma nova edição ou transcrição deixa a versão corrente não validada. Voltar ao mesmo
+texto não reaproveita aprovação de uma versão anterior. Salvar/processar não exige
+validar; a conferência não conclui, confirma operacionalmente ou reabre chamados.
+As regras anteriores de edição/confirmação e suas triggers foram preservadas.
+
+API permite validar o próprio texto ou o de outro autor quando o usuário já pode
+consultar o registro. Essa é a política inicial para revisão por Matheus; não exige
+segunda pessoa. Escopo sempre vem da sessão e inclui autorização por objeto.
+Contratos: [API de registros](docs/API_ATENDIMENTOS.md), [permissões](docs/PERMISSOES.md).
+
+| Verificação atual | Resultado |
+|---|---|
+| Suíte backend completa final | PASSOU: 83 testes, 1 aviso Starlette/httpx |
+| Validação independente/upgrade focados | PASSOU: 10 cenários de validação e 1 de migração; inclui concorrência, idempotência, terceiro autorizado, hash e RLS |
+| Upgrade real 0006a → 0009 | PASSOU: banco novo no cluster de testes; duas empresas, fatos/versões anteriores preservados, nenhuma validação inferida |
+| Downgrade seguro | PASSOU: reversível com tabelas novas vazias; bloqueado antes de descartar histórico existente |
+| Banco local de desenvolvimento | PASSOU: migração aditiva aplicada, revisão 0009, API anuncia text_validation e preserva protocolo legado |
+| Ruff/ESLint, formatação e TypeScript/build | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Regressão autenticada no navegador | PASSOU: 54 cenários, sem skips, em 3,5 min; desktop/emulação móvel com API atualizada |
+| Smoke público | PASSOU: 4 cenários com API atualizada |
+| Interface nova de fidelidade | NÃO EXECUTADO: implementação reservada à Parte B |
+
+Problemas encontrados: preparação do teste de legado sem name_key e comparação
+entre contratos PATCH/GET diferentes, ambos corrigidos. A primeira suíte completa
+teve 81 PASSOU/2 FALHOU: server-info listava revisões antigas; incluída 0009 e
+preservadas as capacidades. Foco repetido: 3 PASSOU; suíte final: 83 PASSOU.
+Após recriar a API local, o proxy Nginx precisou recarregar sua resolução interna.
+Antes dessa estabilização, houve 3 falhas de login e 51 cenários aprovados;
+repetição focada: 8 PASSOU; repetição completa final: 54 PASSOU.
+Não houve alteração de banco/serviço de produção, instalação de modelo ou deploy.
+
+Limitações: interface, etiquetas e revisão individual na web ainda pendentes;
+histórico individual sem paginação. Legado começa sem validação neste eixo, mesmo
+quando já confirmado operacionalmente. Ícones/logo e testes físicos seguem pendentes.
+Sem nova dependência ou serviço. Implementação atual aguarda revisão,
+**sem commit/push próprio**. Não iniciada a Parte B.

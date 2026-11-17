@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy import func, select
 
 from app.access import context
+from app.content_validation import latest_version, validate_content, validation_data
 from app.models import Client, OrganizationMembership, User, now
 from app.security import check_csrf
+from app.validation_models import ContentValidation, RecordContentVersion
 from app.work import (
     act_record,
     change_ticket,
@@ -33,6 +35,7 @@ from app.work_schemas import (
     RecordAction,
     RecordCreate,
     RecordEdit,
+    TextValidation,
     TicketCreate,
     TicketEdit,
     TicketState,
@@ -117,6 +120,61 @@ def batch_review(body: BatchReview, request: Request, ctx=Depends(context, scope
         )
         result.append(record_data(ctx, record))
     return {"items": result}
+
+
+@router.get("/records/text-validations/pending", tags=["Fidelidade do texto"])
+def pending_text_validations(
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+    ctx=Depends(context, scope="function"),
+):
+    latest = (
+        select(RecordContentVersion.id)
+        .where(
+            RecordContentVersion.organization_id == ctx.organization_id,
+            RecordContentVersion.record_id == Record.id,
+        )
+        .order_by(RecordContentVersion.record_revision.desc())
+        .limit(1)
+        .correlate(Record)
+        .scalar_subquery()
+    )
+    validated = (
+        select(ContentValidation.id)
+        .where(
+            ContentValidation.organization_id == ctx.organization_id,
+            ContentValidation.record_id == Record.id,
+            ContentValidation.version_id == latest,
+        )
+        .correlate(Record)
+        .exists()
+    )
+    query = record_query(ctx).where(~validated)
+    total = ctx.db.scalar(select(func.count()).select_from(query.subquery()))
+    rows = ctx.db.scalars(query.order_by(Record.enviado_em, Record.id).offset(offset).limit(limit))
+    return {
+        "total": total,
+        "items": [
+            {
+                "record_id": item.id,
+                "status": "nao_validado",
+                "version_id": (v.id if (v := latest_version(ctx, item.id)) else None),
+            }
+            for item in rows
+        ],
+    }
+
+
+@router.get("/records/{identifier}/text-validation", tags=["Fidelidade do texto"])
+def text_validation(identifier: str, ctx=Depends(context, scope="function")):
+    return validation_data(ctx, find_record(ctx, identifier))
+
+
+@router.post("/records/{identifier}/text-validations", tags=["Fidelidade do texto"])
+def new_text_validation(
+    identifier: str, body: TextValidation, request: Request, ctx=Depends(context, scope="function")
+):
+    return validate_content(ctx, request, identifier, body)
 
 
 @router.get("/records/{identifier}", tags=["Registros"])

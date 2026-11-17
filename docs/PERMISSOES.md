@@ -3,6 +3,17 @@
 Todas as operações exigem sessão válida e vínculo ativo na organização corrente.
 O tenant é recuperado da sessão persistida, nunca aceito como credencial do cliente.
 
+Validação de fidelidade permite membro ativo que já possa consultar o **registro**
+pela regra existente: gestão e autor; técnico também quando participante/responsável
+do chamado ou leitor de finalização confirmada. Ler o cadastro do cliente não
+concede acesso a todos os seus registros. A API verifica organização e objeto sob
+lock; saber ID de registro/versão/hash não concede permissão. Isso não amplia quem
+pode editar ou confirmar operacionalmente um registro.
+
+Política inicial para revisão: o próprio autor também pode validar, de forma
+individual e explícita (`reviewed: true`). Outro leitor autorizado pode fazê-lo sem
+pedir ao autor. Não exige dupla aprovação. Interface específica pendente.
+
 | Recurso e ação | Administrador | Gestor | Técnico |
 | --- | --- | --- | --- |
 | Consultar, buscar e cadastrar/editar clientes | Sim | Sim | Sim |

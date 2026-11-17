@@ -9,6 +9,11 @@ Datas em UTC no banco; `ocorrido_em` é horário do fato, `enviado_em` do envio,
 `revisado_em` da revisão; jamais substituí-los uns pelos outros.
 
 Estados em português sem acento: `aguardando_revisao`, `confirmado`, `publicado`.
+Fidelidade independente: RecordContentVersion e ContentValidation;
+`nao_validado`/`validado` são estados derivados por versão exata. `validado_em`
+é a data UTC da conferência humana; `validated_by` identifica quem a realizou.
+`source_version_id` vincula à trilha RecordVersion; `content_hash` é SHA-256 do
+`canonical_snapshot`, sem misturar status operacional aos campos materiais.
 Vínculos: `ativo`, `inativo`; papéis `administrador`, `gestor`, `tecnico`.
 Datas adicionais: `criado_em`, `expira_em`, `usado_em`, `revogado_em`,
 `bloqueado_ate` e `window_em` (janela interna de limitação).

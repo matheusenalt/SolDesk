@@ -69,3 +69,52 @@ distintas. Notificações e recibos têm leitura limitada ao destinatário/usuá
 além do tenant. Runtime só inclui/consulta versões, comentários, eventos,
 participantes e recibos; não altera nem apaga essas trilhas. Somente `lida_em`
 pode ser atualizado em notificações. Não foram adicionadas dependências.
+
+## Validação humana independente de fidelidade
+
+Exige migração `0009` e a capacidade `text_validation` em `/server-info`.
+Não altera os contratos operacionais anteriores e não cria telas novas.
+
+| Rota sob `/api/v1` | Contrato |
+|---|---|
+| GET `/records/{id}/text-validation` | Estado `nao_validado`/`validado`, versão material atual, conteúdo exato e histórico de validações |
+| POST `/records/{id}/text-validations` | `version_id`, `content_hash` devolvidos pela consulta e `reviewed: true`; conferência individual explícita |
+| GET `/records/text-validations/pending` | Pendências acessíveis ao usuário, `offset` e `limit` (1–100, padrão 20), `total` e IDs de registro/versão |
+
+Não envie `organization_id`: a sessão fornece esse contexto. Uma versão/hash não
+autoriza acesso. Ausência de acesso ao registro retorna 404; conteúdo desatualizado
+ou hash divergente retorna 409 em `application/problem+json`, exigindo recarregar e
+conferir novamente. Ausência de conferência explícita retorna 422. CSRF continua
+obrigatório na sessão web. Outro leitor autorizado pode validar; o próprio autor
+também pode, pela política inicial. Isso não concede permissão para editar o autor.
+
+`version` contém `id`, `record_revision`, `content_hash`, `content`, `criado_em`,
+`source_version_id`, `source_actor_id` e `source_change`. O cliente deve devolver
+ID/hash recebidos; não escolher uma versão antiga nem recalcular o hash de uma
+serialização própria. `content.record` guarda os textos original/organizado/ditado,
+cliente, tipo, horário do fato, categoria e sistema. `content.transcription` guarda
+os textos brutos/normalizados/organizados, segmentos, avisos e seções do último job
+com texto disponível, ou null. Assim, áudio de chamado é conferível sem mudar sua
+descrição. Processo automático identificado por `source_change` não é revisão humana;
+a atribuição legada de ator do worker não representa uma pessoa conferindo o texto.
+
+Cada item em `validations` possui ID, versão/hash, `validated_by` e `validado_em` UTC.
+O histórico é imutável. Reenvio pela mesma pessoa/versão retorna o evento existente,
+sem duplicar auditoria. Pessoas distintas podem registrar sua própria conferência.
+Edição/transcrição material posterior cria versão pendente; validações antigas
+permanecem históricas. Conteúdo que volte ao texto anterior também exige nova
+conferência, porque o ID da versão é diferente. Simples transição operacional não
+altera a versão material. A operação usa lock do registro, como edição e worker.
+
+Validação não altera `status`, `revision`, `revisado_em`, `ocorrido_em`, confirmação
+operacional ou resolução do Ticket. `Attachment.validated` continua técnico.
+Legado é importado sem ContentValidation: mesmo um registro já confirmado
+operacionalmente começa com fidelidade não validada e histórico vazio nesse eixo.
+As triggers antigas que bloqueiam edição de conteúdo confirmado são preservadas;
+nesses casos continua necessário derivar, conforme o contrato anterior.
+
+Migração adiciona tabelas e importa snapshots, sem alterar fatos anteriores.
+Reversão só é permitida com as tabelas novas vazias; com histórico, é bloqueada
+antes de apagar dados. Não executar downgrade para descartar validações.
+A listagem de pendências é paginada; o histórico individual não tem paginação
+nesta versão. Interface específica de conferência e etiquetas permanece pendente.

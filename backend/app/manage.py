@@ -81,6 +81,8 @@ def migrate(settings):
             )
         for table in (
             "record_version",
+            "record_content_version",
+            "content_validation",
             "ticket_event",
             "ticket_comment",
             "ticket_participant",

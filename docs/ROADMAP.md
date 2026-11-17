@@ -32,3 +32,7 @@ Gravação web agora inclui pausa compatível, interrupção, arquivo vazio e re
 de resposta perdida com a chave original. Manifesto inicial existe sem service worker;
 ícones oficiais e instalação PWA continuam pendentes. Testes e restrições operacionais
 em [STATUS](../STATUS.md) e [operação de mídia](OPERACAO_MIDIA.md).
+
+A base de dados/API da validação independente foi implementada. A interface com
+ações individuais e etiquetas permanece pendente; a confirmação operacional
+legada continua funcionando e não equivale à nova validação de fidelidade.

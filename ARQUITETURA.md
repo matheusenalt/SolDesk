@@ -23,6 +23,28 @@ testes de segurança, independente de SDK nativo. Cookie/CSRF continuam sendo
 a autenticação da web. Nenhum modelo de negócio ou horário foi alterado.
 Contrato: [sessão por token](docs/API_SESSAO_TOKEN.md).
 
+## Fidelidade do texto
+
+Migração aditiva `0009`, após `0006a`, acrescenta RecordContentVersion e
+ContentValidation com RLS FORCE, FKs compostas por organização e proteção
+append-only. RecordVersion continua a trilha de todos os eventos; `record_event`
+captura também um snapshot material quando texto/contexto/transcrição mudam.
+O SHA-256 cobre a representação JSON canônica completa, conferida pelo banco.
+Versão material não muda por simples transição operacional. Voltar a um conteúdo
+anterior cria outra versão e exige nova validação, mesmo com hash igual.
+
+Validação bloqueia o Record antes de conferir ID/hash correntes, na mesma ordem
+da edição e do worker. Evento registra pessoa/data/versão/hash; reenvio pela mesma
+pessoa é idempotente. Estado `validado` é derivado da existência de evento para a
+versão atual; versões/eventos anteriores permanecem. Processo automático nunca
+cria ContentValidation. Áudio de chamado também integra o snapshot, sem precisar
+substituir sua descrição ou alterar a resolução. Não há novo serviço ou biblioteca.
+
+Backfill importa somente conteúdo atual, vinculado à versão de origem existente;
+não inventa validações nem datas de revisão antigas. Triggers legadas de fatos e
+classificação permanecem. Downgrade só remove as tabelas novas quando vazias;
+havendo histórico, falha antes de apagá-lo. Interface específica ainda pendente.
+
 ## Conhecimento e relatórios
 
 Migração aditiva 0005 amplia KnowledgeArticle e acrescenta ArticleVersion,

@@ -7,6 +7,12 @@ prepara conteúdo para revisão; nunca confirma/publica sozinho.
 
 ## Registro
 
+A fidelidade é um eixo independente: `nao_validado` ou `validado` para o ID/hash
+material atual. Corrigir texto, contexto ou transcrição cria nova versão pendente;
+o histórico de validações anteriores permanece. Áudio processa em seu próprio
+ciclo. Validar fidelidade não confirma/publica Record, não conclui nem reabre Ticket
+e não revalida tecnicamente um procedimento. A interface nova ainda está pendente.
+
 | Origem | Ação | Destino | Quem pode executar |
 | --- | --- | --- | --- |
 | Criação | Salvar rascunho | `rascunho` | Membro ativo, como autor |

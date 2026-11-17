@@ -54,6 +54,12 @@ class RecordEdit(Occurrence):
     system: str | None = Field(default=None, max_length=80)
 
 
+class TextValidation(Input):
+    version_id: str = Field(min_length=36, max_length=36)
+    content_hash: str = Field(pattern="^[0-9a-f]{64}$")
+    reviewed: Literal[True]
+
+
 class RecordAction(Input):
     revision: int = Field(ge=1)
     action: Literal["enviar", "confirmar", "devolver", "cancelar", "publicar", "processar"]

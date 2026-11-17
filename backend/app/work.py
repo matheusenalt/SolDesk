@@ -155,16 +155,19 @@ def json_record(ctx, item):
 
 def record_event(ctx, request, item, change, before=None):
     after = json_record(ctx, item)
-    ctx.db.add(
-        RecordVersion(
-            organization_id=ctx.organization_id,
-            record_id=item.id,
-            revision=item.revision,
-            actor_id=ctx.user.id,
-            change=change,
-            snapshot=after,
-        )
+    event = RecordVersion(
+        organization_id=ctx.organization_id,
+        record_id=item.id,
+        revision=item.revision,
+        actor_id=ctx.user.id,
+        change=change,
+        snapshot=after,
     )
+    ctx.db.add(event)
+    ctx.db.flush()
+    from app.content_validation import capture_version
+
+    capture_version(ctx, item, event)
     ctx.audit(request, change, "Record", item.id, before, after)
 
 

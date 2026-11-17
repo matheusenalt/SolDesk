@@ -10,6 +10,10 @@ Gravação web oferece pausa quando suportada, prévia e recuperação de envio.
 Há uma base de manifesto PWA, sem modo offline; ícones e instalação homologada
 dependem da logo oficial. Consulte [operação de mídia](docs/OPERACAO_MIDIA.md).
 
+A API oferece validação humana de fidelidade por versão exata, independente da
+resolução de chamados. A interface dessa validação ainda está pendente; consulte
+o [contrato de registros](docs/API_ATENDIMENTOS.md) e o [estado real](STATUS.md).
+
 **Estado:** núcleo web funcional e testado localmente; não homologado para produção.
 Use somente dados fictícios. O mock padrão NÃO reconhece fala; transcrição real,
 HTTPS, restauração e privacidade produtiva ainda exigem homologação.
