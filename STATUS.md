@@ -383,3 +383,52 @@ locais PASSOU. Revisão dos 21 candidatos, diff --check, exclusões locais e sta
 vazio conferidos; nenhum padrão de segredo ou scaffold encontrado, locks intactos.
 Parte A pronta para revisão; a interface permanece pendente e a etapa completa
 depende da Parte B. Nenhuma aprovação automática de etapa posterior.
+
+## Evolução de chamados — Parte A, 17/11/2026
+
+**Funciona agora:** estado alvo derivado dos estados legados, descrição obrigatória
+de conclusão, aceite/devolução pelo solicitante, autoaceite configurável quando
+solicitante = responsável, reabertura pela gestão e cancelamento justificado.
+Prazo opcional, vencidos/próximos e ausência de atualização em horas corridas,
+com filtros 24/48/72 h e borda inclusiva. Aguardando retorno informa desde quando
+aguarda, sem classificar como parado. Responsável e última interação são fatos.
+Eventos, revisão, autoria, notificações, anexos e fidelidade independente preservados.
+
+**Parcial/planejado:** painel completo técnico/gerencial da 14B pendente. Formulário
+legado recebeu somente descrição/justificativa obrigatória. Interfaces 11B/12B/13B
+continuam pendentes. Autoaceite padrão deve ser confirmado por Matheus; configurável
+pela flag booleana ticket_self_accept, padrão true. Não valida transcrição.
+
+| Verificação | Resultado |
+|---|---|
+| Focado inicial após correções | PASSOU: 17 testes de fluxo/legado/migração |
+| Regressões corrigidas e focadas | PASSOU: 30 testes |
+| Backend completo final isolado | PASSOU: 148 testes, 315,66 s, sem falhas/skips; 1 aviso upstream |
+| Ruff/formatação/editor | PASSOU: 71 arquivos; editor sem erros |
+| ESLint/formatação/TypeScript/Vite | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Migração 0014/0014a isolada | PASSOU: legado preservado, duas empresas/RLS e reversão protegida |
+| Docker de desenvolvimento | PASSOU: imagens reconstruídas; capacidade ticket_workflow |
+| Navegador focado após correção | PASSOU: 4 cenários, 1,6 min |
+| Smoke público | PASSOU: 4 cenários, 19,6 s |
+
+Problemas corrigidos: serialização do recibo com ISO idêntico ao primeiro retorno;
+restrição SQL legada ampliada para cancelamento pela migração adicional 0014a;
+capacidade de identidade ausente no novo head; preparação dos testes adaptada à
+descrição obrigatória e à reabertura pela gestão. Relatórios passaram a contar os
+fatos resolução e aceite quando ambos ocorrem por autoaceite. Primeira suíte completa
+backend: 145 PASSOU/3 FALHOU; repetição focada e completa acima PASSOU.
+Primeira suíte de navegador: 56 PASSOU/4 FALHOU nos cenários antigos de resolução;
+preparação corrigida sem remover verificações de tela, anexos ou processamento.
+
+Sem dependência nova, modelo instalado ou acesso a produção/serviço empresarial.
+Licença oficial AGPL e locks preservados. [Contrato e equivalência de estados](docs/API_FLUXO_CHAMADOS.md).
+13A publicada em [65dbb91](https://github.com/matheusenalt/SolDesk/commit/65dbb91574e1671d846084f70fbc401a0fbae172),
+push concluído e [Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44165079855).
+Matheus autorizou seguir à 15A somente após a validação e o fechamento da 14A.
+
+Fechamento 14A: regressão completa final de navegador PASSOU, 60 cenários, 4,9 min,
+sem falhas/skips. Documentação 177 links PASSOU; 32 candidatos revisados, stage
+vazio, licença/locks/exclusões preservados, nenhum padrão de segredo detectado.
+Parte A validada com ressalvas de interface/decisão de autoaceite. Manifesto final
+conferido antes da publicação autorizada para iniciar a pesquisa global.

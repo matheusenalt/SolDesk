@@ -85,3 +85,9 @@ pending é calculado, sem alterar o estado gravado no vencimento.
 - `data`: data civil de evento de dia inteiro; nos eventos com horário, data da criação/edição no fuso da empresa.
 - `inicio_em` / `fim_em`: instantes UTC; fim opcional e exclusivo.
 - `prazo_em`: prazo UTC opcional de chamado, independente dos horários do fato.
+
+- `TicketReceipt`: recibo imutável de idempotência das ações operacionais.
+- `workflow_state`: estado alvo derivado do estado legado de chamado.
+- `completion_description`: descrição humana do que foi feito na conclusão.
+- `auto_accept`: marcação de conclusão aceita pela regra solicitante = responsável.
+- `ultima_interacao_em`: instante UTC da última atualização registrada.

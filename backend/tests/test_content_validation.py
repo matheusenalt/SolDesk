@@ -89,6 +89,7 @@ def test_other_authorized_reader_validates_without_resolving_ticket(world):
         {
             "revision": ticket_before["revision"],
             "status": "resolvido",
+            "completion_description": "Procedimento fictício executado",
         },
         "PATCH",
     )

@@ -278,3 +278,13 @@ reenvios. RLS forçada e FKs compostas protegem empresa/atores. Migração 0013 
 índices temporais parciais e o prazo opcional ausente no Ticket anterior, sem
 backfill ou alteração dos fatos. API usa paginação e janela máxima de 93 dias.
 Sem dependência ou serviço novo. [Contrato e planos reais](docs/API_CALENDARIO.md).
+
+## Evolução de chamados
+
+workflow_state é gerado a partir do status legado, preservando estados e eventos
+anteriores. Descrição de conclusão, autoaceite e última interação são aditivos.
+TicketReceipt assegura reenvio idempotente; revisões e eventos existentes protegem
+transições concorrentes. Notificações são mantidas. PATCH e ações usam a mesma
+regra de conclusão humana; solicitação de retorno não é ausência de trabalho.
+Migrações 0014/0014a preservam registros e ampliam a restrição para cancelamento.
+[Mapa de equivalência e contrato](docs/API_FLUXO_CHAMADOS.md).

@@ -69,3 +69,8 @@ permissões herdadas, fusos e paginação. Testes de milhares de itens e EXPLAIN
 executado documentados no [contrato](API_CALENDARIO.md).
 Pendente: visões mensal/semanal/diária, grade acessível, navegação e formulários web.
 CalDAV/Nextcloud, ICS e notificações não implementados; integração futura opcional.
+
+Evolução de chamados: conclusão humana, aceite/devolução, autoaceite configurável,
+monitoramento de prazos/últimas interações e mapa aditivo de estados disponíveis
+na API. Painéis completos técnico/gerencial ainda pendentes da Parte B.
+[Contrato](API_FLUXO_CHAMADOS.md).

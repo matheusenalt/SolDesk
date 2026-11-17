@@ -135,7 +135,7 @@ test('relatórios exibem fatos distintos, alternativas do gráfico e CSV auditad
   await mutate(page.request, '/records', { client_id: client.id, type: 'finalizacao', texto_original: 'Outra finalização fictícia ainda pendente.' });
   const opened = await mutate(page.request, '/records', { client_id: client.id, type: 'chamado', texto_original: 'Chamado fictício para relatório.' });
   const ticket = await (await page.request.get(`/api/v1/tickets/${opened.ticket_id}`)).json();
-  await mutate(page.request, `/tickets/${ticket.id}`, { revision: ticket.revision, status: 'resolvido' }, 'PATCH');
+  await mutate(page.request, `/tickets/${ticket.id}`, { revision: ticket.revision, status: 'resolvido', completion_description: 'Ação fictícia executada para relatório.' }, 'PATCH');
   await page.goto('/');
   await page.getByRole('button', { name: 'Relatórios', exact: true }).click();
   const area = page.getByRole('region', { name: 'Relatórios', exact: true });
@@ -149,7 +149,7 @@ test('relatórios exibem fatos distintos, alternativas do gráfico e CSV auditad
   }
   const actions = area.getByRole('table', { name: 'Período selecionado', exact: true });
   await expect(actions.getByRole('row').filter({ has: page.getByRole('cell', { name: 'Resolveu', exact: true }) })).toContainText('1');
-  await expect(actions.getByRole('row').filter({ has: page.getByRole('cell', { name: 'Encerrou', exact: true }) })).toContainText('0');
+  await expect(actions.getByRole('row').filter({ has: page.getByRole('cell', { name: 'Encerrou', exact: true }) })).toContainText('1');
   await expect(area.getByText('Estatísticas refletem apenas atendimentos registrados.', { exact: true })).toBeVisible();
   await expect(area).not.toContainText(/\b(?:ranking|posição|domina|precisa de curso|precisa contratar|incompetente)\b/i);
   await expect(area.getByRole('img', { name: 'Registros por período', exact: true })).toBeVisible();

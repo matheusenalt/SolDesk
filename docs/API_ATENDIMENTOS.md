@@ -204,3 +204,7 @@ Retomadas de atendimentos aparecem na [projeção do calendário](API_CALENDARIO
 sem cópia de registros. Chamados aceitam `prazo_em` opcional em PATCH com revisão
 atual e autorização de responsável/gestão. Instante exige offset explícito; null
 remove o prazo. A mudança é versionada/auditada e não altera horários anteriores.
+
+A evolução operacional dos chamados está em [fluxo de chamados](API_FLUXO_CHAMADOS.md).
+Resolver pelo PATCH legado também exige completion_description; reabrir exige
+reason. Aceite da solução e validação de fidelidade do texto permanecem independentes.

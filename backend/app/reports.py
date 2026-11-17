@@ -37,7 +37,7 @@ ACTIONS = (
 )
 CHANGES = ("status", "assignee_id", "priority", "category", "system")
 COMMENTS = {"chamado_comentario", "chamado_resposta", "chamado_esclarecimento"}
-TERMINAL = {"resolvido", "encerrado"}
+TERMINAL = {"resolvido", "encerrado", "cancelado"}
 
 
 class ReportFilters(Input):
@@ -208,6 +208,8 @@ def actions_for(tickets, events):
         before, after = event.before.get("status"), event.after.get("status")
         if before == after:
             continue
+        if after == "encerrado" and event.after.get("auto_accept"):
+            add("resolveu")
         kind = {
             "resolvido": "resolveu",
             "encerrado": "encerrou",
@@ -283,7 +285,10 @@ def time_metrics(tickets, events, intervals, people, window):
                 cycle_start = event.ocorrido_em
             if (
                 changed
-                and event.after.get("status") == "resolvido"
+                and (
+                    event.after.get("status") == "resolvido"
+                    or (event.after.get("status") == "encerrado" and event.after.get("auto_accept"))
+                )
                 and event.actor_id in people
                 and contains(window, event.ocorrido_em)
             ):

@@ -9,6 +9,7 @@ from app.schemas import Input
 RecordType = Literal["finalizacao", "chamado", "conhecimento"]
 Priority = Literal["baixa", "normal", "alta", "urgente"]
 TicketState = Literal[
+    "cancelado",
     "aberto",
     "em_andamento",
     "aguardando_esclarecimento",
@@ -91,6 +92,8 @@ class Derive(Input):
 class TicketEdit(Input):
     revision: int = Field(ge=1)
     prazo_em: AwareDatetime | None = None
+    completion_description: str | None = Field(default=None, max_length=20000)
+    reason: str = Field(default="", max_length=2000)
     status: TicketState | None = None
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority | None = None

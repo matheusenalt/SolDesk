@@ -155,3 +155,8 @@ seu vínculo fica inativo e a consulta é revogada, salvo outro papel autorizado
 Prazo de chamado só é alterado por responsável ou gestão, com revisão/auditoria
 existentes. Sem credencial por ID, link público ou integração externa.
 [Contrato](API_CALENDARIO.md).
+
+Conclusão de chamado exige descrição de responsável/gestão; solicitante aceita ou
+devolve com justificativa. Só a gestão reabre concluído. Autoaceite é configurável
+por administrador na organização e não valida a transcrição. Cancelamento exige
+justificativa. [Contrato e mapa de estados](API_FLUXO_CHAMADOS.md).

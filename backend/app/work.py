@@ -29,6 +29,15 @@ TICKET_TRANSITIONS = {
     "encerrado": {"reaberto"},
     "reaberto": {"em_andamento", "aguardando_esclarecimento", "aguardando_terceiros", "resolvido"},
 }
+TICKET_TRANSITIONS["cancelado"] = set()
+for _state in (
+    "aberto",
+    "em_andamento",
+    "aguardando_esclarecimento",
+    "aguardando_terceiros",
+    "reaberto",
+):
+    TICKET_TRANSITIONS[_state].add("cancelado")
 WAITING = {"aguardando_esclarecimento", "aguardando_terceiros"}
 
 
@@ -241,6 +250,10 @@ def ticket_snapshot(item):
         "resolvido_em",
         "encerrado_em",
         "prazo_em",
+        "workflow_state",
+        "completion_description",
+        "auto_accept",
+        "ultima_interacao_em",
         "system_id",
         "system_name_snapshot",
         "legacy_system_snapshot",
@@ -254,6 +267,8 @@ def ticket_snapshot(item):
 
 
 def ticket_event(ctx, request, item, change, before=None):
+    item.ultima_interacao_em = now()
+    ctx.db.flush()
     after = ticket_snapshot(item)
     ctx.db.add(
         TicketEvent(
@@ -548,7 +563,18 @@ def transition_ticket(ctx, item, target):
 
 
 def change_ticket(ctx, request, item, body):
-    operate_ticket(ctx, item, closing=body.status == "encerrado")
+    returning = body.status == "reaberto" and item.status == "resolvido"
+    operate_ticket(ctx, item, closing=body.status == "encerrado" or returning)
+    if body.status == "encerrado" and item.opened_by != ctx.user.id:
+        raise HTTPException(403, "Somente o solicitante pode aceitar a conclusão")
+    if returning and item.opened_by != ctx.user.id:
+        raise HTTPException(403, "Somente o solicitante pode devolver a conclusão")
+    if body.status == "reaberto" and not returning and ctx.membership.role == "tecnico":
+        raise HTTPException(403, "Somente a gestão pode reabrir um chamado concluído")
+    if body.status in {"reaberto", "cancelado"} and not body.reason.strip():
+        raise HTTPException(422, "Informe a justificativa da devolução, reabertura ou cancelamento")
+    if body.status == "resolvido" and not (body.completion_description or "").strip():
+        raise HTTPException(422, "Descreva o que foi feito para concluir o chamado")
     if "prazo_em" in body.model_fields_set:
         operate_ticket(ctx, item)
     if any(
@@ -557,6 +583,11 @@ def change_ticket(ctx, request, item, body):
     ):
         operate_ticket(ctx, item)
     before = ticket_snapshot(item)
+    if body.status == "resolvido":
+        item.completion_description = body.completion_description
+        item.auto_accept = False
+    if body.status == "reaberto":
+        item.auto_accept = False
     if "prazo_em" in body.model_fields_set:
         from datetime import UTC
 
@@ -587,8 +618,27 @@ def change_ticket(ctx, request, item, body):
         item.system = body.system
     if body.status:
         transition_ticket(ctx, item, body.status)
+        if body.status == "resolvido":
+            from app.models import Organization
+
+            allow_self = ctx.db.get(Organization, ctx.organization_id).settings.get(
+                "ticket_self_accept", True
+            )
+            if item.opened_by == item.assignee_id and allow_self:
+                item.auto_accept = True
+                item.status = "encerrado"
+                item.closed_by, item.encerrado_em = ctx.user.id, now()
+            notify(
+                ctx,
+                item.opened_by,
+                "conclusao_pendente" if item.status == "resolvido" else "chamado_concluido",
+                "ticket",
+                item.id,
+            )
+        elif body.status in {"reaberto", "encerrado", "cancelado"}:
+            notify(ctx, item.assignee_id, "chamado_" + body.status, "ticket", item.id)
     item.revision += 1
-    ticket_event(ctx, request, item, "chamado_alterado", before)
+    ticket_event(ctx, request, item, "chamado_alterado", {**before, "reason": body.reason})
     ctx.db.flush()
 
 
@@ -646,6 +696,10 @@ def ticket_data(ctx, item):
         "resolvido_em",
         "encerrado_em",
         "prazo_em",
+        "workflow_state",
+        "completion_description",
+        "auto_accept",
+        "ultima_interacao_em",
         "system_id",
         "system_name_snapshot",
         "legacy_system_snapshot",

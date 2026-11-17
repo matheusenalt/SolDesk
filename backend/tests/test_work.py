@@ -210,7 +210,11 @@ def test_normal_and_urgent_tickets_bypass_review_and_resolve_close_reopen(world)
     resolved = mutate(
         client,
         f"/tickets/{ticket_id}",
-        {"revision": ticket["revision"], "status": "resolvido"},
+        {
+            "revision": ticket["revision"],
+            "status": "resolvido",
+            "completion_description": "Procedimento fictício executado",
+        },
         "PATCH",
     )
     assert resolved.status_code == 200, resolved.text
@@ -228,7 +232,11 @@ def test_normal_and_urgent_tickets_bypass_review_and_resolve_close_reopen(world)
     reopened = mutate(
         client,
         f"/tickets/{ticket_id}",
-        {"revision": closed.json()["revision"], "status": "reaberto"},
+        {
+            "revision": closed.json()["revision"],
+            "status": "reaberto",
+            "reason": "Retorno fictício solicitado",
+        },
         "PATCH",
     )
     assert reopened.status_code == 200
@@ -244,7 +252,14 @@ def test_opener_may_close_but_cannot_transfer_while_closing(world):
     identifier = item["ticket_id"]
     login(client, world.admin_a, world.password)
     resolved = mutate(
-        client, f"/tickets/{identifier}", {"revision": 1, "status": "resolvido"}, "PATCH"
+        client,
+        f"/tickets/{identifier}",
+        {
+            "revision": 1,
+            "status": "resolvido",
+            "completion_description": "Procedimento fictício executado",
+        },
+        "PATCH",
     )
     assert resolved.status_code == 200
     login(client, world.technician, world.password)

@@ -1263,6 +1263,14 @@ export function WorkArea({
                   ...(get(data, "status")
                     ? { status: get(data, "status") }
                     : {}),
+                  ...(get(data, "status") === "resolvido"
+                    ? {
+                        completion_description: get(data, "completion_details"),
+                      }
+                    : {}),
+                  ...(get(data, "status") === "reaberto"
+                    ? { reason: get(data, "completion_details") }
+                    : {}),
                 };
                 await request(`/tickets/${ticket.id}`, "PATCH", value);
                 await openTicket(ticket.id);
@@ -1331,6 +1339,10 @@ export function WorkArea({
                     </option>
                   ))}
               </select>
+            </label>
+            <label>
+              {s.completionDetails}
+              <textarea name="completion_details" maxLength={2000} />
             </label>
             <button
               disabled={

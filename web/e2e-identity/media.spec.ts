@@ -114,8 +114,10 @@ test('worker realmente parado não impede encaminhar e resolver chamado urgente'
     await area.locator('.workspace-detail').getByRole('button', { name: 'Abrir', exact: true }).click();
     const ticket = area.locator('.workspace-detail').filter({ has: page.getByRole('heading', { name: /^SD-/ }) });
     await ticket.getByLabel('Estado', { exact: true }).selectOption('resolvido');
+    await ticket.getByLabel('O que foi feito / justificativa', { exact: true }).fill('Ação fictícia executada sem depender do worker.');
     await ticket.getByRole('button', { name: 'Salvar alteração', exact: true }).click();
-    await expect(ticket.getByText('✓ Resolvido · Urgente — encaminhamento imediato', { exact: true })).toBeVisible();
+    await expect.poll(async () => (await (await page.request.get(`/api/v1/tickets/${value.record.ticket_id}`)).json()).status).toBe('encerrado');
+    await expect(ticket.getByText('⊙ Encerrado · Urgente — encaminhamento imediato', { exact: true })).toBeVisible();
     const files = ticket.getByRole('region', { name: 'Arquivos privados', exact: true });
     await files.getByLabel('Arquivo para anexar', { exact: true }).setInputFiles({ name: 'detalhe.txt', mimeType: 'text/plain', buffer: Buffer.from('Detalhe fictício do chamado.') });
     await files.getByRole('button', { name: 'Enviar anexo', exact: true }).click();
@@ -123,7 +125,7 @@ test('worker realmente parado não impede encaminhar e resolver chamado urgente'
   } finally { docker(['up', '-d', '--wait', 'worker']); }
   await expect.poll(async () => (await (await page.request.get(`/api/v1/records/${value.record.id}/processing`)).json()).jobs[0].status, { timeout: 30000 }).toBe('concluido');
   const ticket = await (await page.request.get(`/api/v1/tickets/${value.record.ticket_id}`)).json();
-  expect(ticket.status).toBe('resolvido'); expect(ticket.comments.at(-1).kind).toBe('transcricao_mock');
+  expect(ticket.status).toBe('encerrado'); expect(ticket.comments.at(-1).kind).toBe('transcricao_mock');
 });
 
 test('configuração visual versiona template e cadastra glossário por organização', async ({ page }) => {

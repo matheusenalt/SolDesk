@@ -276,7 +276,12 @@ def test_real_rq_urgent_ticket_can_resolve_before_audio_with_worker_stopped(worl
     ticket = mutate(
         world.client,
         f"/tickets/{record['ticket_id']}",
-        {"revision": 1, "priority": "urgente", "status": "resolvido"},
+        {
+            "revision": 1,
+            "priority": "urgente",
+            "status": "resolvido",
+            "completion_description": "Procedimento fictício executado",
+        },
         "PATCH",
     )
     assert ticket.status_code == 200
@@ -294,7 +299,7 @@ def test_real_rq_urgent_ticket_can_resolve_before_audio_with_worker_stopped(worl
     data = world.client.get(f"/api/v1/records/{record['id']}/processing").json()
     assert data["jobs"][0]["id"] == job["id"] and data["jobs"][0]["status"] == "concluido", data
     detail = world.client.get(f"/api/v1/tickets/{record['ticket_id']}").json()
-    assert detail["status"] == "resolvido" and detail["comments"][-1]["kind"] == "transcricao_mock"
+    assert detail["status"] == "encerrado" and detail["comments"][-1]["kind"] == "transcricao_mock"
 
 
 def test_template_versions_glossary_immutable_snapshot_and_retention_cleanup(world):

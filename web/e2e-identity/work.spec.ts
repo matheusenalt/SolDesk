@@ -79,7 +79,8 @@ test('chamado urgente, esclarecimento, resposta, resolução e reabertura no mes
   await expect(ticket.getByText('↗ Em andamento · Urgente — encaminhamento imediato', { exact: true })).toBeVisible();
   await expect(ticket.getByText(/Qual mensagem apareceu\?/)).toBeVisible();
   await expect(ticket.getByText(/Resposta fictícia:/)).toBeVisible();
-  for (const state of ['resolvido', 'encerrado', 'reaberto']) {
+  for (const state of ['resolvido', 'reaberto']) {
+    await ticket.getByLabel('O que foi feito / justificativa', { exact: true }).fill('Ação fictícia executada e retorno solicitado.');
     await ticket.getByLabel('Estado', { exact: true }).selectOption(state);
     const saved = page.waitForResponse(r => r.url().endsWith(`/api/v1/tickets/${record.ticket_id}`) && r.request().method() === 'PATCH');
     await ticket.getByRole('button', { name: 'Salvar alteração', exact: true }).click();

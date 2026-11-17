@@ -351,7 +351,11 @@ def scenario(world):
         mutate(
             world.client,
             f"/tickets/{identifier}",
-            {"revision": detail()["revision"], "status": "resolvido"},
+            {
+                "revision": detail()["revision"],
+                "status": "resolvido",
+                "completion_description": "Procedimento fictício executado",
+            },
             "PATCH",
         ).status_code
         == 200
@@ -366,13 +370,20 @@ def scenario(world):
         ).status_code
         == 200
     )
-    login(world.client, world.technician, world.password)
     for state in ("reaberto", "resolvido"):
+        login(
+            world.client, world.admin_a if state == "reaberto" else world.technician, world.password
+        )
         assert (
             mutate(
                 world.client,
                 f"/tickets/{identifier}",
-                {"revision": detail()["revision"], "status": state},
+                {
+                    "revision": detail()["revision"],
+                    "status": state,
+                    "reason": "Gestão solicita nova análise fictícia",
+                    "completion_description": "Procedimento fictício executado",
+                },
                 "PATCH",
             ).status_code
             == 200

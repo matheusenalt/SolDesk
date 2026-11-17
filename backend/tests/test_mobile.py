@@ -279,7 +279,11 @@ def test_native_m4a_upload_processing_review_and_urgent_ticket(world, native, tm
     assert (
         native.patch(
             f"/api/v1/tickets/{ticket['id']}",
-            json={"revision": ticket["revision"], "status": "resolvido"},
+            json={
+                "revision": ticket["revision"],
+                "status": "resolvido",
+                "completion_description": "Procedimento fictício executado",
+            },
         ).status_code
         == 200
     )

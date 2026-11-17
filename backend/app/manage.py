@@ -95,6 +95,7 @@ def migrate(settings):
             "calendar_receipt",
             "task_receipt",
             "ticket_event",
+            "ticket_receipt",
             "ticket_comment",
             "ticket_participant",
             "request_receipt",

@@ -96,7 +96,11 @@ def test_calendar_migration_preserves_sources_and_guards_both_extensions(pg_sett
         migrate(settings)
         with engine.connect() as db:
             for table in before:
-                expression = "to_jsonb(t)-'prazo_em'" if table == "ticket" else "to_jsonb(t)"
+                expression = (
+                    "to_jsonb(t)-ARRAY['prazo_em','workflow_state','completion_description','auto_accept','ultima_interacao_em']"
+                    if table == "ticket"
+                    else "to_jsonb(t)"
+                )
                 assert (
                     db.execute(text(f"SELECT {expression} FROM {table} t ORDER BY id"))
                     .scalars()
@@ -132,7 +136,7 @@ def test_calendar_migration_preserves_sources_and_guards_both_extensions(pg_sett
         with pytest.raises(RuntimeError, match="agenda"):
             command.downgrade(config, "0012")
         with engine.connect() as db:
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0014a"
             assert db.scalar(text("SELECT count(*) FROM calendar_event")) == 2
             assert db.scalar(text("SELECT count(*) FROM task")) == 2
     finally:

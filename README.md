@@ -94,3 +94,7 @@ A API unifica tarefas, prazos opcionais de chamados e retomadas de atendimentos,
 com eventos próprios da agenda. Consulta por intervalo, sem copiar as fontes e
 com as permissões de cada origem. Interface de calendário ainda pendente.
 [Contrato, índices e EXPLAIN executado](docs/API_CALENDARIO.md).
+
+Chamados têm estados equivalentes, prazo opcional, monitoramento descritivo em
+horas corridas e conclusão com descrição/aceite. Autoaceite é configurável e
+independente da fidelidade da transcrição. [Contrato](docs/API_FLUXO_CHAMADOS.md).

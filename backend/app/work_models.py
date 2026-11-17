@@ -2,7 +2,17 @@
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Computed,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -100,6 +110,20 @@ class Ticket(SystemFields, Base):
     resolvido_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     encerrado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     prazo_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    workflow_state: Mapped[str] = mapped_column(
+        String(32),
+        Computed(
+            """CASE status
+      WHEN 'aberto' THEN 'novo' WHEN 'resolvido' THEN 'aguardando_validacao'
+      WHEN 'encerrado' THEN 'concluido' WHEN 'cancelado' THEN 'cancelado'
+      WHEN 'aguardando_esclarecimento' THEN 'aguardando_retorno'
+      WHEN 'aguardando_terceiros' THEN 'aguardando_retorno' ELSE 'em_andamento' END""",
+            persisted=True,
+        ),
+    )
+    completion_description: Mapped[str] = mapped_column(Text, default="")
+    auto_accept: Mapped[bool] = mapped_column(Boolean, default=False)
+    ultima_interacao_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
 class TicketParticipant(Base):

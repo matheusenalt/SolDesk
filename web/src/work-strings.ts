@@ -25,6 +25,7 @@ export const workStrings = {
   category: "Categoria",
   select: "Selecione",
   save: "Salvar alteração",
+  completionDetails: "O que foi feito / justificativa",
   refresh: "Atualizar",
   open: "Abrir",
   details: "Consultar registro",
