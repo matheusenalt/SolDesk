@@ -80,3 +80,10 @@ terceiros: [licenciamento](docs/LICENCAS.md). Nenhum dado ou código privado de 
 Catálogo estruturado disponível na API, com vínculos N:N por cliente, versão em
 uso, instantâneos históricos e reconciliação manual do texto legado. A interface
 do catálogo está pendente. Consulte o [contrato de sistemas](docs/API_SISTEMAS.md).
+
+## Tarefas
+
+A API oferece tarefas internas ou ligadas a clientes, sistemas, atendimentos e
+chamados, com responsável/equipe, datas e histórico independente. Conclusão simples
+não exige revisão editorial. A interface específica está pendente.
+Consulte o [contrato de tarefas](docs/API_TAREFAS.md).

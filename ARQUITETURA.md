@@ -250,3 +250,15 @@ RLS forçada, FKs compostas, bloqueios e revisões protegem empresas e concorrê
 A pesquisa de artigos passa a indexar o instantâneo em novas gravações. A reversão
 bloqueia antes de remover estrutura se houver dados novos no catálogo.
 [Contrato e evidências](docs/API_SISTEMAS.md). Interface específica pendente.
+
+## Tarefas independentes
+
+Task mantém descrição, responsabilidade exclusiva (usuário ou Team já existente),
+prioridade, data civil e instante UTC opcional. Organization.timezone define a
+interpretação local; dia inteiro não é convertido em meia-noite UTC. Criação rápida
+reutiliza o acesso à origem, sem alterar seu ciclo ou conceder acesso adicional.
+TaskEvent preserva ator, revisão, antes/depois e transferências; TaskReceipt mantém
+idempotência transacional com bloqueio por chave e revisão da tarefa. Ambas são
+append-only. A migração 0012 acrescenta RLS forçada, FKs por empresa e índices;
+reversão bloqueada se houver dados novos. Sem dependência, fila ou serviço novo.
+[Contrato](docs/API_TAREFAS.md). Interface, recorrência e notificações novas pendentes.

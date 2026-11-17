@@ -119,7 +119,7 @@ def test_upgrade_0010_preserves_variants_and_requires_manual_links(pg_settings, 
         with pytest.raises(RuntimeError, match="preserve"):
             command.downgrade(config, "0010")
         with engine.connect() as db:
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0011"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0012"
             assert db.scalar(text("SELECT count(*) FROM record")) == 8
     finally:
         runtime.dispose()

@@ -53,3 +53,11 @@ seleção e filtros estruturados, preservação do texto legado e reconciliaçã
 Migração aditiva e testes de isolamento, integridade e concorrência disponíveis.
 Pendente: gerenciamento web, combobox acessível e interface de reconciliação.
 Consulte o [contrato](API_SISTEMAS.md) e os resultados atuais no [status](../STATUS.md).
+
+## Tarefas: dados e API
+
+Disponíveis tarefas com atribuição a usuário/equipe existente, assunção, datas com
+fuso, criação rápida e histórico independente. Conclusão direta sem aprovação pesada.
+Pendente: interface de Minhas tarefas/equipe, filtros visuais e resumo na home.
+Calendário, recorrência e notificações novas não fazem parte desta entrega.
+[Contrato e testes](API_TAREFAS.md); [resultados executados](../STATUS.md).

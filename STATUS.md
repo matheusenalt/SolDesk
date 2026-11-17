@@ -269,3 +269,61 @@ Publicação anterior concluída: [bf2fb0b](https://github.com/matheusenalt/SolD
 push OK e [GitHub Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44124050455).
 A Parte A atual permanece sem commit/push, aguardando revisão. A etapa completa
 depende da Parte B. [Contrato e testes do catálogo](docs/API_SISTEMAS.md).
+
+## Tarefas — Parte A, 17/11/2026
+
+**Funciona agora:** API de tarefas simples, internas ou vinculadas a cliente,
+sistema, atendimento ou chamado. Responsabilidade de pessoa ou equipe existente,
+assunção por membro, transferência, edição, início, conclusão direta e cancelamento
+justificado. Histórico preserva ator, data e antes/depois. Reenvios idênticos usam
+recibos transacionais; não há criação automática de tarefas por atendimento.
+
+**Datas:** dia inteiro permanece data civil; horário marcado é instante UTC com
+offset explícito na entrada. Hoje/atrasada/futura usa Organization.timezone.
+Criação rápida permite hoje/amanhã/+7 dias e horário opcional; horários locais
+ambíguos ou inexistentes são rejeitados. Tarefa não valida texto nem conclui a origem.
+
+**Parcial/planejado:** interface de tarefas e resumo na home aguardam Parte B;
+interface do catálogo 11B continua pendente. Calendário, recorrência e notificações
+novas não foram implementados. Nenhuma etapa posterior iniciada.
+
+Evidências e contrato: [API de tarefas](docs/API_TAREFAS.md).
+Migração 0012 aditiva, com RLS forçada, FKs compostas e eventos/recibos imutáveis.
+Upgrade isolado preserva os registros legados; reversão vazia é permitida, e com
+dados novos bloqueia antes de remover estrutura. Nenhuma dependência nova ou modelo
+instalado; nenhum banco de produção ou serviço empresarial acessado.
+
+Na rodada inicial, 11 testes PASSOU e 4 FALHOU por uma expectativa incorreta do
+teste sobre o formato de /me; corrigido para o contrato real. Rodada seguinte:
+15 PASSOU e 1 FALHOU por esperar somente 409 após perda de escopo na assunção.
+O teste passou a verificar 404 quando perde acesso ou 409 quando mantém consulta,
+sempre com um único vencedor e um único evento novo. Rodada focada final:
+40 testes PASSOU (tarefas, migração, atendimentos e chamados), 64,57 s.
+
+Publicação anterior: Parte A do catálogo aprovada por Matheus ao solicitar tarefas;
+[b307576](https://github.com/matheusenalt/SolDesk/commit/b307576d4fb6f13e8d90a8be809e7e5b103e9747),
+push concluído e [GitHub Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44157493315).
+A etapa 12 atual permanece sem commit/push; interface e homologação completa da
+etapa dependem da Parte B. ASR real, dispositivos físicos, logo/PWA e restauração
+homologada continuam não verificados nesta entrega.
+
+| Validação final da Parte A | Resultado |
+|---|---|
+| Backend completo isolado | PASSOU: 127 testes, 288,71 s, sem falhas/skips; 1 aviso upstream Starlette/httpx |
+| Ruff / formatação Python | PASSOU: 60 arquivos |
+| Tokens e contraste | PASSOU: 32 pares WCAG; tokens consistentes |
+| ESLint / formatação / TypeScript / Vite | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Migração local de desenvolvimento e Docker | PASSOU: revisão 0012; API anuncia tasks; API/worker/db/Redis saudáveis |
+| Documentação | PASSOU: 152 links locais; diff --check sem erros |
+
+Revisão de segurança: nenhum padrão de segredo ou scaffold encontrado nos candidatos;
+sem dependência nova, lock removido ou alteração da licença oficial AGPL. Stage vazio.
+
+Navegador final: PASSOU, 20 cenários autenticados de regressão em desktop/móvel
+emulado, 3,2 min. Smoke público final: PASSOU, 4 cenários, 1,1 min. Na primeira
+execução pública, 3 PASSOU / 1 FALHOU por ENOENT na gravação de trace: saídas
+temporárias sobrepostas com outra execução. Repetição com saída independente:
+4 PASSOU, sem alterar verificações da interface. Os testes de navegador cobrem
+fluxos existentes; a nova API de tarefas é comprovada pelos testes do backend.
+Parte A testada e pronta para revisão; etapa completa ainda depende da Parte B.

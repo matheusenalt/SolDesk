@@ -134,3 +134,13 @@ Técnicos consultam o catálogo e selecionam sistemas nos registros que já pode
 operar. Acesso aos registros e relatórios mantém as permissões existentes.
 Nenhum papel recebe acesso entre empresas. Sistemas inativos permanecem nos
 históricos; não há endpoint de exclusão. [Contrato](API_SISTEMAS.md).
+
+## Tarefas
+
+Gestão opera todas as tarefas da própria organização. Técnicos consultam as que
+criaram, as que lhes foram atribuídas e as de suas equipes atuais. Operam as próprias;
+qualquer membro da equipe pode assumir uma tarefa ainda atribuída à equipe.
+Autor mantém consulta após transferir, sem manter permissão de operação por autoria.
+Técnicos atribuem a pessoas ativas ou equipes das quais participam. Origem exige
+permissão de consulta na criação; possuir tarefa vinculada não concede acesso à
+origem. Histórico segue a visibilidade atual da tarefa. [Contrato](API_TAREFAS.md).

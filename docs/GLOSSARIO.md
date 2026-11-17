@@ -65,3 +65,13 @@ pending é calculado, sem alterar o estado gravado no vencimento.
 - `system_id`: referência opcional ao catálogo, sempre limitada à empresa autenticada.
 - `system_name_snapshot`: nome do catálogo preservado no momento da seleção.
 - `legacy_system_snapshot`: texto original preservado no momento da classificação.
+
+## Tarefas
+
+- `Task`: ação futura independente de atendimento e chamado.
+- `TaskEvent`: histórico imutável por revisão, com ator, ação, motivo e antes/depois.
+- `TaskReceipt`: recibo imutável de idempotência por organização/ator/chave.
+- `prevista_para`: data civil prevista; permanece data, inclusive em dia inteiro.
+- `agendado_em`: instante opcional com fuso na entrada e UTC no banco.
+- `concluido_em` / `cancelado_em`: instantes de encerramento da tarefa.
+- `pendente`, `em_andamento`, `concluida`, `cancelada`: estados de tarefa.

@@ -70,6 +70,7 @@ def migrate(settings):
         for table in (
             "record",
             "attendance",
+            "task",
             "software_system",
             "client_system",
             "ticket",
@@ -87,6 +88,8 @@ def migrate(settings):
             "record_content_version",
             "content_validation",
             "system_reconciliation",
+            "task_event",
+            "task_receipt",
             "ticket_event",
             "ticket_comment",
             "ticket_participant",
