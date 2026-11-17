@@ -27,3 +27,8 @@ Situação visual atual: paleta provisória, ações principais e responsividade
 ajustadas e testadas localmente. A identidade definitiva ainda depende da logo
 oficial; não foram criados ícones PWA nem substituto da marca. Ver
 [identidade](IDENTIDADE_SOL.md) e [estado real](../STATUS.md).
+
+Gravação web agora inclui pausa compatível, interrupção, arquivo vazio e recuperação
+de resposta perdida com a chave original. Manifesto inicial existe sem service worker;
+ícones oficiais e instalação PWA continuam pendentes. Testes e restrições operacionais
+em [STATUS](../STATUS.md) e [operação de mídia](OPERACAO_MIDIA.md).

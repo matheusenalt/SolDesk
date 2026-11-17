@@ -5,6 +5,14 @@ test('conexão real, identidade, temas e layout responsivo', async ({ page, requ
   expect(response.ok()).toBeTruthy();
   const info = await response.json();
   await page.goto('/');
+  const manifest = await request.get('/manifest.webmanifest');
+  expect(manifest.ok()).toBeTruthy();
+  expect(manifest.headers()['content-type']).toContain('application/manifest+json');
+  const pwa = await manifest.json();
+  expect(pwa.short_name).toBe('SolDesk');
+  expect(pwa.theme_color).toBe(await page.locator('meta[name="theme-color"]').getAttribute('content'));
+  expect(manifest.headers()['content-security-policy']).toContain("script-src 'self'");
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.webmanifest');
   await expect(page.getByRole('status')).toHaveText('✓Backend conectado');
   await expect(page.getByText(info.instance_id)).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Suporte com memória.');

@@ -5,6 +5,24 @@ export const mediaStrings = {
   file: "Escolher áudio",
   record: "● Gravar áudio",
   stop: "■ Parar gravação",
+  pause: "Pausar gravação",
+  resume: "Continuar gravação",
+  paused: "Gravação pausada",
+  noMicrophone:
+    "Nenhum microfone encontrado. Conecte um dispositivo, envie um arquivo ou digite.",
+  badFormat:
+    "Formato de gravação incompatível. Envie um arquivo compatível ou digite.",
+  emptyAudio:
+    "O arquivo de áudio está vazio. Grave novamente, escolha outro arquivo ou digite.",
+  interrupted:
+    "A gravação foi interrompida. Confira a prévia disponível antes de enviar; você pode gravar novamente ou digitar.",
+  previewHint:
+    "Ouça a prévia antes de enviar. Se estiver sem som ou incompreensível, descarte e grave novamente ou digite. O sistema não garante detecção automática de silêncio.",
+  unsaved:
+    "Este áudio ainda não foi salvo no servidor. Fechar a página ou trocar de área pode perder a gravação ou a prévia.",
+  retryUpload:
+    "O envio não foi concluído. O registro pode já estar salvo; tente novamente para recuperar o mesmo registro e enviar o mesmo áudio, sem duplicar. As alterações ficam bloqueadas até concluir a tentativa. Nada é salvo automaticamente ao fechar a página.",
+  openSaved: "Abrir registro salvo e descartar prévia local",
   cancel: "Descartar prévia",
   preview: "Prévia do áudio",
   seconds: "segundos",

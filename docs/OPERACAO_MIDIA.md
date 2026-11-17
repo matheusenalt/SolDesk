@@ -71,3 +71,47 @@ Estado de validação e pendências: [STATUS](../STATUS.md).
 
 
 Contrato: [API de mídia](API_MIDIA.md). Limites: [limitações](LIMITACOES.md).
+
+## Gravação e recuperação no navegador
+
+O React usa `getUserMedia` e `MediaRecorder`. Detecta WebM/Opus, Ogg/Opus ou
+MP4 antes de iniciar; pausa/continuação aparecem somente quando disponíveis.
+O limite de duração vem de `/media/settings` (padrão 600 s). Digitação e escolha
+de arquivo continuam disponíveis quando falta permissão, dispositivo ou formato.
+Ao parar, o áudio permanece apenas em memória, com prévia para escuta e descarte.
+Arquivo vazio é recusado; silêncio deve ser identificado pela escuta humana:
+não há detector automático nem garantia de qualidade. Interrupção conserva a prévia
+disponível e mostra aviso; arquivo incompleto pode ser recusado pelo servidor.
+
+O aviso de saída usa `beforeunload`, sujeito às restrições do navegador, sobretudo
+em celulares. Trocar de área ou encerrar o navegador pode perder o conteúdo local;
+não existe rascunho persistido automaticamente, sincronização offline ou envio em
+segundo plano. O ditado experimental pode depender do fabricante e continua opt-in.
+
+O formulário envia primeiro `POST /records` com chave de idempotência; depois
+envia os bytes a `/records/{id}/audio?revision=...`. O servidor persiste o arquivo
+privado, vínculo e job antes de depender do worker. Registro salvo e áudio aceito
+são operações separadas: uma falha no upload não desfaz o registro já criado.
+Uma resposta perdida mantém a chave e bloqueia edição até recuperar a tentativa.
+O reenvio usa os mesmos bytes; SHA-256/lock no servidor evitam outro arquivo/job.
+Conflito 409 no upload permite uma releitura da revisão e uma tentativa adicional,
+sem alterar o texto. Quando o ID salvo é conhecido, é possível abrir esse registro
+e descartar apenas a prévia local, inclusive após recusa de tamanho/formato.
+
+O processamento segue assíncrono (Redis/RQ, dispatcher e worker/ffmpeg).
+Mock não reconhece fala. `Attachment.validated` indica validação técnica do arquivo;
+texto processado continua exigindo revisão humana. A validação independente por
+versão permanece planejada. Limites de 25 MiB por padrão/teto 64 MiB não mudaram;
+anexos de 80 MB dependem de etapa própria de streaming, quotas e proteção contra abuso.
+
+## Base PWA e privacidade
+
+Existe manifesto com nome, idioma, escopo e cores provisórias. Ícones oficiais e
+homologação de instalação permanecem pendentes da logo. Não há service worker,
+Cache Storage da aplicação, armazenamento local de registros ou operação offline.
+Falha de conexão exige tentar novamente com a página ainda aberta.
+A API preserva `Cache-Control: no-store`; CSP e política de permissões não foram
+relaxadas. HTTPS é obrigatório para microfone remoto; localhost é exceção de
+desenvolvimento. HTTP por IP da rede não equivale a um contexto seguro.
+
+A matriz de testes e suas limitações está em [STATUS](../STATUS.md).

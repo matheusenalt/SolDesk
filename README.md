@@ -6,6 +6,10 @@ Uma interface React responsiva para computador e celular; Android/iOS nativos de
 Paleta e navegação em evolução; a [identidade definitiva](docs/IDENTIDADE_SOL.md)
 depende do arquivo oficial da logo, ainda não localizado.
 
+Gravação web oferece pausa quando suportada, prévia e recuperação de envio.
+Há uma base de manifesto PWA, sem modo offline; ícones e instalação homologada
+dependem da logo oficial. Consulte [operação de mídia](docs/OPERACAO_MIDIA.md).
+
 **Estado:** núcleo web funcional e testado localmente; não homologado para produção.
 Use somente dados fictícios. O mock padrão NÃO reconhece fala; transcrição real,
 HTTPS, restauração e privacidade produtiva ainda exigem homologação.

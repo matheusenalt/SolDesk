@@ -1,6 +1,6 @@
 # Estado do SolDesk
 
-Atualizado em 16/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinuados.
+Atualizado em 17/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinuados.
 **Não homologado para produção. Somente dados fictícios.**
 
 ## Funciona agora — confirmado por código e testes locais
@@ -35,10 +35,10 @@ Atualizado em 16/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
 
 Atendimento contínuo/atividade interna; validação independente; catálogo de sistemas;
 tarefas e calendário; busca global/por voz/semântica; confirmação técnica por versão;
-PWA; CSV/sincronização externa; Nextcloud opcional; instalador Linux completo.
+instalação PWA com ícones oficiais; CSV/sincronização externa; Nextcloud opcional; instalador Linux completo.
 Detalhes e decisões: [visão](docs/VISAO.md) e [evolução](docs/ROADMAP.md).
 
-## Validação e publicação
+## Validação anterior e publicação
 
 Paleta provisória e responsividade validadas localmente em 16/11/2026. Mesmos
 componentes React, sem novo frontend ou modalidades de negócio. Ações destacadas
@@ -67,5 +67,50 @@ para esse commit. Migrações até `0006a` e controles de API preservados; Andro
 anterior não foi aprovado, foi descontinuado. Saneamento documental publicado em
 [eba2566](https://github.com/matheusenalt/SolDesk/commit/eba2566429dad36bb380e679b4f47f72b2709218),
 com [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43982343154).
-Paleta/responsividade atuais aguardam revisão, **sem commit/push próprio**;
+Paleta/responsividade publicadas em [cfa7250](https://github.com/matheusenalt/SolDesk/commit/cfa7250b794114771b9da2ffdf189710a1131f23), com [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/44095281109);
 não declarar a identidade definitiva concluída sem a logo oficial.
+
+## Gravação web e base PWA — validação em 17/11/2026
+
+Implementado: pausa/continuação compatível, prévia e descarte, recusa de arquivo
+vazio, avisos de falta de microfone/formato/interrupção e conteúdo local não salvo.
+Recuperação de resposta perdida conserva a chave de criação; duplo envio é
+bloqueado e o upload reutiliza a deduplicação do servidor. Registro salvo pode ser
+aberto após upload recusado. Processado não significa validado por uma pessoa.
+Manifesto inicial existe com MIME correto; não há service worker ou modo offline.
+Ícones e instalação homologada permanecem pendentes da logo oficial.
+Operação e limites: [mídia](docs/OPERACAO_MIDIA.md).
+
+| Verificação atual | Resultado |
+|---|---|
+| Backend isolado PostgreSQL/Redis/ffmpeg | PASSOU: 72 testes, 1 aviso Starlette/httpx |
+| Unitários web | PASSOU: 6 testes |
+| Ruff/ESLint, formatação, TypeScript/build e Compose | PASSOU |
+| Foco em áudio e recuperação | PASSOU: 28 cenários; cenário worker repetido separadamente: 2 PASSOU |
+| Suíte autenticada completa final | PASSOU: 54 cenários em 3,8 min, sem skips; desktop e emulação móvel |
+| Instalação pública e manifesto/CSP | PASSOU: 4 cenários |
+| Cache após sessão autenticada | PASSOU: Cache Storage vazio, zero service workers, local/sessionStorage vazios; clientes, registro, processamento e relatórios com no-store |
+| Banco | PASSOU: suíte em banco isolado, revisão 0006a; nenhuma migração nova |
+
+Problemas encontrados: Docker estava parado; primeira rodada iniciou antes de o
+servidor dev ficar disponível. Manifesto faltava no volume de desenvolvimento e
+estava com MIME genérico no Nginx; ambos corrigidos. Recuperação de upload podia
+disputar a revisão com o worker; releitura e uma tentativa adicional implementadas.
+Um seletor de teste não considerava o prefixo do alerta e foi corrigido. Vitest foi
+bloqueado pelo sandbox na leitura de diretórios ancestrais: repetido com sucesso
+fora dessa restrição. Primeira suíte completa teve 53 PASSOU e um timeout durante
+reinicialização concorrente do frontend; cenário afetado repetido: 2 PASSOU.
+A repetição completa final teve 54 PASSOU, sem reconstruções concorrentes.
+
+| Navegador | Dispositivo/ambiente | Resultado e limite |
+|---|---|---|
+| Microsoft Edge/Chromium | Windows, desktop automatizado; microfone fictício | PASSOU nos cenários focados de gravação, pausa, envio, recuperação e interrupção simulada |
+| Microsoft Edge/Chromium | Pixel 7 emulado no Windows; microfone fictício | PASSOU nos mesmos cenários focados; não equivale a Android físico |
+| Chrome/Firefox/Safari | Desktop independente ou aparelho físico | NÃO EXECUTADO nesta validação |
+| Safari iOS / Chrome Android | Celular físico e microfone real | NÃO EXECUTADO |
+| Instalação PWA | Dispositivo físico | NÃO VERIFICÁVEL (ícones oficiais ausentes); manifesto não representa homologação de instalação |
+
+Silêncio exige escuta humana; não há detector automático. beforeunload não garante
+aviso ao encerrar aplicativos móveis. Sem rascunho offline, inferência real ou teste
+de HTTPS remoto/produção. Upload continua 25 MiB por padrão/teto 64 MiB; 80 MB pendente.
+Implementação atual aguarda revisão, **sem commit/push próprio**.

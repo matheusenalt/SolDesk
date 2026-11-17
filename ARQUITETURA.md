@@ -9,6 +9,13 @@ Tokens centralizados geram a paleta provisória; abas e formulários existentes
 servem desktop/celular. Ações principais abrem o registro atual ou a pesquisa
 editorial, sem nova rota de negócio. Logo oficial e identidade definitiva pendentes.
 
+AudioCapture detecta MIME, gerencia pausa/interrupção e libera tracks na saída.
+Prévia vive em memória (blob URL revogada); formulário mantém chave de criação
+durante recuperação de rede e usa deduplicação de áudio já existente no servidor.
+Manifesto web é público e estático; desenvolvimento monta `web/public` somente
+leitura. Não há service worker nem cache offline de dados autenticados. Ícones
+oficiais e instalação PWA homologada pendentes. Pipeline backend permanece igual.
+
 A migração aplicada `0006a` é preservada: `client_kind`, MobileRefreshToken,
 RLS por usuário/empresa e hashes de tokens não foram removidos nem alterados.
 O contrato legado bearer mantém acesso curto, refresh rotativo/antirreplay e

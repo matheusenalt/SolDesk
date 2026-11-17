@@ -74,6 +74,12 @@ test('MediaRecorder real com microfone fictício: prévia, cancelamento e conhec
   const { area } = await start(page, 'conhecimento');
   await area.getByRole('button', { name: '● Gravar áudio', exact: true }).click();
   await expect(area.getByText(/● Gravando: 1 segundos/)).toBeVisible();
+  await area.getByRole('button', { name: 'Pausar gravação', exact: true }).click();
+  await expect(area.getByText(/Gravação pausada:/)).toBeVisible();
+  const pausedTime = await area.getByText(/Gravação pausada:/).textContent();
+  await page.waitForTimeout(1200);
+  expect(await area.getByText(/Gravação pausada:/).textContent()).toBe(pausedTime);
+  await area.getByRole('button', { name: 'Continuar gravação', exact: true }).click();
   await area.getByRole('button', { name: '■ Parar gravação', exact: true }).click();
   await expect(area.getByLabel('Prévia do áudio', { exact: true })).toBeVisible();
   await area.getByRole('button', { name: 'Descartar prévia', exact: true }).click();
@@ -146,4 +152,119 @@ test('recusa simulada do microfone mantém envio por digitação', async ({ page
   await expect(area.getByRole('alert')).toContainText('Não foi possível acessar o microfone. Confira a permissão; você pode enviar um arquivo ou digitar.');
   await area.getByRole('button', { name: 'Enviar registro', exact: true }).click();
   await expect(area.locator('.workspace-detail').getByText('◷ Aguardando revisão · ◷ Provisório — não confirmado', { exact: true })).toBeVisible();
+});
+
+for (const failure of ['NotFoundError', 'NotSupportedError']) {
+  test(`microfone: ${failure} simulado libera digitação`, async ({ page }) => {
+    await page.addInitScript((name) => {
+      if (name === 'NotFoundError') Object.defineProperty(navigator.mediaDevices, 'getUserMedia', { value: async () => { throw new DOMException('', name); } });
+      else MediaRecorder.isTypeSupported = () => false;
+    }, failure);
+    const { area } = await start(page);
+    await area.getByRole('button', { name: '● Gravar áudio', exact: true }).click();
+    await expect(area.getByRole('alert')).toContainText(failure === 'NotFoundError' ? 'Nenhum microfone encontrado' : 'Formato de gravação incompatível');
+    await expect(area.getByRole('button', { name: 'Enviar registro', exact: true })).toBeEnabled();
+    expect(await page.evaluate(() => document.querySelector('audio')?.src || '')).toBe('');
+  });
+}
+
+test('arquivo vazio não vira prévia e pode ser substituído por texto', async ({ page }) => {
+  const { area } = await start(page);
+  await area.getByLabel('Escolher áudio', { exact: true }).setInputFiles({ name: 'vazio.wav', mimeType: 'audio/wav', buffer: Buffer.alloc(0) });
+  await expect(area.getByRole('alert')).toContainText('O arquivo de áudio está vazio');
+  await expect(area.getByLabel('Prévia do áudio', { exact: true })).toHaveCount(0);
+  await area.getByRole('button', { name: 'Enviar registro', exact: true }).click();
+  await expect(area.locator('.workspace-detail')).toBeVisible();
+});
+
+for (const lost of ['record', 'audio']) {
+  test(`resposta de ${lost} perdida: reenvio mantém um registro e um job`, async ({ page }) => {
+    const { area } = await start(page);
+    let recordId = '';
+    const keys: string[] = [];
+    page.on('request', request => {
+      if (request.method() === 'POST' && request.url().endsWith('/api/v1/records')) keys.push(request.headers()['idempotency-key']);
+    });
+    const pattern = lost === 'record' ? '**/api/v1/records' : '**/api/v1/records/*/audio?revision=*';
+    let intercepted = false;
+    await page.route(pattern, async route => {
+      if (route.request().method() !== 'POST' || intercepted) return route.continue();
+      intercepted = true;
+      const response = await route.fetch();
+      expect(response.ok()).toBeTruthy();
+      const value = await response.json();
+      recordId = lost === 'record' ? value.id : value.record.id;
+      await route.abort('failed');
+    });
+    await area.getByLabel('Escolher áudio', { exact: true }).setInputFiles({ name: 'ficticio.wav', mimeType: 'audio/wav', buffer: wav() });
+    await area.getByRole('button', { name: 'Enviar registro', exact: true }).click();
+    await expect(area.getByText(/O envio não foi concluído/)).toBeVisible();
+    await expect(area.getByLabel('Relato original', { exact: true })).toBeDisabled();
+    const received = page.waitForResponse(r => r.url().includes('/audio?revision=') && r.request().method() === 'POST' && r.status() === 202);
+    await area.getByRole('button', { name: 'Enviar registro', exact: true }).click();
+    expect((await (await received).json()).record.id).toBe(recordId);
+    expect(keys).toHaveLength(2); expect(keys[0]).toBe(keys[1]);
+    const processing = await (await page.request.get(`/api/v1/records/${recordId}/processing`)).json();
+    expect(processing.jobs).toHaveLength(1);
+  });
+}
+
+test('upload recusado mantém registro salvo acessível e não confirma texto', async ({ page }) => {
+  const { area } = await start(page);
+  await page.route('**/api/v1/records/*/audio?revision=*', route => route.fulfill({ status: 413, contentType: 'application/problem+json', body: JSON.stringify({ title: 'Arquivo maior que o limite permitido', status: 413 }) }));
+  await area.getByLabel('Escolher áudio', { exact: true }).setInputFiles({ name: 'ficticio.wav', mimeType: 'audio/wav', buffer: wav() });
+  await area.getByRole('button', { name: 'Enviar registro', exact: true }).click();
+  await expect(area.getByText(/O envio não foi concluído/)).toBeVisible();
+  await expect(area.getByRole('alert').filter({ hasText: 'Arquivo maior que o limite permitido' })).toBeVisible();
+  await area.getByRole('button', { name: 'Abrir registro salvo e descartar prévia local', exact: true }).click();
+  await expect(area.locator('.workspace-detail').getByText('◷ Aguardando revisão · ◷ Provisório — não confirmado', { exact: true })).toBeVisible();
+});
+
+test('manifest inicial e sessão autenticada não criam cache offline de dados', async ({ page }) => {
+  const { area, client } = await start(page);
+  const value = await sendAudio(page, area);
+  for (const path of [`/api/v1/clients/${client.id}`, `/api/v1/records/${value.record.id}`, `/api/v1/records/${value.record.id}/processing`, '/api/v1/reports']) {
+    const response = await page.request.get(path);
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()['cache-control']).toContain('no-store');
+  }
+  const manifestResponse = await page.request.get('/manifest.webmanifest');
+  expect(manifestResponse.headers()['content-type']).toContain('application/manifest+json');
+  const manifest = await manifestResponse.json();
+  expect(manifest.name).toContain('SolDesk'); expect(manifest.scope).toBe('/');
+  expect(manifest.icons).toBeUndefined(); // Logo oficial pendente; não inventar identidade.
+  expect(await page.evaluate(async () => ({ caches: await caches.keys(), workers: (await navigator.serviceWorker.getRegistrations()).length, local: localStorage.length, session: sessionStorage.length }))).toEqual({ caches: [], workers: 0, local: 0, session: 0 });
+});
+
+test('interrupção simulada preserva prévia e aviso de fechamento não promete salvamento', async ({ page, context }) => {
+  await context.grantPermissions(['microphone']);
+  await page.addInitScript(() => {
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async constraints => {
+      const stream = await original(constraints);
+      (window as unknown as { testTrack: MediaStreamTrack }).testTrack = stream.getAudioTracks()[0];
+      return stream;
+    };
+  });
+  const { area } = await start(page);
+  await area.getByRole('button', { name: '● Gravar áudio', exact: true }).click();
+  await expect(area.getByText(/● Gravando: 1 segundos/)).toBeVisible();
+  expect(await page.evaluate(() => {
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event); return event.defaultPrevented;
+  })).toBeTruthy();
+  await page.evaluate(() => (window as unknown as { testTrack: MediaStreamTrack }).testTrack.dispatchEvent(new Event('ended')));
+  await expect(area.getByRole('alert')).toContainText('A gravação foi interrompida');
+  await expect(area.getByLabel('Prévia do áudio', { exact: true })).toBeVisible();
+  await expect(area.getByText(/Este áudio ainda não foi salvo no servidor/)).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { testTrack: MediaStreamTrack }).testTrack.readyState)).toBe('ended');
+});
+
+test('dois envios simultâneos do formulário criam um único registro', async ({ page }) => {
+  const { area } = await start(page);
+  let requests = 0;
+  page.on('request', r => { if (r.method() === 'POST' && r.url().endsWith('/api/v1/records')) requests++; });
+  await area.locator('form.workspace-form').evaluate((form: HTMLFormElement) => { form.requestSubmit(); form.requestSubmit(); });
+  await expect(area.locator('.workspace-detail')).toBeVisible();
+  expect(requests).toBe(1);
 });

@@ -1,0 +1,12 @@
+{
+  "id": "/",
+  "name": "SolDesk — Suporte com memória",
+  "short_name": "SolDesk",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F8F8F5",
+  "theme_color": "#F7C400",
+  "description": "Registro e acompanhamento de suporte técnico. Requer conexão com o servidor."
+}

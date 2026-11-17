@@ -724,3 +724,6 @@ footer {
 .knowledge-area .workspace-detail {
   overflow-wrap: anywhere;
 }
+.record-fields {
+  display: contents;
+}

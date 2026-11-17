@@ -38,6 +38,7 @@ export function AudioCapture({
   onBusy: (value: boolean) => void;
 }) {
   const [recording, setRecording] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [permission, setPermission] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");
@@ -51,16 +52,29 @@ export function AudioCapture({
   const stream = useRef<MediaStream | null>(null);
   const recognition = useRef<Recognition | null>(null);
   const mounted = useRef(true);
+  const captureLock = useRef(false);
+  const elapsed = useRef(0);
+  const fileInput = useRef<HTMLInputElement | null>(null);
   const liveRef = useRef(live);
   liveRef.current = live;
   const secure = window.isSecureContext;
   const supported =
     secure &&
     !!navigator.mediaDevices?.getUserMedia &&
-    typeof MediaRecorder !== "undefined";
+    typeof MediaRecorder !== "undefined" &&
+    typeof MediaRecorder.isTypeSupported === "function";
   const Speech =
     (window as SpeechWindow).SpeechRecognition ||
     (window as SpeechWindow).webkitSpeechRecognition;
+  useEffect(() => {
+    if (!recording && !permission && !file) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [recording, permission, file]);
   useEffect(() => {
     onBusy(recording || permission || liveRunning);
     return () => onBusy(false);
@@ -84,6 +98,8 @@ export function AudioCapture({
     return () => {
       mounted.current = false;
       recognition.current?.abort();
+      if (recorder.current && recorder.current.state !== "inactive")
+        recorder.current.stop();
       stream.current?.getTracks().forEach((track) => track.stop());
     };
   }, []);
@@ -97,18 +113,22 @@ export function AudioCapture({
     return () => URL.revokeObjectURL(url);
   }, [file]);
   useEffect(() => {
-    if (!recording) return;
-    const started = Date.now();
+    if (!recording || paused) return;
+    const started = performance.now();
+    const previous = elapsed.current;
     const timer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - started) / 1000);
-      setSeconds(elapsed);
-      if (elapsed >= maxSeconds && recorder.current?.state === "recording")
+      const duration = previous + (performance.now() - started) / 1000;
+      elapsed.current = duration;
+      setSeconds(Math.floor(duration));
+      if (duration >= maxSeconds && recorder.current?.state === "recording")
         recorder.current.stop();
     }, 250);
     return () => clearInterval(timer);
-  }, [recording, maxSeconds]);
+  }, [recording, paused, maxSeconds]);
 
   async function start() {
+    if (captureLock.current) return;
+    captureLock.current = true;
     setError("");
     setPermission(true);
     try {
@@ -123,12 +143,18 @@ export function AudioCapture({
         "audio/ogg;codecs=opus",
         "audio/mp4",
       ].find((value) => MediaRecorder.isTypeSupported(value));
-      const recording = new MediaRecorder(
-        input,
-        mime ? { mimeType: mime } : undefined,
-      );
+      if (!mime) throw new DOMException("", "NotSupportedError");
+      const recording = new MediaRecorder(input, { mimeType: mime });
       recorder.current = recording;
       const chunks: BlobPart[] = [];
+      let failed = false;
+      input.getAudioTracks().forEach((track) => {
+        track.onended = () => {
+          if (!mounted.current || recording.state === "inactive") return;
+          setError(s.interrupted);
+          recording.stop();
+        };
+      });
       recording.ondataavailable = (event) => {
         if (event.data.size) chunks.push(event.data);
       };
@@ -141,19 +167,39 @@ export function AudioCapture({
           : type.includes("ogg")
             ? "ogg"
             : "webm";
-        onFile(new File(chunks, `gravacao.${extension}`, { type }));
+        const result = new File(chunks, `gravacao.${extension}`, { type });
+        if (!failed && result.size) onFile(result);
+        else if (!failed) setError(s.emptyAudio);
         setRecording(false);
+        setPaused(false);
+        captureLock.current = false;
       };
       recording.onerror = () => {
+        failed = true;
         setError(s.microphoneError);
+        if (recording.state !== "inactive") recording.stop();
         input.getTracks().forEach((track) => track.stop());
         setRecording(false);
+        setPaused(false);
+        captureLock.current = false;
       };
+      onFile(null);
+      elapsed.current = 0;
       setSeconds(0);
+      setPaused(false);
       recording.start(1000);
       setRecording(true);
-    } catch {
-      setError(s.microphoneError);
+    } catch (err) {
+      stream.current?.getTracks().forEach((track) => track.stop());
+      captureLock.current = false;
+      const name = err instanceof DOMException ? err.name : "";
+      setError(
+        name === "NotFoundError"
+          ? s.noMicrophone
+          : name === "NotSupportedError"
+            ? s.badFormat
+            : s.microphoneError,
+      );
     } finally {
       setPermission(false);
     }
@@ -210,13 +256,36 @@ export function AudioCapture({
           <button
             type="button"
             disabled={!recording}
-            onClick={() => recorder.current?.stop()}
+            onClick={() => {
+              const active = recorder.current;
+              if (active && active.state !== "inactive") active.stop();
+            }}
           >
             {s.stop}
           </button>
+          {typeof MediaRecorder.prototype.pause === "function" &&
+            typeof MediaRecorder.prototype.resume === "function" && (
+              <button
+                type="button"
+                disabled={!recording}
+                onClick={() => {
+                  const active = recorder.current;
+                  if (!active || active.state === "inactive") return;
+                  try {
+                    if (active.state === "paused") active.resume();
+                    else active.pause();
+                    setPaused(active.state === "paused");
+                  } catch {
+                    setError(s.interrupted);
+                  }
+                }}
+              >
+                {paused ? s.resume : s.pause}
+              </button>
+            )}
           {recording && (
             <p role="status">
-              {s.recording}: {seconds} {s.seconds}
+              {paused ? s.paused : s.recording}: {seconds} {s.seconds}
             </p>
           )}
         </>
@@ -225,20 +294,37 @@ export function AudioCapture({
         {s.file}
         <input
           aria-label={s.file}
+          ref={fileInput}
           type="file"
           accept=".webm,.ogg,.opus,.mp4,.m4a,.aac,.wav,.mp3"
-          disabled={recording || permission}
-          onChange={(event) => onFile(event.target.files?.[0] || null)}
+          disabled={recording || permission || liveRunning}
+          onChange={(event) => {
+            const selected = event.target.files?.[0] || null;
+            setError("");
+            if (selected && !selected.size) {
+              setError(s.emptyAudio);
+              event.target.value = "";
+              onFile(null);
+            } else onFile(selected);
+          }}
         />
       </label>
       {preview && (
         <>
           <audio aria-label={s.preview} controls src={preview} />
-          <button type="button" onClick={() => onFile(null)}>
+          <p role="note">{s.previewHint}</p>
+          <button
+            type="button"
+            onClick={() => {
+              if (fileInput.current) fileInput.current.value = "";
+              onFile(null);
+            }}
+          >
             {s.cancel}
           </button>
         </>
       )}
+      {(recording || permission || file) && <p role="note">{s.unsaved}</p>}
       {liveAllowed ? (
         secure && Speech ? (
           <>

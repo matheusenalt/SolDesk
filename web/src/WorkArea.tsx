@@ -177,7 +177,23 @@ export function WorkArea({
   const [notices, setNotices] = useState<Notice[]>([]);
   const [unread, setUnread] = useState(0);
   const [noticeError, setNoticeError] = useState(false);
-  const creation = useRef<{ key: string; body: unknown } | null>(null);
+  const creation = useRef<{
+    key: string;
+    body: unknown;
+    recordId?: string;
+  } | null>(null);
+  const creationLock = useRef(false);
+  const [pendingCreation, setPendingCreation] = useState(false);
+  const [savedRecordId, setSavedRecordId] = useState("");
+  useEffect(() => {
+    if (!pendingCreation) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [pendingCreation]);
   const derivedKeys = useRef(new Map<string, string>());
   const formRef = useRef<HTMLFormElement>(null);
   const date = (value: string) =>
@@ -329,56 +345,89 @@ export function WorkArea({
   }
   function createSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (creationLock.current) return;
     const data = new FormData(event.currentTarget);
     const shouldSend =
       (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") !==
       "draft";
     void perform(async () => {
-      if (!creation.current) {
-        creation.current = {
-          key: crypto.randomUUID(),
-          body: {
-            client_id: clientId,
-            type: kind,
-            texto_original: get(data, "texto_original") || ms.audioOnly,
-            ...(liveText ? { ditado_texto: liveText } : {}),
-            ocorrido_em: occurrence(data),
-            capturado_em: new Date().toISOString(),
-            submit: shouldSend,
-            category: get(data, "category"),
-            system: get(data, "system"),
-            ...(kind === "chamado"
-              ? {
-                  assignee_id: get(data, "assignee_id") || userId,
-                  priority: get(data, "priority"),
-                }
-              : {}),
-          },
-        };
-      }
-      let item = await request<Entry>(
-        "/records",
-        "POST",
-        creation.current.body,
-        { "Idempotency-Key": creation.current.key },
-      );
-      if (audioFile) {
-        const current = await request<Entry>(`/records/${item.id}`);
-        const result = await uploadFile<{ record: Entry }>(
-          `/records/${item.id}/audio?revision=${current.revision}`,
-          audioFile,
+      creationLock.current = true;
+      try {
+        if (!creation.current) {
+          creation.current = {
+            key: crypto.randomUUID(),
+            body: {
+              client_id: clientId,
+              type: kind,
+              texto_original: get(data, "texto_original") || ms.audioOnly,
+              ...(liveText ? { ditado_texto: liveText } : {}),
+              ocorrido_em: occurrence(data),
+              capturado_em: new Date().toISOString(),
+              submit: shouldSend,
+              category: get(data, "category"),
+              system: get(data, "system"),
+              ...(kind === "chamado"
+                ? {
+                    assignee_id: get(data, "assignee_id") || userId,
+                    priority: get(data, "priority"),
+                  }
+                : {}),
+            },
+          };
+        }
+        let item = await request<Entry>(
+          "/records",
+          "POST",
+          creation.current.body,
+          { "Idempotency-Key": creation.current.key },
         );
-        item = result.record;
+        creation.current.recordId = item.id;
+        setSavedRecordId(item.id);
+        if (audioFile) {
+          const sendAudio = async () => {
+            const current = await request<Entry>(`/records/${item.id}`);
+            return uploadFile<{ record: Entry }>(
+              `/records/${item.id}/audio?revision=${current.revision}`,
+              audioFile,
+            );
+          };
+          try {
+            item = (await sendAudio()).record;
+          } catch (err) {
+            // O worker pode avançar a revisão entre leitura e upload. Reenviar
+            // os mesmos bytes uma vez preserva a deduplicação no servidor.
+            if (!(err instanceof ApiError) || err.status !== 409) throw err;
+            item = (await sendAudio()).record;
+          }
+        }
+        creation.current = null;
+        setPendingCreation(false);
+        setSavedRecordId("");
+        setAudioFile(null);
+        setLiveText("");
+        setOriginalText("");
+        formRef.current?.reset();
+        setSelected(item);
+        setVersions([]);
+        setTab("records");
+        setMessage(s.saved);
+      } catch (err) {
+        if (
+          creation.current &&
+          (pendingCreation ||
+            creation.current.recordId ||
+            !(err instanceof ApiError) ||
+            err.status >= 500)
+        ) {
+          setPendingCreation(true);
+        } else {
+          creation.current = null;
+          setPendingCreation(false);
+        }
+        throw err;
+      } finally {
+        creationLock.current = false;
       }
-      creation.current = null;
-      setAudioFile(null);
-      setLiveText("");
-      setOriginalText("");
-      formRef.current?.reset();
-      setSelected(item);
-      setVersions([]);
-      setTab("records");
-      setMessage(s.saved);
     }).catch(() => {});
   }
   async function recordAction(
@@ -432,6 +481,7 @@ export function WorkArea({
       {s.client}
       <select
         required
+        disabled={pendingCreation || busy}
         aria-label={s.client}
         value={clientId}
         onChange={(event) => {
@@ -571,114 +621,146 @@ export function WorkArea({
           className="workspace-form"
           onSubmit={createSubmit}
           onChange={() => {
-            creation.current = null;
+            if (!pendingCreation) creation.current = null;
           }}
         >
           <h4>{s.newRecord}</h4>
-          <label>
-            {s.destination}
-            <select
-              aria-label={s.destination}
-              value={kind}
-              onChange={(event) => setKind(event.target.value)}
-            >
-              {Object.entries(s.kinds).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {s.original}
-            <textarea
-              aria-label={s.original}
-              required={!audioFile}
-              name="texto_original"
-              maxLength={20000}
-              value={originalText}
-              onChange={(event) => setOriginalText(event.target.value)}
-            />
-          </label>
-          <label>
-            {s.occurred} · {timezone}
-            <input
-              type="datetime-local"
-              required
-              name="ocorrido_em"
-              value={occurred}
-              onChange={(e) => setOccurred(e.target.value)}
-            />
-          </label>
-          <details>
-            <summary>{s.explicitTime}</summary>
+          {pendingCreation && <p role="alert">{ms.retryUpload}</p>}
+          <fieldset
+            disabled={busy || pendingCreation}
+            className="record-fields"
+          >
             <label>
-              {s.explicitHint}
-              <input name="explicit_time" maxLength={40} />
+              {s.destination}
+              <select
+                aria-label={s.destination}
+                value={kind}
+                onChange={(event) => setKind(event.target.value)}
+              >
+                {Object.entries(s.kinds).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
             </label>
-          </details>
-          {kind === "chamado" && (
-            <>
+            <label>
+              {s.original}
+              <textarea
+                aria-label={s.original}
+                required={!audioFile}
+                name="texto_original"
+                maxLength={20000}
+                value={originalText}
+                onChange={(event) => setOriginalText(event.target.value)}
+              />
+            </label>
+            <label>
+              {s.occurred} · {timezone}
+              <input
+                type="datetime-local"
+                required
+                name="ocorrido_em"
+                value={occurred}
+                onChange={(e) => setOccurred(e.target.value)}
+              />
+            </label>
+            <details>
+              <summary>{s.explicitTime}</summary>
               <label>
-                {s.responsible}
-                <select
-                  aria-label={s.responsible}
-                  name="assignee_id"
-                  defaultValue={userId}
-                >
-                  {personOptions}
-                </select>
+                {s.explicitHint}
+                <input name="explicit_time" maxLength={40} />
               </label>
-              <label>
-                {s.priority}
-                <select
-                  aria-label={s.priority}
-                  name="priority"
-                  defaultValue="normal"
-                >
-                  {Object.entries(s.priorities).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
-          <label>
-            {s.category}
-            <input name="category" maxLength={80} />
-          </label>
-          <label>
-            {ins.system}
-            <input name="system" maxLength={80} />
-          </label>
-          <AudioCapture
-            file={audioFile}
-            onFile={(file) => {
-              setAudioFile(file);
-              creation.current = null;
-            }}
-            live={liveText}
-            onLive={(value) => {
-              setLiveText(value);
-              creation.current = null;
-            }}
-            onUseLive={() => {
-              setOriginalText(liveText);
-              creation.current = null;
-            }}
-            onBusy={setCaptureBusy}
-          />
+            </details>
+            {kind === "chamado" && (
+              <>
+                <label>
+                  {s.responsible}
+                  <select
+                    aria-label={s.responsible}
+                    name="assignee_id"
+                    defaultValue={userId}
+                  >
+                    {personOptions}
+                  </select>
+                </label>
+                <label>
+                  {s.priority}
+                  <select
+                    aria-label={s.priority}
+                    name="priority"
+                    defaultValue="normal"
+                  >
+                    {Object.entries(s.priorities).map(([key, value]) => (
+                      <option key={key} value={key}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            )}
+            <label>
+              {s.category}
+              <input name="category" maxLength={80} />
+            </label>
+            <label>
+              {ins.system}
+              <input name="system" maxLength={80} />
+            </label>
+            <AudioCapture
+              file={audioFile}
+              onFile={(file) => {
+                setAudioFile(file);
+                creation.current = null;
+              }}
+              live={liveText}
+              onLive={(value) => {
+                setLiveText(value);
+                creation.current = null;
+              }}
+              onUseLive={() => {
+                setOriginalText(liveText);
+                creation.current = null;
+              }}
+              onBusy={setCaptureBusy}
+            />
+          </fieldset>
           <button disabled={busy || !clientId || captureBusy} value="send">
             {s.submit}
           </button>
           <button
-            disabled={busy || !clientId || captureBusy || !!audioFile}
+            disabled={
+              busy || pendingCreation || !clientId || captureBusy || !!audioFile
+            }
             value="draft"
           >
             {s.draft}
           </button>
+          {savedRecordId && pendingCreation && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                void perform(async () => {
+                  const item = await request<Entry>(
+                    `/records/${savedRecordId}`,
+                  );
+                  creation.current = null;
+                  setPendingCreation(false);
+                  setSavedRecordId("");
+                  setAudioFile(null);
+                  setLiveText("");
+                  setOriginalText("");
+                  setSelected(item);
+                  setVersions([]);
+                  setTab("records");
+                })
+              }
+            >
+              {ms.openSaved}
+            </button>
+          )}
         </form>
       )}
       {tab === "history" && (
