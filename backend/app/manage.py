@@ -69,6 +69,7 @@ def migrate(settings):
         connection.execute("GRANT SELECT, INSERT ON audit_event TO soldesk_runtime")
         for table in (
             "record",
+            "attendance",
             "ticket",
             "ticket_sequence",
             "ticket_interval",

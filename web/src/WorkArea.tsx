@@ -8,11 +8,19 @@ import { uploadFile } from "./media-api";
 import { mediaStrings as ms } from "./media-strings";
 import { RelatedArticles } from "./KnowledgeArea";
 import { insightStrings as ins } from "./insight-strings";
+import { AttendanceArea } from "./AttendanceArea";
+import {
+  TextValidation,
+  ValidationQueue,
+  ValidationBadge,
+} from "./TextValidation";
+import { evolutionStrings as es } from "./evolution-strings";
 
 export type Entry = {
   id: string;
-  client_id: string;
-  client_name: string;
+  client_id: string | null;
+  client_name: string | null;
+  internal_activity: boolean;
   author_id: string;
   author_name: string;
   type: string;
@@ -330,7 +338,7 @@ export function WorkArea({
 
   useEffect(() => {
     if (!creationRequest) return;
-    setTab("new");
+    setTab("continuous");
     setSelected(null);
     setTicket(null);
     setOffset(0);
@@ -501,9 +509,10 @@ export function WorkArea({
   const recordCard = (item: Entry) => (
     <article key={item.id} className="work-card">
       <h4>
-        {item.client_name} · {label(s.kinds, item.type)}
+        {item.client_name || es.internal} · {label(s.kinds, item.type)}
       </h4>
       <p>{label(s.recordStates, item.status)}</p>
+      <ValidationBadge id={item.id} revision={item.revision} />
       <p>
         {s.author}: {item.author_name}
       </p>
@@ -563,6 +572,8 @@ export function WorkArea({
       {noticeError && <p role="alert">{s.notifyError}</p>}
       <nav className="workspace-tabs" aria-label={s.title}>
         {[
+          ["continuous", es.dashboard],
+          ["validation", es.pendingText],
           ["new", s.newRecord],
           ["records", s.myRecords],
           ["reviews", s.reviews],
@@ -587,6 +598,18 @@ export function WorkArea({
           </button>
         ))}
       </nav>
+      {tab === "continuous" && (
+        <AttendanceArea userId={userId} role={role} timezone={timezone} />
+      )}
+      {tab === "validation" && (
+        <ValidationQueue
+          onOpen={(id) =>
+            void perform(async () => {
+              setSelected(await request<Entry>(`/records/${id}`));
+            })
+          }
+        />
+      )}
       {(tab === "new" || tab === "history") && (
         <>
           <form
@@ -790,6 +813,7 @@ export function WorkArea({
           <button disabled={busy} onClick={() => void perform(() => load())}>
             {s.refresh}
           </button>
+          {tab === "reviews" && <p>{es.operationalOnly}</p>}
           {tab === "reviews" && (
             <button
               disabled={busy || !checked.length}
@@ -824,7 +848,7 @@ export function WorkArea({
           key={selected.id + ":" + selected.revision}
         >
           <h4>
-            {s.details} · {selected.client_name}
+            {s.details} · {selected.client_name || es.internal}
           </h4>
           <p>
             {label(s.recordStates, selected.status)} ·{" "}
@@ -847,6 +871,12 @@ export function WorkArea({
           <p>
             {s.original}: {selected.texto_original}
           </p>
+          <TextValidation
+            key={selected.id}
+            id={selected.id}
+            revision={selected.revision}
+            timezone={timezone}
+          />
           {selected.texto_organizado && (
             <p>
               {s.edited}: {selected.texto_organizado}

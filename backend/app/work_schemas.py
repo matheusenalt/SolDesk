@@ -31,7 +31,8 @@ class Occurrence(Input):
 
 
 class RecordCreate(Occurrence):
-    client_id: str = Field(min_length=36, max_length=36)
+    client_id: str | None = Field(default=None, min_length=36, max_length=36)
+    internal_activity: bool = False
     type: RecordType
     texto_original: str = Field(min_length=1, max_length=20000)
     capturado_em: AwareDatetime | None = None

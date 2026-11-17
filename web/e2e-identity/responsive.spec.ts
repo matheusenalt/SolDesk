@@ -69,9 +69,9 @@ test('gestão e fluxos existentes preservam layout, alvos de toque e foco nos do
   await keyboardFocus(page);
   await actions.getByRole('button', { name: 'Abrir atendimento', exact: true }).click();
   const work = page.getByRole('region', { name: 'Atendimentos', exact: true });
-  await expect(work.getByLabel('Relato original', { exact: true })).toBeVisible();
-  await work.getByLabel('Cliente', { exact: true }).selectOption(client.id);
-  await work.getByLabel('Destino', { exact: true }).selectOption('chamado');
+  await expect(work.getByLabel('Descrição do atendimento ou atualização', { exact: true })).toBeVisible();
+  await work.getByLabel('Cliente do atendimento', { exact: true }).selectOption(client.id);
+  await work.getByLabel('Modalidade do atendimento', { exact: true }).selectOption('em_andamento');
   await layout(page);
   if (info.project.name === 'mobile-web') {
     await page.setViewportSize({ width: 760, height: 900 });
@@ -81,7 +81,7 @@ test('gestão e fluxos existentes preservam layout, alvos de toque e foco nos do
   await page.screenshot({ path: info.outputPath('atendimento.png'), fullPage: true });
   await work.getByRole('button', { name: 'Meus registros', exact: true }).click();
   await actions.getByRole('button', { name: 'Abrir atendimento', exact: true }).click();
-  await expect(work.getByLabel('Relato original', { exact: true })).toBeVisible();
+  await expect(work.getByLabel('Descrição do atendimento ou atualização', { exact: true })).toBeVisible();
   await actions.getByRole('button', { name: 'Pesquisar', exact: true }).click();
   const knowledge = page.getByRole('region', { name: 'Base de Conhecimento', exact: true });
   await expect(knowledge.getByRole('button', { name: 'Pesquisar artigos', exact: true })).toBeVisible();
@@ -119,9 +119,9 @@ test('técnico acessa ações reais sem modalidades futuras ou controles adminis
     await expect(actions).toBeVisible();
     await expect(workspace.getByRole('button', { name: 'Equipe', exact: true })).toHaveCount(0);
     await actions.getByRole('button', { name: 'Abrir atendimento', exact: true }).click();
-    const destination = tech.getByLabel('Destino', { exact: true });
-    await expect(destination.locator('option')).toHaveCount(3);
-    expect(await destination.locator('option').evaluateAll(nodes => nodes.map(node => (node as HTMLOptionElement).value))).toEqual(['finalizacao', 'chamado', 'conhecimento']);
+    const destination = tech.getByLabel('Modalidade do atendimento', { exact: true });
+    await expect(destination.locator('option')).toHaveCount(2);
+    expect(await destination.locator('option').evaluateAll(nodes => nodes.map(node => (node as HTMLOptionElement).value))).toEqual(['finalizacao', 'em_andamento']);
     await layout(tech);
     await actions.getByRole('button', { name: 'Pesquisar', exact: true }).click();
     await expect(tech.getByText('Carregando dados…', { exact: true })).toBeHidden();

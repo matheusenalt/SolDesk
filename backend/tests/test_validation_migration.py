@@ -39,7 +39,7 @@ def test_upgrade_from_previous_preserves_legacy_and_two_tenants(pg_settings, mon
     engine = create_engine(migration_url)
     runtime = create_engine(runtime_url)
     try:
-        command.upgrade(config, "head")
+        command.upgrade(config, "0009")
         # Reversão somente com as tabelas novas vazias; nenhum dado de negócio apagado.
         command.downgrade(config, "0006a")
         organizations = []
@@ -91,6 +91,8 @@ def test_upgrade_from_previous_preserves_legacy_and_two_tenants(pg_settings, mon
                 db.execute(text("SELECT to_jsonb(r) FROM record r ORDER BY id")).scalars().all()
             )
         migrate(settings)
+        for row in before:
+            row["internal_activity"] = False
         with engine.connect() as db:
             assert (
                 db.execute(text("SELECT to_jsonb(r) FROM record r ORDER BY id")).scalars().all()
@@ -107,6 +109,23 @@ def test_upgrade_from_previous_preserves_legacy_and_two_tenants(pg_settings, mon
                 )
                 assert rows == [identifier]
                 assert db.scalar(text("SELECT count(*) FROM content_validation")) == 0
+        # O ciclo novo não converte atendimentos legados nem altera suas datas.
+        command.downgrade(config, "0009")  # Sem atendimento/atividade interna, reversão segura.
+        migrate(settings)  # Recriação também reaplica privilégios mínimos do runtime.
+        with engine.begin() as db:
+            assert db.scalar(text("SELECT count(*) FROM attendance")) == 0
+            for org, user, identifier in organizations:
+                db.execute(
+                    text(
+                        "INSERT INTO attendance(id,organization_id,assignee_id) "
+                        "VALUES (:id,:org,:user)"
+                    ),
+                    {"id": identifier, "org": org, "user": user},
+                )
+        for org, _user, identifier in organizations:
+            with runtime.begin() as db:
+                db.execute(text("SELECT set_config('app.organization_id',:org,true)"), {"org": org})
+                assert db.execute(text("SELECT id FROM attendance")).scalars().all() == [identifier]
         with pytest.raises(RuntimeError, match="preserve"):
             command.downgrade(config, "0006a")  # Guarda impede descartar versões importadas.
     finally:

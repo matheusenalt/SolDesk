@@ -49,3 +49,11 @@ Sessão legada: MobileRefreshToken, family_id (família de rotação), client_ki
 `renovacao_expira_em`; persistência usa expira_em/usado_em/revogado_em.
 instance_name é nome público da instalação; instance_id continua identidade,
 nunca credencial. Cliente nativo e painel QR descontinuados; termos da sessão legada preservados na API.
+
+## Atendimentos contínuos
+
+Attendance: ciclo operacional, com o ID do Record inicial. internal_activity é o
+marcador explícito e imutável de atividade interna; next_action é a próxima ação;
+retomada_em é o agendamento UTC e finalizado_em é a conclusão operacional, distintos
+de ocorrido_em. result é o resultado humano; assignee_id é o responsável atual.
+pending é calculado, sem alterar o estado gravado no vencimento.

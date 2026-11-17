@@ -456,7 +456,7 @@ def report(ctx, filters, instant=None, *, full_history=False):
         }
         for key, count in classifications.items()
     ]
-    client_counts = Counter(r.client_id for r in current)
+    client_counts = Counter(r.client_id for r in current if r.client_id is not None)
     active_ids = {action["ticket"] for action in selected_actions}
     ticket_counts = Counter(
         (t.category, t.system, t.priority) for t in tickets if t.id in active_ids
@@ -527,9 +527,11 @@ def report(ctx, filters, instant=None, *, full_history=False):
         "clients": [
             {"id": key, "name": clients[key], "records": value}
             for key, value in sorted(
-                client_counts.items(), key=lambda pair: (-pair[1], clients[pair[0]])
+                client_counts.items(),
+                key=lambda pair: (-pair[1], clients[pair[0]]),
             )
         ],
+        "internal_activities": sum(r.internal_activity for r in current),
         "article_consultations": article_views,
         "article_consultations_scope": "agregado_organizacao_sem_leitor"
         if ctx.membership.role != "tecnico" and not filters.responsible_id and not filters.team_id
@@ -544,7 +546,7 @@ def report(ctx, filters, instant=None, *, full_history=False):
                 {
                     "id": r.id,
                     "client_id": r.client_id,
-                    "client_name": clients[r.client_id],
+                    "client_name": clients.get(r.client_id),
                     "author_id": r.author_id,
                     "author_name": people[r.author_id],
                     "type": r.type,

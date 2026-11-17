@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -14,7 +14,8 @@ class Record(Base):
     __table_args__ = (UniqueConstraint("organization_id", "id"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     organization_id: Mapped[str] = mapped_column(ForeignKey("organization.id"), index=True)
-    client_id: Mapped[str] = mapped_column(ForeignKey("client.id"), index=True)
+    client_id: Mapped[str | None] = mapped_column(ForeignKey("client.id"), index=True)
+    internal_activity: Mapped[bool] = mapped_column(Boolean, default=False)
     author_id: Mapped[str] = mapped_column(ForeignKey("app_user.id"), index=True)
     type: Mapped[str] = mapped_column(String(24))
     texto_original: Mapped[str] = mapped_column(Text)
@@ -36,6 +37,21 @@ class Record(Base):
     ditado_texto: Mapped[str | None] = mapped_column(Text)
     category: Mapped[str] = mapped_column(String(80), default="")
     system: Mapped[str] = mapped_column(String(80), default="")
+
+
+class Attendance(Base):
+    """Ciclo operacional separado do conteúdo/revisão do registro existente."""
+
+    __tablename__ = "attendance"
+    id: Mapped[str] = mapped_column(ForeignKey("record.id"), primary_key=True)
+    organization_id: Mapped[str] = mapped_column(ForeignKey("organization.id"), index=True)
+    assignee_id: Mapped[str] = mapped_column(ForeignKey("app_user.id"), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="em_andamento")
+    next_action: Mapped[str] = mapped_column(Text, default="")
+    retomada_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    finalizado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    result: Mapped[str] = mapped_column(Text, default="")
+    revision: Mapped[int] = mapped_column(Integer, default=1)
 
 
 class RecordVersion(Base):

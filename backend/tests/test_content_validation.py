@@ -199,7 +199,10 @@ def test_async_processing_changes_exact_content_but_never_validates(world, kind)
     assert uploaded.status_code == 202, uploaded.text
     job = uploaded.json()["job"]
     assert job["status"] == "aguardando"
-    assert current(world.client, item)["status"] == "validado"  # O texto atual não mudou.
+    processing = current(world.client, item)
+    assert processing["status"] == "processando"
+    assert processing["version"]["id"] == before["id"]
+    assert processing["validations"]  # A revisão anterior é preservada durante o job.
     processed = media_tests.run(world, job)
     assert processed["jobs"][0]["status"] == "concluido"
     state = current(world.client, item)

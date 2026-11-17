@@ -17,6 +17,9 @@ Atualizado em 17/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
 - API de fidelidade independente: versão material/hash exatos, conferência por leitor
   autorizado, histórico imutável e pendências; interface específica ainda pendente.
 
+- API de atendimentos contínuos: mesmo ID, atualizações com datas próprias,
+  retomada, transferência e finalização; atividade interna sem cliente artificial.
+  Histórico, controle de revisão/idempotência e isolamento por empresa testados.
 ## Parcial ou com limitações
 
 - Paleta provisória, ações principais e responsividade ajustadas; **identidade
@@ -156,5 +159,77 @@ Não houve alteração de banco/serviço de produção, instalação de modelo o
 Limitações: interface, etiquetas e revisão individual na web ainda pendentes;
 histórico individual sem paginação. Legado começa sem validação neste eixo, mesmo
 quando já confirmado operacionalmente. Ícones/logo e testes físicos seguem pendentes.
-Sem nova dependência ou serviço. Implementação atual aguarda revisão,
-**sem commit/push próprio**. Não iniciada a Parte B.
+Sem nova dependência ou serviço. Parte A publicada no commit 2ba85f2 em 17/11/2026;
+push concluído e GitHub Actions aprovado. Parte B adiada por solicitação de avanço.
+
+## Atendimentos contínuos — dados/API (17/11/2026)
+
+Implementado: extensão operacional Attendance reutiliza Record/revisões/áudio;
+ciclo em_andamento/aguardando_retomada/finalizado, consulta de pendências vencidas,
+passagem de turno, resultado e atualizações preservadas. Finalizar não valida texto.
+Atividade interna funciona também na finalização existente; API e banco exigem
+cliente ou marcador interno. Relatórios aceitam cliente ausente sem inventar cadastro.
+Interface de atendimentos e interface de fidelidade independente seguem pendentes.
+
+| Verificação | Resultado |
+|---|---|
+| Backend completo com PostgreSQL/Redis/ffmpeg isolados | PASSOU: 93 testes, 1 aviso upstream Starlette/httpx |
+| Ciclo e migração focados | PASSOU: abertura, histórico, áudio/retry, permissões, conflitos e idempotência |
+| Migração 0010 / legado / duas empresas | PASSOU: fatos e revisões preservados; RLS nova tabela comprovada |
+| Reversão segura | PASSOU: extensão vazia reverte; existência de atendimento impede reversão antes de remover dados |
+| Ruff / formatação backend | PASSOU: 50 arquivos verificados |
+| ESLint / formatação / TypeScript / Vite | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Docker local | PASSOU: imagens reconstruídas, migração aditiva aplicada e serviços saudáveis; API anuncia attendances |
+| Navegador autenticado | PASSOU: 54 cenários (6,1 min); mais 6 focados após proteção final (1,2 min) |
+| Smoke público | PASSOU: 4 cenários, desktop e móvel emulado |
+| Reconhecimento real de fala | NÃO EXECUTADO: sem instalar modelo; mock e provedor controlado não comprovam ASR |
+| Interface nova | NÃO EXECUTADO: reservada à Parte B |
+
+Problemas corrigidos durante validação: invocação inicial de pytest fora do módulo
+não utilizava corretamente o código montado; padronizado python -m pytest.
+Teste de áudio passou a distinguir erro esperado do mock sem texto e sucesso de
+provedor controlado com retry. Teste de reversão recriava tabela sem reaplicar
+privilégios; corrigido para usar o comando de migração completo do projeto.
+Lint apontou ordem de import e linha longa, ambos corrigidos. Revisão final bloqueou
+derivação legada fora do ciclo; 19 testes focados PASSOU. Resultado completo
+backend final repetido após proteção: 93 PASSOU em 3 min 20 s, sem falhas ou skips. Nenhuma dependência nova; AGPL preservada.
+Sem mudança em produção, instalação de modelo ou deploy. Parte atual sem commit/push.
+
+Publicação anterior: [2ba85f2](https://github.com/matheusenalt/SolDesk/commit/2ba85f2622852ea84786b52ddbc11d986052b7ee),
+push concluído e [GitHub Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44111577983).
+Parte B da validação independente foi adiada por solicitação de avanço.
+
+Documentação: 126 links locais PASSOU. Revisão dos 21 arquivos alterados: nenhum
+padrão de segredo encontrado; stage vazio, licença oficial e exclusões preservados.
+Parte A pronta para revisão; Parte B não iniciada. Nenhum aceite automático de fase seguinte.
+
+## Interfaces de validação e atendimentos — situação atual
+
+Implementado: painel de atendimentos com listas paginadas de em andamento,
+aguardando retomada, finalizados recentes e pendências de passagem de turno;
+abertura por Finalização ou Em andamento, atividade interna explícita, atualização,
+transferência, próxima ação, retomada e conclusão. Texto e áudio usam o pipeline
+existente; reenvio preserva chave e registro salvo. Datas são exibidas no fuso da empresa.
+Fidelidade tem etiquetas, fila própria, versão exata, conferência individual sem
+pré-seleção, Validar agora/depois, histórico e recuperação de falhas. Outro leitor
+autorizado valida pela web. Correção exige nova conferência sem mudar o ciclo.
+Não existe botão de validação coletiva; confirmação operacional legada é independente.
+
+- PASSOU: 6 cenários novos focados em desktop e móvel emulado, inclusive resposta
+  perdida, outro leitor, erro recuperável e histórico após correção.
+- PASSOU: backend completo 93 testes, 1 aviso upstream; ESLint/formatação,
+  6 unitários web e TypeScript/Vite. Editor sem erros.
+- PASSOU: regressão completa final de navegador, 60 cenários, 4,7 min.
+- Sem migração adicional, dependência nova, serviço externo empresarial ou produção.
+- Limitações mantidas: mock não reconhece fala; ASR real, dispositivos físicos,
+  logo/ícones oficiais e instalação PWA não foram homologados nesta entrega.
+Esta seção substitui as pendências de interface das entregas anteriores.
+
+Na primeira regressão completa: 56 PASSOU / 4 FALHOU. As novas seleções não
+tinham nome acessível exato; corrigido com aria-label centralizado, sem reduzir
+as verificações. Repetição focada: 4 PASSOU em desktop/móvel. Suíte final: 60 PASSOU, sem falhas ou skips.
+
+Fechamento autorizado em 17/11/2026: interfaces 09B e 10B aprovadas pelos testes
+acima e incluídas no conjunto da etapa 10. Implementação validada, pronta para
+publicação pelo fluxo do projeto antes do catálogo. Demais limitações permanecem.

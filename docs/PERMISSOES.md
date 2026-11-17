@@ -119,3 +119,11 @@ e vínculo ativo. Server-info é público e não concede acesso; painel QR e app
 foram descontinuados. Login por token usa a primeira associação ativa; não há seleção
 de múltiplas empresas nesse fluxo. Conhecimento publicado exige revisão
 editorial autorizada. Não há serviço Cloud oficial embutido no produto.
+
+Atendimentos contínuos: gestão lê/altera dentro da empresa; técnico lê como autor
+ou responsável atual e altera como responsável. Autor conserva acesso ao ciclo e
+às atualizações posteriores à transferência; antigo responsável não autor mantém
+somente os próprios registros quando não participa mais do ciclo. Confirmação
+operacional do conteúdo não compartilha estes atendimentos com toda a empresa.
+Validação da fidelidade continua permitida ao leitor autorizado, sem conceder edição.
+RLS forçada e FKs compostas protegem Attendance; empresa vem da sessão no servidor.

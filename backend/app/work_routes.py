@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from sqlalchemy import func, select
 
 from app.access import context
@@ -20,6 +20,7 @@ from app.work import (
     ticket_query,
 )
 from app.work_models import (
+    Attendance,
     Notification,
     Record,
     RecordVersion,
@@ -157,7 +158,7 @@ def pending_text_validations(
         "items": [
             {
                 "record_id": item.id,
-                "status": "nao_validado",
+                "status": validation_data(ctx, item)["status"],
                 "version_id": (v.id if (v := latest_version(ctx, item.id)) else None),
             }
             for item in rows
@@ -230,8 +231,14 @@ def derive_record(
     ctx=Depends(context, scope="function"),
 ):
     source = find_record(ctx, identifier, body.revision)
+    cycle = ctx.db.scalar(
+        ctx.query(Attendance).where(Attendance.id.in_([source.id, source.origem_record_id]))
+    )
+    if cycle:
+        raise HTTPException(409, "Use as atualizações do atendimento para preservar seu ciclo")
     value = RecordCreate(
         client_id=source.client_id,
+        internal_activity=source.internal_activity,
         type=body.type,
         texto_original=source.texto_organizado or source.texto_original,
         ocorrido_em=source.ocorrido_em,

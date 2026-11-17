@@ -36,3 +36,13 @@ em [STATUS](../STATUS.md) e [operação de mídia](OPERACAO_MIDIA.md).
 A base de dados/API da validação independente foi implementada. A interface com
 ações individuais e etiquetas permanece pendente; a confirmação operacional
 legada continua funcionando e não equivale à nova validação de fidelidade.
+
+Atendimentos contínuos têm base de dados/API: mesmo ID, atualizações preservadas,
+retomada, transferência e resultado. Atividade interna dispensa cliente mediante
+marcador explícito. A interface dessa operação e a interface de validação independente
+continuam pendentes. Próxima entrega prevista: conectar o painel a estes contratos,
+mediante autorização; não considerar a experiência completa já disponível.
+
+Interfaces de validação independente e atendimentos contínuos implementadas na web.
+A abertura principal oferece Finalização e Em andamento; catálogos estruturados de
+sistemas são a próxima evolução autorizada, mantendo campos e histórico textuais.

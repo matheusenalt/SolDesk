@@ -64,10 +64,30 @@ def ticket_query(ctx):
 def record_query(ctx):
     query = ctx.query(Record)
     if ctx.membership.role == "tecnico":
+        from app.work_models import Attendance
+
+        assigned = select(Attendance.id).where(
+            Attendance.organization_id == ctx.organization_id,
+            Attendance.assignee_id == ctx.user.id,
+        )
+        attendance_roots = select(Attendance.id).where(
+            Attendance.organization_id == ctx.organization_id,
+        )
+        own_roots = select(Record.id).where(
+            Record.organization_id == ctx.organization_id,
+            Record.author_id == ctx.user.id,
+            Record.id.in_(attendance_roots),
+        )
         query = query.where(
             or_(
                 Record.author_id == ctx.user.id,
-                (Record.type == "finalizacao") & (Record.status == "confirmado"),
+                Record.id.in_(assigned),
+                Record.origem_record_id.in_(assigned),
+                Record.origem_record_id.in_(own_roots),
+                (Record.type == "finalizacao")
+                & (Record.status == "confirmado")
+                & ~Record.id.in_(attendance_roots)
+                & ~Record.origem_record_id.in_(attendance_roots).is_(True),
                 Record.ticket_id.in_(ticket_query(ctx).with_only_columns(Ticket.id)),
             )
         )
@@ -110,6 +130,7 @@ def record_data(ctx, item):
     fields = (
         "id",
         "client_id",
+        "internal_activity",
         "author_id",
         "type",
         "texto_original",
@@ -134,7 +155,7 @@ def record_data(ctx, item):
     )
     result = {field: getattr(item, field) for field in fields}
     result["author_name"] = ctx.db.get(User, item.author_id).name
-    result["client_name"] = ctx.get(Client, item.client_id).name
+    result["client_name"] = ctx.get(Client, item.client_id).name if item.client_id else None
     result["provisional"] = item.status not in {"confirmado", "publicado"}
     result["age_seconds"] = max(0, int((now() - item.enviado_em).total_seconds()))
     result["article_status"] = (
@@ -282,8 +303,12 @@ def send_record(ctx, request, item, assignee_id=None, priority="normal", categor
         notify(ctx, item.author_id, "registro_pronto_revisao", "record", item.id)
 
 
-def create_record(ctx, request, body, key=None, scope="records", source=None):
+def create_record(
+    ctx, request, body, key=None, scope="records", source=None, parent=None, allow_assignee=False
+):
     payload = body.model_dump(mode="json")
+    if not payload.get("internal_activity"):
+        payload.pop("internal_activity", None)
     if payload.get("ditado_texto") is None:
         payload.pop("ditado_texto", None)
     if not payload.get("system"):
@@ -309,7 +334,12 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
             if receipt.fingerprint != fingerprint:
                 raise HTTPException(409, "Idempotency-Key já usada com outro conteúdo")
             return find_record(ctx, receipt.record_id)
-    ctx.get(Client, body.client_id)
+    if not body.client_id and not body.internal_activity:
+        raise HTTPException(422, "Informe um cliente ou marque atividade interna")
+    if not body.client_id and body.type != "finalizacao":
+        raise HTTPException(422, "Esta modalidade exige cliente")
+    if body.client_id:
+        ctx.get(Client, body.client_id)
     from app.media import ensure_defaults
     from app.media_models import GlossaryTerm, TemplateVersion
     from app.transcription import RulesOrganizer, normalize_terms
@@ -332,20 +362,23 @@ def create_record(ctx, request, body, key=None, scope="records", source=None):
 
         if not media_preferences(ctx)["live_dictation_enabled"]:
             raise HTTPException(403, "Ditado ao vivo desabilitado pela organização")
-    if body.type != "chamado" and (body.assignee_id or body.priority != "normal"):
+    if body.type != "chamado" and (
+        (body.assignee_id and not allow_assignee) or body.priority != "normal"
+    ):
         raise HTTPException(422, "Responsável e prioridade são campos de chamado")
     received = now()
     occurred = source.ocorrido_em if source else body.ocorrido_em or received
     item = Record(
         organization_id=ctx.organization_id,
         client_id=body.client_id,
+        internal_activity=body.internal_activity,
         author_id=ctx.user.id,
         type=body.type,
         texto_original=body.texto_original,
         ocorrido_em=occurred,
         enviado_em=received,
         capturado_em=body.capturado_em,
-        origem_record_id=source.id if source else None,
+        origem_record_id=source.id if source else parent.id if parent else None,
         ditado_texto=body.ditado_texto,
         template_version_id=template.id,
         category=body.category,

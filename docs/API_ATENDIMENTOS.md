@@ -118,3 +118,75 @@ Reversão só é permitida com as tabelas novas vazias; com histórico, é bloqu
 antes de apagar dados. Não executar downgrade para descartar validações.
 A listagem de pendências é paginada; o histórico individual não tem paginação
 nesta versão. Interface específica de conferência e etiquetas permanece pendente.
+
+## Atendimentos contínuos e atividade interna
+
+Disponíveis na API, com migração `0010`; interface específica pendente.
+`Attendance` guarda o ciclo operacional usando o ID do registro inicial.
+Conteúdo reutiliza `Record`, `RecordVersion`, anexos, fila e validações por versão.
+Registros legados não são convertidos automaticamente.
+
+| Método e rota | Contrato |
+|---|---|
+| `POST /api/v1/attendances` | Abre; `Idempotency-Key` obrigatório, 8–128 caracteres |
+| `GET /api/v1/attendances` | Filtros `mine`, `pending`, `status`; `offset` e `limit` (1–100) |
+| `GET /api/v1/attendances/{id}` | Registro, atualizações e eventos; listas paginadas por `offset`/`limit` |
+| `POST /api/v1/attendances/{id}/updates` | Atualiza/transfere/finaliza; revisão e chave idempotente obrigatórias |
+
+Abertura: `client_id` ou `internal_activity=true`, categoria/sistema opcionais,
+`assignee_id` de integrante ativo (padrão: próprio usuário), `texto_original` e
+`ocorrido_em`. Atividade interna também funciona em `POST /api/v1/records` com
+`type=finalizacao`; chamado/conhecimento sem cliente continuam rejeitados.
+Banco e API exigem cliente ou marcador explícito. Nenhum cliente artificial é
+criado; relatórios separam `internal_activities` da lista de clientes.
+
+Atualização: `revision`, `texto_original`, `ocorrido_em`, `next_action`,
+`retomada_em` e `action` (`atualizar`, `transferir`, `finalizar`). Transferência
+exige `assignee_id`; finalização exige `result` não vazio e nenhuma retomada.
+Cada atualização cria registro ligado por `origem_record_id`, com ID próprio
+para áudio/revisão, preservando o ID do atendimento. Próxima ação ausente vira
+vazia; retomada ausente limpa o agendamento. Valores anteriores ficam nos eventos.
+Correções de texto usam versões; nunca substituem o relato original.
+A ação legada Derivar é recusada no registro inicial e nas atualizações do ciclo,
+evitando inserção de histórico fora do controle de revisão do atendimento.
+Conversão desses registros em outros fluxos fica para evolução posterior.
+
+Retomada deve ser futura: ciclo `aguardando_retomada`; sem ela, `em_andamento`.
+Ao vencer, `pending=true` inclui o atendimento sem transição automática.
+Finalizar produz `finalizado`/`finalizado_em`, preserva as datas dos fatos e não
+valida texto. Novas atualizações são recusadas com 409. Lock e revisão impedem
+perda de dados: envio obsoleto retorna 409. Retry com mesma chave/corpo recupera
+a atualização existente mesmo com revisão antiga; resposta traz o ciclo atual.
+
+Gestão consulta/altera na própria empresa; técnico consulta como autor ou
+responsável atual e altera somente como responsável. Autor mantém leitura após
+transferir, inclusive de atualizações posteriores. Antigo responsável não autor
+perde leitura do ciclo completo; autoria dos próprios registros é preservada.
+A regra de finalização confirmada compartilhada não libera atendimentos ou suas
+atualizações a técnicos sem acesso. RLS/FKs por empresa são obrigatórios;
+`organization_id` no corpo é rejeitado.
+
+Áudio: salvar descrição vazia e enviar para a rota de áudio do registro inicial
+ou da atualização. Cada registro usa as rotas de fidelidade existentes. Job ativo
+anuncia `processando`; após processamento, a versão fica `nao_validado` até
+conferência explícita, ou `validado` se o material atual já foi conferido.
+Validações anteriores são preservadas. Worker nunca altera o ciclo operacional.
+Mock não reconhece fala: fonte vazia produz erro recuperável, preservando registro
+e áudio. Reconhecimento real requer o provedor local já suportado; não foi instalado
+nem medido nesta implementação. Testes com provedor controlado não comprovam ASR real.
+
+Upgrade preserva fatos/versões. Downgrade somente sem atendimentos nem registros
+internos/sem cliente; caso contrário bloqueia antes de remover estrutura.
+Usar o comando de migração do projeto, que também reaplica privilégios do runtime.
+Evidências: [ciclo](../backend/tests/test_attendance.py),
+[migração/legado/RLS](../backend/tests/test_validation_migration.py) e
+[validação](../backend/tests/test_content_validation.py).
+
+## Interface disponível
+
+A web oferece painel paginado do ciclo, abertura/atualização por texto ou áudio,
+atividade interna, próxima ação/retomada, transferência e resultado. Fila de
+fidelidade e revisão individual usam as rotas acima; validar depois preserva o
+registro e não altera a resolução. Etiquetas identificam o estado da fidelidade.
+Testes reais de interface em [evolution.spec.ts](../web/e2e-identity/evolution.spec.ts).
+As menções anteriores à interface pendente descrevem o estado da entrega de API.

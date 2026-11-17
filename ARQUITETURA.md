@@ -206,9 +206,29 @@ Ticket recebe comentário posterior sem mudar estado. Horários originais imutá
 Retenção padrão manter; políticas explícitas removem áudio elegível com auditoria.
 Detalhes, limites e contratos: [API](docs/API_MIDIA.md).
 
+## Atendimentos contínuos
+
+Atendimentos contínuos reutilizam `Record`, revisões, anexos e processamento.
+`Attendance` é uma extensão operacional: responsável, revisão, estado, próxima
+ação, retomada e resultado. A separação impede que transcrição finalize/reabra o
+ciclo ou que finalização valide o texto. O ID é o do registro inicial; atualizações
+são registros ligados por `origem_record_id`, com fato e revisão próprios.
+Transferências/transições usam auditoria existente. Migração `0010` adiciona
+RLS forçada, FKs por empresa e marcador interno para ausência de cliente.
+Sem serviço ou dependência nova. [Contrato](docs/API_ATENDIMENTOS.md).
+
 ## Licenciamento do código
 
 Código próprio sob GNU AGPL v3 somente (`AGPL-3.0-only`). Componentes terceiros
 mantêm suas licenças; inventário, condições de redistribuição e limites da revisão
 em [docs/LICENCAS.md](docs/LICENCAS.md). A arquitetura permite instalações próprias
 e hospedagem comercial, sujeitas à licença e às obrigações de fonte correspondente.
+
+## Interface dos ciclos independentes
+
+AttendanceArea reaproveita estilos e componentes de áudio. Ações principais abrem
+Finalização/Em andamento; painel mostra listas paginadas e atualizações com histórico.
+TextValidation/ValidationQueue consultam a versão material no servidor e validam
+somente após conferência explícita. Conflito/rede mostram erro sem fabricar sucesso;
+retry de atendimento mantém a chave e recupera o registro antes de reenviar áudio.
+Textos novos estão centralizados em evolution-strings.ts; não há cache offline.

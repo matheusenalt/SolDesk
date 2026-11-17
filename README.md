@@ -53,6 +53,11 @@ e navegador: [TESTE_LOCAL.md](TESTE_LOCAL.md). Para desenvolvimento com reload:
 
 ## Estado e documentação
 
+Atendimentos contínuos disponíveis na web e API: atualizações datadas, próxima ação,
+retomada, transferência e finalização com mesmo ID/histórico. Atividade interna
+também aceita finalização sem cliente artificial. Interface específica pendente;
+contratos e limites em [API de atendimentos](docs/API_ATENDIMENTOS.md).
+
 - [Funciona agora, parcial, planejado e testes executados](STATUS.md).
 - [Arquitetura](ARQUITETURA.md), [visão](docs/VISAO.md) e [evolução](docs/ROADMAP.md).
 - [Instalação](docs/INSTALACAO.md), [mídia](docs/OPERACAO_MIDIA.md),

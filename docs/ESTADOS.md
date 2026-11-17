@@ -137,3 +137,13 @@ de sucesso local antes da resposta da API. Finalização exige confirmação do 
 conhecimento continua editorial no painel. Captura e envio não trocam o horário
 do fato por revisão/publicação. Falha de rede permite reenvio manual idempotente
 na mesma tela; não é uma fila offline persistente.
+
+## Ciclo de atendimentos contínuos
+
+Abrir inicia em_andamento. Atualização com retomada futura passa a
+aguardando_retomada; sem retomada volta a em_andamento. Vencimento somente torna
+pending verdadeiro, sem transição automática. Finalizar exige resultado e produz
+finalizado, impedindo novas atualizações. Horário do fato e validação do texto
+continuam independentes. Job de áudio nunca muda Attendance. Fidelidade anuncia
+processando durante job ativo, preserva eventos anteriores e depois avalia a
+validação da versão material atual. Ciclo disponível na API; painel ainda pendente.

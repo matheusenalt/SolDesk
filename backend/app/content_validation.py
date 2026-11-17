@@ -55,6 +55,9 @@ def capture_version(ctx, record, event):
         ),
     }
     canonical = json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    if record.internal_activity:
+        content["record"]["internal_activity"] = True
+        canonical = json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     previous = latest_version(ctx, record.id)
     if previous and previous.canonical_snapshot == canonical:
         return
@@ -81,8 +84,15 @@ def validation_data(ctx, record):
         )
     )
     source = ctx.get(RecordVersion, version.source_version_id) if version else None
+    processing = ctx.db.scalar(
+        ctx.query(AudioJob).where(
+            AudioJob.record_id == record.id, AudioJob.status.in_(["aguardando", "processando"])
+        )
+    )
     return {
-        "status": "validado"
+        "status": "processando"
+        if processing
+        else "validado"
         if version and any(v.version_id == version.id for v in history)
         else "nao_validado",
         "version": {
