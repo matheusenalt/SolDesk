@@ -2,7 +2,7 @@
 @import "./tokens.css";
 
 .workspace {
-  margin: 36px 0;
+  margin: 28px 0;
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -38,10 +38,53 @@
   min-height: 100px;
 }
 .workspace button {
-  color: var(--on-primary);
-  background: var(--primary);
+  color: var(--text);
+  background: var(--panel);
   border: 1px solid var(--control-border);
   padding: 10px 14px;
+}
+.workspace-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
+  border-block: 1px solid var(--border);
+}
+.workspace-actions button {
+  min-width: 180px;
+  font-weight: 650;
+}
+.workspace-actions .primary-action {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.workspace-actions p {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.shell:has(.workspace-actions) .hero {
+  padding: 18px 0 0;
+}
+.shell:has(.workspace-actions) .hero h1 {
+  font-size: 30px;
+  margin: 10px 0;
+  letter-spacing: -1px;
+}
+.shell:has(.workspace-actions) .hero .eyebrow,
+.shell:has(.workspace-actions) .hero .lead,
+.shell:has(.workspace-actions) .hero .intro,
+.shell:has(.workspace-actions) .next {
+  display: none;
+}
+.workspace-tabs button[aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--text);
+  border-inline-start: 3px solid var(--accent);
+  font-weight: 650;
+}
+.workspace button:hover:not(:disabled) {
+  border-color: var(--text);
 }
 .workspace button:disabled {
   opacity: 0.65;
@@ -56,9 +99,38 @@
   margin: 18px 0;
 }
 .workspace-toolbar form {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+.workspace-toolbar label {
+  flex: 1 1 200px;
+}
+.workspace-toolbar > label {
+  max-width: 100%;
+}
+.workspace label:has(input[type="checkbox"]),
+.workspace label:has(input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 10px;
+  cursor: pointer;
+}
+.workspace input[type="checkbox"],
+.workspace input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.workspace a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  overflow-wrap: anywhere;
 }
 .workspace-list {
   display: grid;
@@ -134,6 +206,7 @@ body {
   background: var(--surface);
   color: var(--text);
   font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 button,
@@ -144,10 +217,25 @@ a {
   color: inherit;
   text-decoration: none;
 }
+button,
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea,
+summary {
+  min-height: 44px;
+}
 button {
+  min-width: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font: inherit;
   cursor: pointer;
   border-radius: var(--radius-xl);
+}
+summary {
+  padding-block: 10px;
+  cursor: pointer;
 }
 :focus-visible {
   outline: 3px solid var(--text);
@@ -173,16 +261,9 @@ button {
   font-size: 26px;
   font-weight: 750;
   letter-spacing: -1px;
-}
-.sun {
-  background: var(--primary);
-  color: var(--on-primary);
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 28px;
+  border-inline-start: 5px solid var(--primary);
+  padding-inline-start: 12px;
+  min-height: 44px;
 }
 nav {
   display: grid;
@@ -241,8 +322,8 @@ header {
   border: 1px solid var(--control-border);
   background: var(--panel);
   color: var(--text);
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   font-size: 22px;
 }
 .hero {
@@ -279,50 +360,6 @@ h1 {
   max-width: 420px;
   position: relative;
   z-index: 1;
-}
-.hero-art {
-  position: absolute;
-  right: -25px;
-  top: 20px;
-  width: 290px;
-  height: 290px;
-  opacity: 0.9;
-}
-.orbit {
-  border: 1px solid var(--border);
-  position: absolute;
-  border-radius: 50%;
-}
-.one {
-  inset: 15px;
-}
-.two {
-  inset: 45px;
-}
-.orb {
-  position: absolute;
-  inset: 80px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: var(--on-primary);
-  display: grid;
-  place-items: center;
-  font-size: 80px;
-  transform: rotate(-15deg);
-}
-.spark {
-  position: absolute;
-  font-size: 36px;
-  color: var(--text);
-}
-.spark.a {
-  top: 45px;
-  left: 50px;
-}
-.spark.b {
-  right: 35px;
-  bottom: 50px;
-  font-size: 22px;
 }
 .connection {
   background: var(--panel);
@@ -462,10 +499,6 @@ footer {
   line-height: 1.8;
 }
 @media (max-width: 1150px) {
-  .hero-art {
-    opacity: 0.3;
-    right: -100px;
-  }
   .connection-top {
     flex-direction: column;
   }
@@ -498,23 +531,18 @@ footer {
   .sidebar-foot {
     display: none;
   }
-  nav {
+  .sidebar nav {
     display: none;
   }
   main {
     width: 100%;
-    padding: 0 22px;
+    padding: 0 16px;
   }
   header {
     height: 70px;
   }
   .hero {
     padding: 40px 0 30px;
-  }
-  .hero-art {
-    opacity: 0.2;
-    top: 0;
-    right: -130px;
   }
   .lead {
     font-size: 17px;
@@ -535,7 +563,50 @@ footer {
     grid-column: auto;
   }
   .connection {
-    padding: 21px;
+    padding: 18px;
+  }
+  .workspace {
+    padding: 16px;
+  }
+  .workspace-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .workspace-actions button {
+    min-width: 0;
+    width: 100%;
+  }
+  .workspace-toolbar,
+  .workspace-toolbar form {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .workspace-toolbar label {
+    flex: initial;
+  }
+  .workspace-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .workspace-tabs button {
+    min-width: 0;
+    width: 100%;
+  }
+  .workspace-form {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace .insight-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-detail,
+  .workspace-list article,
+  .audio-capture,
+  .audio-review,
+  .file-panel {
+    padding: 12px;
   }
   h1 {
     font-size: 39px;

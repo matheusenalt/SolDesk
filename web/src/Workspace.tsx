@@ -109,6 +109,8 @@ function Situation({ value = "ativo" }: { value?: string }) {
 export function Workspace() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [creationRequest, setCreationRequest] = useState(0);
+  const [searchRequest, setSearchRequest] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -417,19 +419,78 @@ export function Workspace() {
           </>
         ) : (
           <>
+            <div
+              className="workspace-actions"
+              aria-label={s.actions}
+              role="group"
+            >
+              <button
+                type="button"
+                className="primary-action"
+                disabled={busy}
+                onClick={() => {
+                  setWorkClient(undefined);
+                  setSourceFocus(undefined);
+                  setCreationRequest((value) => value + 1);
+                  setTab("work");
+                }}
+              >
+                {s.openRecord}
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                aria-describedby="knowledge-search-hint"
+                onClick={() => {
+                  setArticleId(undefined);
+                  setSearchRequest((value) => value + 1);
+                  setTab("knowledge");
+                }}
+              >
+                {s.searchKnowledge}
+              </button>
+              <p id="knowledge-search-hint">{s.searchHint}</p>
+            </div>
             <nav className="workspace-tabs" aria-label={s.title}>
-              <button onClick={() => setTab("clients")}>{s.clients}</button>
+              <button
+                aria-current={tab === "clients" ? "page" : undefined}
+                onClick={() => setTab("clients")}
+              >
+                {s.clients}
+              </button>
               {profile.role !== "tecnico" && (
-                <button onClick={() => setTab("team")}>{s.team}</button>
+                <button
+                  aria-current={tab === "team" ? "page" : undefined}
+                  onClick={() => setTab("team")}
+                >
+                  {s.team}
+                </button>
               )}
-              <button onClick={() => setTab("settings")}>{s.settings}</button>
-              <button disabled={busy} onClick={() => setTab("work")}>
+              <button
+                aria-current={tab === "settings" ? "page" : undefined}
+                onClick={() => setTab("settings")}
+              >
+                {s.settings}
+              </button>
+              <button
+                aria-current={tab === "work" ? "page" : undefined}
+                disabled={busy}
+                onClick={() => setTab("work")}
+              >
                 {workStrings.title}
               </button>
-              <button disabled={busy} onClick={() => setTab("knowledge")}>
+              <button
+                aria-current={tab === "knowledge" ? "page" : undefined}
+                disabled={busy}
+                onClick={() => setTab("knowledge")}
+              >
                 {insightStrings.knowledge}
               </button>
-              <button disabled={busy} onClick={() => setTab("reports")}>
+              <button
+                aria-current={tab === "reports" ? "page" : undefined}
+                disabled={busy}
+                onClick={() => setTab("reports")}
+              >
                 {insightStrings.reports}
               </button>
             </nav>
@@ -812,11 +873,12 @@ export function Workspace() {
               initialClient={workClient}
               hidden={tab !== "work"}
               focus={sourceFocus}
+              creationRequest={creationRequest}
               onArticle={navigateArticle}
             />
             {tab === "knowledge" && (
               <KnowledgeArea
-                key={profile.organization_id}
+                key={profile.organization_id + ":" + searchRequest}
                 userId={profile.id}
                 role={profile.role}
                 timezone={organization?.timezone || "America/Sao_Paulo"}

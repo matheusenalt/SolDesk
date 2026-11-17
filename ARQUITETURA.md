@@ -5,6 +5,9 @@
 SolDesk usa uma única interface React responsiva para computador e navegador
 móvel. Android/iOS nativos foram descontinuados. Não há pipeline nativo nem
 painel de conexão por deep link; gravação e anexos continuam no navegador.
+Tokens centralizados geram a paleta provisória; abas e formulários existentes
+servem desktop/celular. Ações principais abrem o registro atual ou a pesquisa
+editorial, sem nova rota de negócio. Logo oficial e identidade definitiva pendentes.
 
 A migração aplicada `0006a` é preservada: `client_kind`, MobileRefreshToken,
 RLS por usuário/empresa e hashes de tokens não foram removidos nem alterados.

@@ -22,3 +22,8 @@ a uma empresa externa. Sem OCR, app nativo ou produção implícitos nesse plane
 Importação/sincronização futura precisa de identidade externa única, procedência,
 conflitos explícitos e proteção dos campos locais; ausência na fonte não autoriza exclusão.
 Logo, regras de validação/aceite, retenção e plataformas homologadas dependem de decisão.
+
+Situação visual atual: paleta provisória, ações principais e responsividade
+ajustadas e testadas localmente. A identidade definitiva ainda depende da logo
+oficial; não foram criados ícones PWA nem substituto da marca. Ver
+[identidade](IDENTIDADE_SOL.md) e [estado real](../STATUS.md).

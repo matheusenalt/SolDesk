@@ -17,6 +17,9 @@ Atualizado em 16/11/2026. SolDesk Web responsivo; Android/iOS nativos descontinu
 
 ## Parcial ou com limitações
 
+- Paleta provisória, ações principais e responsividade ajustadas; **identidade
+  definitiva pendente da logo oficial**, não localizada. Nenhuma logo foi recriada.
+  Ver [identidade e medições](docs/IDENTIDADE_SOL.md).
 - Mock reutiliza texto humano; **não reconhece fala**. faster-whisper opcional existe,
   mas inferência/qualidade/desempenho reais não foram homologados.
 - Finalização exige cliente; validação pelo autor segue acoplada ao ciclo do registro.
@@ -37,19 +40,23 @@ Detalhes e decisões: [visão](docs/VISAO.md) e [evolução](docs/ROADMAP.md).
 
 ## Validação e publicação
 
-Saneamento documental validado localmente em 16/11/2026, após separar instruções
-operacionais de relatórios históricos e preservar contratos com nomes por domínio.
-Foi retirado um comentário redundante; código executável e JavaScript gerado não mudaram.
+Paleta provisória e responsividade validadas localmente em 16/11/2026. Mesmos
+componentes React, sem novo frontend ou modalidades de negócio. Ações destacadas
+abrem o formulário existente e pesquisam artigos publicados; não há busca global.
+Identidade definitiva não concluída: depende do arquivo oficial da logo.
 
 | Verificação executada | Resultado |
 |---|---|
 | Backend PostgreSQL/Redis/ffmpeg isolados | PASSOU: 72 testes; 1 aviso de depreciação Starlette/httpx |
 | Unitários web | PASSOU: 6 testes; também executados entre os grupos de limpeza |
-| Navegador autenticado | PASSOU: 32 cenários Edge desktop/emulação móvel, sem skips |
+| Navegador autenticado | PASSOU: 36 cenários Edge desktop/emulação móvel, sem skips |
 | Instalação pública | PASSOU: 4 cenários desktop/emulação móvel |
 | Ruff/ESLint, formatação, TypeScript e build | PASSOU |
-| Contraste e documentação | PASSOU: 32 pares WCAG e 127 destinos locais de links |
-| Preservação de escopo | PASSOU: backend, migrações, testes, dependências, licenças e infraestrutura sem alteração |
+| Contraste e foco | PASSOU: 32 pares WCAG; foco sólido 3 px/afastamento 4 px, navegação Tab e contraste nos dois temas |
+| Responsividade | PASSOU: alvos visíveis ≥44 × 44 px, formulários móveis em uma coluna, sem overflow da página; gestão/técnico, 360/760 px e desktop |
+| Documentação | PASSOU: destinos locais dos links existentes |
+| Preservação de escopo | PASSOU: backend, migrações, testes de segurança, dependências, licenças e infraestrutura sem alteração |
+| Marca oficial | NÃO VERIFICÁVEL (arquivo da logo ausente); paleta e nome textual são provisórios |
 
 Restauração completa, inferência real, dispositivo físico e produção:
 **NÃO EXECUTADO nesta validação**. Instruções documentadas não representam homologação.
@@ -57,5 +64,8 @@ Restauração completa, inferência real, dispositivo físico e produção:
 Descontinuação nativa publicada em [feed935](https://github.com/matheusenalt/SolDesk/commit/feed935fb553d8346fddfa80672206bd9eabab05).
 [GitHub Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43979286026)
 para esse commit. Migrações até `0006a` e controles de API preservados; Android
-anterior não foi aprovado, foi descontinuado. Saneamento documental validado
-localmente e aguardando aprovação, **sem commit/push próprio**.
+anterior não foi aprovado, foi descontinuado. Saneamento documental publicado em
+[eba2566](https://github.com/matheusenalt/SolDesk/commit/eba2566429dad36bb380e679b4f47f72b2709218),
+com [Actions aprovado](https://github.com/matheusenalt/SolDesk/actions/runs/43982343154).
+Paleta/responsividade atuais aguardam revisão, **sem commit/push próprio**;
+não declarar a identidade definitiva concluída sem a logo oficial.

@@ -9,6 +9,9 @@ test('conexão real, identidade, temas e layout responsivo', async ({ page, requ
   await expect(page.getByText(info.instance_id)).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Suporte com memória.');
   const originalTheme = await page.locator('html').getAttribute('data-theme');
+  const themeTarget = await page.getByRole('button', { name: 'Alternar tema' }).boundingBox();
+  expect(themeTarget?.width).toBeGreaterThanOrEqual(44);
+  expect(themeTarget?.height).toBeGreaterThanOrEqual(44);
   await page.getByRole('button', { name: 'Alternar tema' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', originalTheme === 'dark' ? 'light' : 'dark');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();

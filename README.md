@@ -3,6 +3,8 @@
 Plataforma web independente e open source de suporte técnico, com clientes,
 histórico, chamados, áudio/anexos privados, conhecimento revisado e relatórios.
 Uma interface React responsiva para computador e celular; Android/iOS nativos descontinuados.
+Paleta e navegação em evolução; a [identidade definitiva](docs/IDENTIDADE_SOL.md)
+depende do arquivo oficial da logo, ainda não localizado.
 
 **Estado:** núcleo web funcional e testado localmente; não homologado para produção.
 Use somente dados fictícios. O mock padrão NÃO reconhece fala; transcrição real,

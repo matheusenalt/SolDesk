@@ -36,9 +36,6 @@ function App() {
     <div className="shell">
       <aside className="sidebar">
         <a className="brand" href="#inicio">
-          <span className="sun" aria-hidden="true">
-            ☀
-          </span>
           {s.product}
         </a>
         <nav aria-label={s.overview}>
@@ -73,14 +70,8 @@ function App() {
           <h1 id="welcome">{s.tagline}</h1>
           <p className="lead">{s.subtitle}</p>
           <p className="intro">{s.intro}</p>
-          <div className="hero-art" aria-hidden="true">
-            <div className="orbit one" />
-            <div className="orbit two" />
-            <div className="orb">☀</div>
-            <span className="spark a">✦</span>
-            <span className="spark b">✦</span>
-          </div>
         </section>
+        <Workspace />
         <section
           className="connection"
           id="instalacao"
@@ -132,7 +123,6 @@ function App() {
             </div>
           )}
         </section>
-        <Workspace />
         <section className="next" aria-labelledby="next-title">
           <div className="section-title">
             <h2 id="next-title">{s.future}</h2>

@@ -330,6 +330,7 @@ export function KnowledgeArea({
         ].map(([key, label]) => (
           <button
             key={key}
+            aria-current={tab === key ? "page" : undefined}
             disabled={busy}
             onClick={() => {
               setTab(key);

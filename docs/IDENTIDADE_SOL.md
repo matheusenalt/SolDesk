@@ -1,43 +1,49 @@
-# Identidade Sol
+# Identidade Sol — aplicação provisória
 
-Fonte única: [tokens.json](tokens.json). Execute `python scripts/tokens.py` para
-gerar CSS web; `--check` detecta deriva e mede contraste.
+**Logo oficial não localizada no projeto em 16/11/2026. Identidade definitiva pendente.**
+Não foi criada outra logo. A interface usa o nome SolDesk em texto; símbolos de sol
+antes usados como marca provisória foram retirados. Não há ícones PWA nem app nativo.
 
-## Paleta oficial recebida
+## Fonte única e paleta
 
-| Nome | HEX |
-|---|---|
-| zinc-50 | #fafafa |
-| zinc-200 | #e4e4e7 |
-| zinc-950 | #09090b |
-| sol-gold | #f1a502 |
-| sol-orange | #e45825 |
-| sol-cream | #fbf8f2 |
+[tokens.json](tokens.json) é a fonte da paleta; `python scripts/tokens.py` gera
+[tokens.css](../web/src/tokens.css). `--check` detecta deriva e mede contraste.
 
-`--spacing: 0.25rem` e `--radius-xl: 0.75rem` preservados. CSS usa `@theme`
-do Tailwind v4. Tema claro: surface creme, panel zinc-50, texto zinc-950,
-primary dourado, accent laranja e borda decorativa zinc-200. Tema escuro:
-surface zinc-950 e panel zinc-900, textos zinc-50 e zinc-300.
+| Token | Cor provisória | Uso |
+|---|---|---|
+| sol-gold | #F7C400 | Ação principal e destaque moderado |
+| sol-orange | #FF7A00 | Detalhe decorativo na navegação ativa, com sublinhado de alto contraste e aria-current |
+| sol-black | #0B0B0B | Texto claro e superfície do tema escuro |
+| sol-cream | #F8F8F5 | Superfície clara |
+| white | #FFFFFF | Painéis claros |
 
-## Extensões — não vêm da paleta Sol
+Espaçamento 0,25rem e raio 0,75rem preservados; Tailwind v4 e componentes React
+existentes reaproveitados. Escalas zinc/feedback são extensões semânticas, não logo.
+Os valores deverão ser conferidos com o arquivo oficial antes de concluir a identidade.
 
-Escala zinc padrão Tailwind: 900 #18181b, 800 #27272a, 600 #52525b,
-400 #a1a1aa, 300 #d4d4d8. Usada em superfícies, texto secundário e contornos.
-As bordas zinc-200/800 são decorativas; limites de controles interativos usam
-`control-border` zinc-600/400 com contraste de pelo menos 3:1.
+## Contraste e acessibilidade
 
-Feedback: sucesso green-800 #166534 / green-300 #86efac; erro red-800 #991b1b /
-red-300 #fca5a5; aviso amber-800 #92400e / amber-300 #fcd34d; informação
-blue-800 #1e40af / blue-300 #93c5fd (claro/escuro). Essas cores são apenas tokens
-de estado, sempre acompanhados por ícone e texto, sem depender só de cor.
-Todos os textos de feedback superam 4,5:1 sobre surface e panel nos dois temas.
+Medições do gerador: preto sobre amarelo **12,04:1**, sobre laranja **7,53:1**;
+texto sobre superfície clara **18,50:1**, sobre painel branco **19,68:1**.
+Menor par de texto/feedback: **6,66:1**; contorno interativo mínimo: **6,91:1**.
+São 32 pares nos temas claro/escuro, acima de 4,5:1 para texto e 3:1 para contornos.
+Não usar texto pequeno amarelo/branco sobre amarelo ou laranja.
+Laranja sobre branco não atinge 3:1; por isso não é o único indicador de seleção.
+A aba ativa tem sublinhado na cor do texto do tema, negrito e estado acessível.
 
-## Contraste
+Foco visível: contorno sólido de 3 px, afastamento de 4 px; cor de texto do tema.
+O teste navega com Tab e mede espessura, afastamento e contraste no navegador,
+nos dois temas. Feedback continua com texto/ícone, sem depender somente de cor.
+Botões/controles têm alvo mínimo de 44 × 44 px; checkbox/radio usam o label como alvo.
 
-Zinc-950 sobre dourado: 9,59:1; sobre laranja: 5,42:1; sobre creme: 18,77:1.
-Texto de ações é escuro. Branco sobre dourado/laranja e texto corrente dourado
-ou laranja sobre creme são proibidos. Acentos só em preenchimentos ou detalhes.
-Foco de teclado tem contorno de texto; respeitar preferência de movimento reduzido.
-O teste calcula todos os pares de texto/feedback e contornos de controles usados;
-falha abaixo de 4,5:1 para texto e 3:1 para limites interativos. Não substitui QA
-de teclado, leitor de tela e layout. A interface web utiliza os valores gerados em computadores e celulares.
+## Responsividade e navegação
+
+Mesma interface para desktop e celular, formulários em uma coluna até 760 px,
+abas com quebra, campos sem largura mínima que estoure a página e controles de áudio
+preservados. Tabelas extensas mantêm contêiner de rolagem próprio, sem alargar a página.
+Ações destacadas: **Abrir atendimento** (formulário existente) e **Pesquisar**
+(artigos publicados, explicitamente identificado; não é busca global).
+Somente finalização, chamado e conhecimento são oferecidos, conforme a API atual.
+
+Testes autenticados e dispositivos efetivamente verificados: [STATUS](../STATUS.md).
+Emulação e screenshots não homologam aparelho físico, leitor de tela ou Safari/iOS.

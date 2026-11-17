@@ -91,6 +91,7 @@ type Props = {
   timezone: string;
   initialClient?: string;
   hidden?: boolean;
+  creationRequest?: number;
   focus?: { id: string; ticket: boolean };
   onArticle: (id: string) => void;
 };
@@ -138,6 +139,7 @@ export function WorkArea({
   hidden,
   focus,
   onArticle,
+  creationRequest,
 }: Props) {
   const [tab, setTab] = useState(initialClient ? "history" : "new");
   const [busy, setBusy] = useState(false);
@@ -309,6 +311,14 @@ export function WorkArea({
       }
     });
   }, [focus, hidden]);
+
+  useEffect(() => {
+    if (!creationRequest) return;
+    setTab("new");
+    setSelected(null);
+    setTicket(null);
+    setOffset(0);
+  }, [creationRequest]);
 
   function occurrence(data: FormData) {
     const explicit = get(data, "explicit_time");
@@ -514,6 +524,7 @@ export function WorkArea({
         ].map(([key, title]) => (
           <button
             key={key}
+            aria-current={tab === key ? "page" : undefined}
             disabled={busy}
             onClick={() => {
               setTab(key);

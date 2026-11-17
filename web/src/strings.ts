@@ -47,6 +47,10 @@ export const strings = {
 } as const;
 export const workspaceStrings = {
   title: "Área da organização",
+  actions: "Ações principais",
+  openRecord: "Abrir atendimento",
+  searchKnowledge: "Pesquisar",
+  searchHint: "Pesquise procedimentos publicados na base de conhecimento.",
   login: "Entrar",
   email: "E-mail",
   password: "Senha",
