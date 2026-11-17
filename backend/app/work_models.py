@@ -99,6 +99,7 @@ class Ticket(SystemFields, Base):
     aberto_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     resolvido_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     encerrado_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    prazo_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class TicketParticipant(Base):

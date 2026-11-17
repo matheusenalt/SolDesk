@@ -144,3 +144,14 @@ Autor mantém consulta após transferir, sem manter permissão de operação por
 Técnicos atribuem a pessoas ativas ou equipes das quais participam. Origem exige
 permissão de consulta na criação; possuir tarefa vinculada não concede acesso à
 origem. Histórico segue a visibilidade atual da tarefa. [Contrato](API_TAREFAS.md).
+
+## Calendário
+
+A projeção aplica permissões de cada fonte antes da seleção/paginação; filtro por
+responsável/equipe não concede acesso adicional. Eventos próprios são consultados
+por autor, responsável, participantes ativos ou gestão da organização. Participante
+não edita; autor, responsável ou gestão editam e cancelam. Removido o participante,
+seu vínculo fica inativo e a consulta é revogada, salvo outro papel autorizado.
+Prazo de chamado só é alterado por responsável ou gestão, com revisão/auditoria
+existentes. Sem credencial por ID, link público ou integração externa.
+[Contrato](API_CALENDARIO.md).

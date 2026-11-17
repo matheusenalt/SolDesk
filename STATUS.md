@@ -327,3 +327,59 @@ temporárias sobrepostas com outra execução. Repetição com saída independen
 4 PASSOU, sem alterar verificações da interface. Os testes de navegador cobrem
 fluxos existentes; a nova API de tarefas é comprovada pelos testes do backend.
 Parte A testada e pronta para revisão; etapa completa ainda depende da Parte B.
+
+## Calendário interno — Parte A, 17/11/2026
+
+**Funciona agora:** consulta unificada por intervalo de datas sobre tarefas,
+prazos opcionais de chamados, retomadas de atendimentos e eventos próprios.
+Projeção direta, com IDs por fonte, vínculo à origem e sem copiar registros.
+Permissões de cada fonte aplicadas antes da seleção e paginação; sem acesso
+adicional por filtro. Eventos próprios têm responsável, participantes autorizados,
+cliente opcional, edição, cancelamento, revisões e reenvio idempotente.
+
+**Datas:** dia inteiro é data civil; horários são instantes UTC com offset na
+entrada e data local no fuso da organização. Intervalo de consulta tem fim exclusivo,
+até 93 dias; eventos com duração usam sobreposição, sem repetir versões/participantes.
+Chamados não tinham prazo no código anterior: acrescentado somente prazo_em opcional,
+editável por responsável/gestão com revisão e auditoria, sem mudar fatos anteriores.
+
+**Parcial/planejado:** interface 13B (visões mensal/semanal/diária, grade acessível,
+filtros e formulários) pendente; interfaces 11B/12B continuam pendentes. CalDAV,
+Nextcloud, ICS e notificações novas não implementados. Nenhuma etapa 14 iniciada.
+
+| Validação executada | Resultado |
+|---|---|
+| Backend focado: calendário/migração/tarefas/atendimentos/chamados | PASSOU: 52 testes, 66,06 s |
+| Backend completo isolado PostgreSQL/Redis/ffmpeg | PASSOU: 140 testes, 181,04 s, sem falhas/skips; 1 aviso upstream Starlette/httpx |
+| Migração 0013 com duas organizações fictícias | PASSOU: fontes preservadas; RLS; reversão vazia e guardas de agenda/prazos |
+| Volume e paginação | PASSOU: 8.000 itens fictícios; 16 resultados únicos no intervalo de dois dias; páginas sem sobreposição |
+| EXPLAIN real com RLS/usuário restrito | PASSOU: índices temporais usados nas quatro fontes; planos no contrato |
+| Ruff/formatação Python e editor | PASSOU: 66 arquivos; editor sem erros |
+| Tokens/contraste | PASSOU: 32 pares e tokens consistentes |
+| ESLint/formatação/TypeScript/Vite | PASSOU |
+| Unitários web | PASSOU: 6 testes |
+| Docker local de desenvolvimento | PASSOU: imagens reconstruídas; migração aplicada; API anuncia calendar; API/worker saudáveis |
+
+Testes iniciais: 8 PASSOU/2 FALHOU por preparação duplicada do mesmo cliente fictício;
+corrigido o helper do calendário. Rodada seguinte: 12 PASSOU/1 FALHOU por um trecho
+de teste inserido na função errada; corrigido sem remover a cobertura de revogação
+de participante. Lint corrigiu imports e linhas SQL longas. Resultado focado e
+completo acima foram executados após essas correções.
+
+Sem dependência nova, modelo instalado ou serviço externo empresarial. Nenhum banco
+de produção, deploy ou configuração de produção alterado. AGPL oficial preservada.
+ASR real, dispositivos físicos, logo/PWA e restauração homologada continuam não
+verificados nesta entrega. [Contrato, fontes, índices e EXPLAIN](docs/API_CALENDARIO.md).
+
+Publicação anterior: [cc2405b](https://github.com/matheusenalt/SolDesk/commit/cc2405b8c7da00ac4de10f02f9ba1398e1e74352),
+Parte 12A aprovada por Matheus ao solicitar 13; push concluído e
+[GitHub Actions PASSOU](https://github.com/matheusenalt/SolDesk/actions/runs/44161501878).
+A etapa 13 atual permanece sem commit/push, aguardando revisão.
+
+Fechamento da Parte A: PASSOU, 20 cenários autenticados de regressão desktop/móvel
+emulado (1,3 min) e 4 públicos (19,4 s). Esses cenários cobrem fluxos existentes;
+a nova API da agenda está coberta pelos testes do backend. Documentação: 166 links
+locais PASSOU. Revisão dos 21 candidatos, diff --check, exclusões locais e stage
+vazio conferidos; nenhum padrão de segredo ou scaffold encontrado, locks intactos.
+Parte A pronta para revisão; a interface permanece pendente e a etapa completa
+depende da Parte B. Nenhuma aprovação automática de etapa posterior.

@@ -87,3 +87,10 @@ A API oferece tarefas internas ou ligadas a clientes, sistemas, atendimentos e
 chamados, com responsável/equipe, datas e histórico independente. Conclusão simples
 não exige revisão editorial. A interface específica está pendente.
 Consulte o [contrato de tarefas](docs/API_TAREFAS.md).
+
+## Calendário interno
+
+A API unifica tarefas, prazos opcionais de chamados e retomadas de atendimentos,
+com eventos próprios da agenda. Consulta por intervalo, sem copiar as fontes e
+com as permissões de cada origem. Interface de calendário ainda pendente.
+[Contrato, índices e EXPLAIN executado](docs/API_CALENDARIO.md).

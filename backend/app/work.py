@@ -240,6 +240,7 @@ def ticket_snapshot(item):
         "aberto_em",
         "resolvido_em",
         "encerrado_em",
+        "prazo_em",
         "system_id",
         "system_name_snapshot",
         "legacy_system_snapshot",
@@ -548,12 +549,18 @@ def transition_ticket(ctx, item, target):
 
 def change_ticket(ctx, request, item, body):
     operate_ticket(ctx, item, closing=body.status == "encerrado")
+    if "prazo_em" in body.model_fields_set:
+        operate_ticket(ctx, item)
     if any(
         getattr(body, field) is not None and getattr(body, field) != getattr(item, field)
         for field in ("assignee_id", "priority", "category", "system")
     ):
         operate_ticket(ctx, item)
     before = ticket_snapshot(item)
+    if "prazo_em" in body.model_fields_set:
+        from datetime import UTC
+
+        item.prazo_em = body.prazo_em.astimezone(UTC) if body.prazo_em else None
     if "system_id" in body.model_fields_set:
         operate_ticket(ctx, item)
         from app.system_routes import select_system
@@ -638,6 +645,7 @@ def ticket_data(ctx, item):
         "aberto_em",
         "resolvido_em",
         "encerrado_em",
+        "prazo_em",
         "system_id",
         "system_name_snapshot",
         "legacy_system_snapshot",

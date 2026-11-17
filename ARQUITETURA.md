@@ -262,3 +262,19 @@ idempotência transacional com bloqueio por chave e revisão da tarefa. Ambas s�
 append-only. A migração 0012 acrescenta RLS forçada, FKs por empresa e índices;
 reversão bloqueada se houver dados novos. Sem dependência, fila ou serviço novo.
 [Contrato](docs/API_TAREFAS.md). Interface, recorrência e notificações novas pendentes.
+
+## Calendário como projeção
+
+A agenda consulta Task, Ticket.prazo_em e Attendance.retomada_em, com UNION ALL
+de seleções já limitadas pelo contexto e pelas permissões de origem. O namespace
+de ID distingue fontes sem juntar versões/participantes, evitando duplicidade.
+Não persiste cópias das origens. Filtros de intervalo usam limites com o fuso da
+organização; datas civis não são transformadas em instantes. Eventos com duração
+são selecionados por sobreposição com fim exclusivo.
+
+CalendarEvent guarda somente eventos próprios. CalendarParticipant controla
+participação ativa; CalendarVersion e CalendarReceipt preservam alterações e
+reenvios. RLS forçada e FKs compostas protegem empresa/atores. Migração 0013 adiciona
+índices temporais parciais e o prazo opcional ausente no Ticket anterior, sem
+backfill ou alteração dos fatos. API usa paginação e janela máxima de 93 dias.
+Sem dependência ou serviço novo. [Contrato e planos reais](docs/API_CALENDARIO.md).

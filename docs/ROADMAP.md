@@ -61,3 +61,11 @@ fuso, criação rápida e histórico independente. Conclusão direta sem aprova�
 Pendente: interface de Minhas tarefas/equipe, filtros visuais e resumo na home.
 Calendário, recorrência e notificações novas não fazem parte desta entrega.
 [Contrato e testes](API_TAREFAS.md); [resultados executados](../STATUS.md).
+
+## Calendário: dados e API
+
+Projeção por intervalo sobre tarefas, prazos e retomadas, com eventos próprios,
+permissões herdadas, fusos e paginação. Testes de milhares de itens e EXPLAIN
+executado documentados no [contrato](API_CALENDARIO.md).
+Pendente: visões mensal/semanal/diária, grade acessível, navegação e formulários web.
+CalDAV/Nextcloud, ICS e notificações não implementados; integração futura opcional.

@@ -92,7 +92,7 @@ def test_upgrade_preserves_legacy_and_enforces_task_tenants(pg_settings, monkeyp
         with pytest.raises(RuntimeError, match="preserve"):
             command.downgrade(config, "0011")
         with engine.connect() as db:
-            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0012"
+            assert db.scalar(text("SELECT version_num FROM alembic_version")) == "0013"
             assert (
                 db.execute(text("SELECT to_jsonb(r) FROM record r ORDER BY id")).scalars().all()
                 == before

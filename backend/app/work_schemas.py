@@ -90,6 +90,7 @@ class Derive(Input):
 
 class TicketEdit(Input):
     revision: int = Field(ge=1)
+    prazo_em: AwareDatetime | None = None
     status: TicketState | None = None
     assignee_id: str | None = Field(default=None, min_length=36, max_length=36)
     priority: Priority | None = None

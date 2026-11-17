@@ -130,39 +130,46 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "instance_id": instance_id,
             "instance_name": settings.soldesk_instance_name,
             "mobile_protocol_version": 1
-            if revision in {"0006a", "0009", "0010", "0011", "0012"}
+            if revision in {"0006a", "0009", "0010", "0011", "0012", "0013"}
             else None,
             "mode": settings.soldesk_mode,
             "capabilities": ["health", "server_info"]
             + (
                 ["auth", "organizations", "clients", "audit"]
                 if revision
-                in {"0002", "0003", "0004", "0005", "0006a", "0009", "0010", "0011", "0012"}
+                in {"0002", "0003", "0004", "0005", "0006a", "0009", "0010", "0011", "0012", "0013"}
                 else []
             )
             + (
                 ["records", "tickets", "notifications"]
-                if revision in {"0003", "0004", "0005", "0006a", "0009", "0010", "0011", "0012"}
+                if revision
+                in {"0003", "0004", "0005", "0006a", "0009", "0010", "0011", "0012", "0013"}
                 else []
             )
             + (
                 ["attachments", "audio", "templates"]
-                if revision in {"0004", "0005", "0006a", "0009", "0010", "0011", "0012"}
+                if revision in {"0004", "0005", "0006a", "0009", "0010", "0011", "0012", "0013"}
                 else []
             )
             + (
                 ["knowledge", "search", "reports"]
-                if revision in {"0005", "0006a", "0009", "0010", "0011", "0012"}
+                if revision in {"0005", "0006a", "0009", "0010", "0011", "0012", "0013"}
                 else []
             )
-            + (["mobile_auth"] if revision in {"0006a", "0009", "0010", "0011", "0012"} else [])
-            + (["text_validation"] if revision in {"0009", "0010", "0011", "0012"} else [])
-            + (["attendances"] if revision in {"0010", "0011", "0012"} else [])
-            + (["systems"] if revision in {"0011", "0012"} else [])
-            + (["tasks"] if revision == "0012" else []),
+            + (
+                ["mobile_auth"]
+                if revision in {"0006a", "0009", "0010", "0011", "0012", "0013"}
+                else []
+            )
+            + (["text_validation"] if revision in {"0009", "0010", "0011", "0012", "0013"} else [])
+            + (["attendances"] if revision in {"0010", "0011", "0012", "0013"} else [])
+            + (["systems"] if revision in {"0011", "0012", "0013"} else [])
+            + (["tasks"] if revision in {"0012", "0013"} else [])
+            + (["calendar"] if revision == "0013" else []),
         }
 
     from app.attendance_routes import router as attendance_router
+    from app.calendar_routes import router as calendar_router
     from app.knowledge_routes import router as knowledge_router
     from app.media_routes import router as media_router
     from app.mobile_routes import router as mobile_router
@@ -177,6 +184,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(system_router)
     app.include_router(task_router)
     app.include_router(attendance_router)
+    app.include_router(calendar_router)
     app.include_router(media_router)
     app.include_router(knowledge_router)
     app.include_router(report_router)

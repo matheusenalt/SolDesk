@@ -197,3 +197,10 @@ chamados e atendimentos aceitam filtro pelo mesmo campo, limitado à empresa e a
 escopo autorizado. Atualizações e derivados herdam os instantâneos históricos do
 registro de origem quando não há nova seleção explícita. O texto legado permanece.
 Consulte o [contrato do catálogo](API_SISTEMAS.md) para inativação e reconciliação.
+
+## Agenda e prazos
+
+Retomadas de atendimentos aparecem na [projeção do calendário](API_CALENDARIO.md),
+sem cópia de registros. Chamados aceitam `prazo_em` opcional em PATCH com revisão
+atual e autorização de responsável/gestão. Instante exige offset explícito; null
+remove o prazo. A mudança é versionada/auditada e não altera horários anteriores.

@@ -75,3 +75,13 @@ pending é calculado, sem alterar o estado gravado no vencimento.
 - `agendado_em`: instante opcional com fuso na entrada e UTC no banco.
 - `concluido_em` / `cancelado_em`: instantes de encerramento da tarefa.
 - `pendente`, `em_andamento`, `concluida`, `cancelada`: estados de tarefa.
+
+## Calendário
+
+- `CalendarEvent`: evento próprio da agenda; não é cópia de uma origem.
+- `CalendarParticipant`: participação ativa no evento, limitada à organização.
+- `CalendarVersion`: histórico imutável de revisões do evento.
+- `CalendarReceipt`: recibo imutável de idempotência de mutações da agenda.
+- `data`: data civil de evento de dia inteiro; nos eventos com horário, data da criação/edição no fuso da empresa.
+- `inicio_em` / `fim_em`: instantes UTC; fim opcional e exclusivo.
+- `prazo_em`: prazo UTC opcional de chamado, independente dos horários do fato.
